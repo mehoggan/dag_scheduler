@@ -1,0 +1,168 @@
+import java.util.regex.Pattern
+import org.apache.tools.ant.taskdefs.condition.Os
+import groovy.io.FileType
+
+apply plugin: 'java'
+apply plugin: 'cpp'
+
+repositories {
+  jcenter()
+  mavenCentral()
+}
+
+dependencies {
+  testCompile "junit:junit:4.12"
+  compile 'org.apache.commons:commons-math3:3.6.1'
+}
+
+def lib_base_path = "${projectDir}${File.separator}" +
+        "..${File.separator}..${File.separator}..${File.separator}"
+def lib_include_dir = "${lib_base_path}" + "include"
+def lib_linker_path = "${lib_base_path}build" + "${File.separator}lib"
+def jvm_lib_path = "${projectDir}${File.separator}" +
+        "build${File.separator}libs${File.separator}u_dagtasks_jni" +
+        "${File.separator}shared"
+def jni_base_path =  "${projectDir}${File.separator}" +
+        "src${File.separator}"  + "main${File.separator}" + "jni"
+
+task cleanJniHeaders(dependsOn: compileJava) {
+    doLast {
+        def classpath = sourceSets.main.output.classesDir
+        def list = []
+
+        classpath.eachFileRecurse(FileType.FILES) {
+            file -> list << file
+        }
+
+        list.each {
+            def inClass = it.path.substring(
+                    it.path.lastIndexOf("com")).replace('/', '.').replace(
+                    ".class", "")
+            println "Removing files associated with ${inClass}."
+            def parts = inClass.split("\\.")
+            def outPath = "${jni_base_path}${File.separator}" +
+                    parts[parts.size() - 2] + "${File.separator}" +
+                    parts[parts.size() - 1] + "_jni.h"
+            file("${outPath}").delete()
+            file(it.path).delete()
+        }
+    }
+}
+
+task generateJniHeaders(dependsOn: compileJava) {
+    doLast {
+        def classpath = sourceSets.main.output.classesDir
+        def list = []
+
+        classpath.eachFileRecurse(FileType.FILES) {
+            file -> list << file
+        }
+
+        list.each {
+            def inClass = it.path.substring(
+                    it.path.lastIndexOf("com")).replace('/', '.').replace(
+                    ".class", "")
+            println "Generating jni header for ${inClass}."
+            def parts = inClass.split("\\.")
+            def outPath = "${jni_base_path}${File.separator}" +
+                    parts[parts.size() - 2] + "${File.separator}" +
+                    parts[parts.size() - 1] + "_jni.h"
+            def rtclasspath = sourceSets.main.runtimeClasspath.asPath
+            def includes = "${lib_include_dir}"
+
+            def args_list = ["-classpath",
+                    "${rtclasspath}",
+                    "-o",
+                    "${outPath}",
+                    "${inClass}"]
+
+            println ":Running > javah " + args_list.join(" ")
+            exec {
+                executable "javah"
+                args args_list
+            }
+        }
+    }
+}
+
+task copyLibs(type: Copy) {
+    description = "Copies output of cmake build into same directory as " +
+        " the jni built library."
+    from "${lib_linker_path}"
+    into "${jvm_lib_path}"
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+      println "Os is OsX"
+      include("**/*.dylib*")
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+      println "Os is Unix"
+      include("**/*.so*")
+    }
+}
+
+compileJava.dependsOn copyLibs
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", "${jvm_lib_path}"
+}
+
+task buildJni {
+    model {
+        repositories {
+            libs(PrebuiltLibraries) {
+                jdk {
+                    headers.srcDirs "${System.properties['java.home']}/../include",
+                      "${System.properties['java.home']}/../include/win32",
+                      "${System.properties['java.home']}/../include/darwin",
+                      "${System.properties['java.home']}/../include/linux"
+                }
+            }
+        }
+        components {
+            u_dagtasks_jni(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            lib library: 'jdk', linkage: 'api'
+                            srcDir "src/main/jni"
+                            include "**/*.cpp"
+                        }
+                    }
+                }
+                binaries {
+                    all {
+                        if (toolChain in Gcc) {
+                            println "Compiling for gcc."
+                            cppCompiler.args "--std=c++11",
+                                "-I", "${lib_base_path}",
+                                "-I", "${lib_base_path}${File.separator}include",
+                                "-I", "${jni_base_path}",
+                                "-I", "/usr/local/include/eigen3",
+                                "-Wall", "-Werror"
+                            linker.args "-L", "${lib_linker_path}", "-lu_dagtasks",
+                                "-Wl,-rpath,${lib_linker_path}"
+                        } else if (toolChain in Clang) {
+                            println "Compiling for clang."
+                            cppCompiler.args "--std=c++11",
+                                "-I", "${lib_base_path}",
+                                "-I", "${lib_base_path}${File.separator}include",
+                                "-I", "${jni_base_path}",
+                                "-I", "/usr/local/include/eigen3",
+                                "-Wall", "-Werror"
+                            linker.args "-L", "${lib_linker_path}", "-lu_dagtasks",
+                                "-Wl,-rpath,${lib_linker_path}"
+                        } else {
+                            throw GradleException("Tool chain " + toolChain +
+                                " is not supported.")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
