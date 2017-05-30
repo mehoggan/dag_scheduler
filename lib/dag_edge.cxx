@@ -13,6 +13,7 @@ namespace uber
     dag_edge::~dag_edge()
     {
       current_status_ = status::non_traverable;
+      connection_.reset();
     }
 
     dag_edge::dag_edge(dag_edge &&other)
@@ -38,8 +39,9 @@ namespace uber
       return (*this);
     }
 
-    void dag_edge::update_status_to(const status &)
+    std::weak_ptr<dag_vertex> dag_edge::get_connection()
     {
+      return connection_;
     }
 
     bool dag_edge::connect_to(std::shared_ptr<dag_vertex> v)
@@ -52,7 +54,6 @@ namespace uber
       }
 
       connection_ = v;
-      // TODO: Test this.
       if (!connection_.expired()) {
         connection_.lock()->add_incomming_edge();
       }
@@ -71,7 +72,7 @@ namespace uber
       return ret;
     }
 
-    const uuid &dag_edge::uuid() const
+    const uuid &dag_edge::get_uuid() const
     {
       return uuid_;
     }
@@ -116,6 +117,24 @@ namespace uber
       connection_.reset();
 
       return (*this);
+    }
+
+    std::ostream &operator<<(std::ostream &out, const dag_edge &e)
+    {
+      out << "uuid_ = " << e.uuid_ << " current_status_ = "
+        << "(" << e.current_status_as_string() << ")";
+
+      return out;
+    }
+
+    bool operator==(const dag_edge &lhs, const dag_edge &rhs)
+    {
+      return lhs.uuid_.as_string() == rhs.uuid_.as_string();
+    }
+
+    bool operator!=(const dag_edge &lhs, const dag_edge &rhs)
+    {
+      return !(lhs.uuid_.as_string() == rhs.uuid_.as_string());
     }
   }
 }

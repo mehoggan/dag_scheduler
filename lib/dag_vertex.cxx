@@ -13,12 +13,13 @@ namespace uber
     dag_vertex::dag_vertex(const std::string &label) :
       current_status_(status::initialized),
       label_(label),
-      connected_to_count_(0)
+      incomming_edge_count_(0)
     {}
 
     dag_vertex::~dag_vertex()
     {
       current_status_ = status::invalid;
+      incomming_edge_count_.store(0);
     }
 
     dag_vertex::dag_vertex(dag_vertex &&other)
@@ -27,17 +28,24 @@ namespace uber
       current_status_ = other.current_status_;
       label_ = std::move(other.label_);
       edges_ = std::move(other.edges_);
+      incomming_edge_count_ = other.incomming_edge_count_.load();
+
+      other.label_.clear();
       other.current_status_ = status::invalid;
+      other.incomming_edge_count_.store(0ul);
     }
 
     dag_vertex &dag_vertex::operator=(dag_vertex &&rhs)
     {
       uuid_ = std::move(rhs.uuid_);
       current_status_ = rhs.current_status_;
-      label_ = rhs.label_;
       label_ = std::move(rhs.label_);
       edges_ = std::move(rhs.edges_);
+      incomming_edge_count_ = rhs.incomming_edge_count_.load();
+
+      rhs.label_.clear();
       rhs.current_status_ = status::invalid;
+      rhs.incomming_edge_count_.store(0ul);
 
       return (*this);
     }
@@ -62,10 +70,6 @@ namespace uber
       assert(index < edge_count());
 
       return (*edges_[index]);
-    }
-
-    void dag_vertex::update_status_to(const status &)
-    {
     }
 
     bool dag_vertex::contains_connection_to(const dag_vertex &other)
@@ -98,7 +102,7 @@ namespace uber
       return ret;
     }
 
-    const uuid &dag_vertex::uuid() const
+    const uuid &dag_vertex::get_uuid() const
     {
       return uuid_;
     }
@@ -154,20 +158,34 @@ namespace uber
 
     bool dag_vertex::has_incomming_edge() const
     {
-      return (connected_to_count_.load(std::memory_order_acquire) > 0);
+      return (incomming_edge_count_ > 0);
     }
 
     std::size_t dag_vertex::incomming_edge_count() const
     {
-      return connected_to_count_;
+      return incomming_edge_count_;
+    }
+
+    void dag_vertex::add_incomming_edge()
+    {
+      ++incomming_edge_count_;
+    }
+
+    void dag_vertex::sub_incomming_edge()
+    {
+      --incomming_edge_count_;
+    }
+
+    void dag_vertex::clear_edges()
+    {
+      edges_.clear();
     }
 
     dag_vertex::dag_vertex(const dag_vertex &other) :
       uuid_(const_cast<dag_vertex *>(&other)->uuid_.clone()),
       current_status_(other.current_status_),
       label_(other.label()),
-      connected_to_count_(other.connected_to_count_.load(
-        std::memory_order_acquire))
+      incomming_edge_count_(other.incomming_edge_count_.load())
     {
       dag_vertex &t = *(const_cast<dag_vertex *>(&other));
 
@@ -195,25 +213,56 @@ namespace uber
             o->get_connection().lock()->clone()));
       });
 
-      connected_to_count_ = rhs.connected_to_count_.load(
-        std::memory_order_acquire);
+      incomming_edge_count_ = rhs.incomming_edge_count_.load();
 
       return (*this);
     }
 
-    void dag_vertex::add_incomming_edge()
+    std::ostream &operator<<(std::ostream &out, const dag_vertex &v)
     {
-      connected_to_count_.fetch_add(1, std::memory_order_relaxed);
+      out << "uuid_ = " << v.uuid_ << " current_status_ = "
+        << v.current_status_as_string() << " label = " << v.label_
+        << std::endl << "edges(" << v.edge_count() << "): ";
+      v.visit_all_edges([&](const dag_edge &e) {
+          out << "\t" << e << std::endl;
+        }
+      );
+
+      return out;
     }
 
-    void dag_vertex::sub_incomming_edge()
+    bool operator==(const dag_vertex &lhs, const dag_vertex &rhs)
     {
-      connected_to_count_.fetch_sub(-1, std::memory_order_relaxed);
+      bool ret = true;
+
+      auto lhs_str = lhs.uuid_.as_string();
+      auto rhs_str = rhs.uuid_.as_string();
+
+      ret &= (lhs_str == rhs_str);
+      ret &= (lhs.label() == rhs.label());
+      ret &= (lhs.edge_count() == rhs.edge_count());
+
+      dag_vertex &tmp = *const_cast<dag_vertex *>(&lhs);
+
+      // We are not guaranteed edges are in order. So this is O(e^2).
+      for (std::unique_ptr<dag_edge> &e : tmp.edges_) {
+        auto it = std::find_if(rhs.edges_.begin(), rhs.edges_.end(),
+          [&](const std::unique_ptr<dag_edge> &a) {
+            return ((*e) == (*a));
+          }
+        );
+        if (it == lhs.edges_.end()) {
+          ret &= false;
+        }
+      }
+
+      return ret;
     }
 
-    void dag_vertex::clear_edges()
+    bool operator!=(const dag_vertex &lhs, const dag_vertex &rhs)
     {
-      edges_.clear();
+      return !(lhs.uuid_.as_string() == rhs.uuid_.as_string());
+
     }
   }
 }

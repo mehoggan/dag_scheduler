@@ -2,6 +2,7 @@
 
 #include "u_dagtasks/dag_edge.h"
 
+#include <algorithm>
 #include <cassert>
 #include <list>
 #include <iostream>
@@ -14,12 +15,13 @@ namespace uber
   namespace u_dagtasks
   {
     dag::dag_exception::dag_exception(const char *message) :
-      std::runtime_error(message)
+      std::runtime_error(message),
+      what_(message)
     {}
 
     const char *dag::dag_exception::what() const throw()
     {
-      return std::exception::what();
+      return what_.c_str();
     }
 
     dag::dag()
@@ -43,7 +45,7 @@ namespace uber
       return (*this);
     }
 
-    bool dag::add_vertex(dag_vertex &v)
+    bool dag::add_vertex(dag_vertex &&v)
     {
       bool ret = false;
 
@@ -81,7 +83,7 @@ namespace uber
       auto it = std::find_if(graph_.begin(), graph_.end(),
         [&](std::shared_ptr<dag_vertex> vi) {
           const dag_vertex &rhs = (*(vi.get()));
-          return (u == rhs.uuid());
+          return (u == rhs.get_uuid());
         }
       );
 
@@ -150,11 +152,18 @@ namespace uber
 
       dag dag_clone = clone();
 
+      if (dag_clone != (*this)) {
+        std::stringstream error_str;
+        error_str << "Cloning graph in " << __FUNCTION__ << " failed to "
+          << "produce equal graphs.";
+        throw dag_exception(error_str.str().c_str());
+      }
+
       dag_vertex v1_clone = (*const_cast<dag_vertex *>(&v1)).clone();
       dag_vertex v2_clone = (*const_cast<dag_vertex *>(&v2)).clone();
 
-      dag_clone.add_vertex(v1_clone);
-      dag_clone.add_vertex(v2_clone);
+      dag_clone.add_vertex(std::move(v1_clone));
+      dag_clone.add_vertex(std::move(v2_clone));
 
       auto v1_ptr = dag_clone.find_vertex(v1);
       auto v2_ptr = dag_clone.find_vertex(v2);
@@ -163,6 +172,11 @@ namespace uber
       assert(!v2_ptr.expired() && "Failed to find vertex 2.");
       v1_ptr.lock()->connect(v2_ptr.lock());
 
+      if (v1_ptr.lock()->edge_count() == 0) {
+        //"We just connected these vertices, there must be more than one "
+        //"connection.";
+      }
+
       dag_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
           if (!v->has_incomming_edge()) {
             entry_vertices.push_back(v);
@@ -170,10 +184,21 @@ namespace uber
         }
       );
 
+      if (entry_vertices.empty()) {
+        std::stringstream error_str;
+        error_str << "Connecting " << std::endl << (*(v1_ptr.lock().get()))
+          << std::endl << "to " << std::endl << (*(v1_ptr.lock().get()))
+          << std::endl << " would cause there to be no entry point in the "
+          << "graph.";
+        throw dag_exception(error_str.str().c_str());
+      }
+
       while (!entry_vertices.empty()) {
         std::shared_ptr<dag_vertex> n = entry_vertices.front();
         sorted_vertices.push_back(n);
         entry_vertices.pop_front();
+
+        std::cout << "Looking at: " << std::endl << (*n) << std::endl;
 
         n->visit_all_edges([&](const dag_edge &e) {
             dag_edge &e_tmp = *const_cast<dag_edge *>(&e);
@@ -206,6 +231,11 @@ namespace uber
     {
       bool ret = false;
 
+      std::weak_ptr<dag_vertex> v1_tmp = find_vertex_by_uuid(u1);
+      std::weak_ptr<dag_vertex> v2_tmp = find_vertex_by_uuid(u2);
+
+      ret = connection_would_make_cyclic(*(v1_tmp.lock()), *(v2_tmp.lock()));
+
       return ret;
     }
 
@@ -213,6 +243,17 @@ namespace uber
       const std::string &l2)
     {
       bool ret = false;
+
+      std::vector<std::weak_ptr<dag_vertex>> v1;
+      v1 = find_all_verticies_with_label(l1);
+      std::vector<std::weak_ptr<dag_vertex>> v2;
+      v2 = find_all_verticies_with_label(l2);
+
+      for (auto v : v1) {
+        for (auto u : v2) {
+          ret &= connection_would_make_cyclic(*(v.lock()), *(u.lock()));
+        }
+      }
 
       return ret;
     }
@@ -229,18 +270,17 @@ namespace uber
         auto v2_it = std::find(graph_.begin(), graph_.end(), v2_tmp.lock());
 
         if (v1_it != graph_.end() && v2_it != graph_.end()) {
-          /*
           if (!connection_would_make_cyclic(*(v1_it->get()),
             *(v2_it->get()))) {
             v1_it->get()->connect(*v2_it);
             ret = true;
           } else {
             std::stringstream error_str;
-            error_str << "Connecting " << (*(v1_tmp.lock())) << " to "
-              << (*(v2_tmp.lock())) << " would cause a cycle.";
+            error_str << "Connecting " << std::endl << (*(v1_tmp.lock()))
+              << std::endl << "to " << std::endl << (*(v2_tmp.lock()))
+              << std::endl << "would cause a cycle.";
             throw dag_exception(error_str.str().c_str());
           }
-          */
         }
       }
 
@@ -254,23 +294,7 @@ namespace uber
       std::weak_ptr<dag_vertex> v1_tmp = find_vertex_by_uuid(u1);
       std::weak_ptr<dag_vertex> v2_tmp = find_vertex_by_uuid(u2);
 
-      if (!v1_tmp.expired() && !v2_tmp.expired()) {
-        auto v1_it = std::find(graph_.begin(), graph_.end(), v1_tmp.lock());
-        auto v2_it = std::find(graph_.begin(), graph_.end(), v2_tmp.lock());
-
-        if (v1_it != graph_.end() && v2_it != graph_.end()) {
-          if (!connection_would_make_cyclic(*(v1_it->get()),
-            *(v2_it->get()))) {
-            v1_it->get()->connect(*v2_it);
-            ret = true;
-          } else {
-            std::stringstream error_str;
-            error_str << "Connecting " << (*(v1_tmp.lock())) << " to "
-              << (*(v2_tmp.lock())) << " would cause a cycle.";
-            throw dag_exception(error_str.str().c_str());
-          }
-        }
-      }
+      ret = connect(*(v1_tmp.lock()), *(v2_tmp.lock()));
 
       return ret;
     }
@@ -287,30 +311,22 @@ namespace uber
 
       for (auto v : v1) {
         for (auto u : v2) {
-          if (!connection_would_make_cyclic(*(v.lock()), *(u.lock()))) {
-            v.lock()->connect(u.lock());
-            ret = true;
-          } else {
-            std::stringstream error_str;
-            error_str << "Connecting " << (*(v.lock())) << " to "
-              << (*(u.lock())) << " would cause a cycle.";
-            throw dag_exception(error_str.str().c_str());
-          }
+          ret &= connect(*(v.lock()), *(u.lock()));
         }
       }
 
       return ret;
     }
 
-    bool dag::add_and_connect(dag_vertex &v1, dag_vertex &v2)
+    bool dag::add_and_connect(dag_vertex &&v1, dag_vertex &&v2)
     {
       bool ret = false;
 
       std::string l1 = v1.label();
       std::string l2 = v2.label();
 
-      add_vertex(v1);
-      add_vertex(v2);
+      add_vertex(std::move(v1));
+      add_vertex(std::move(v2));
 
       if (!connection_would_make_cyclic(v1, v2)) {
         ret = connect_all_by_label(l1, l2);
@@ -396,12 +412,17 @@ namespace uber
       return ret;
     }
 
+    void dag::reset()
+    {
+      graph_.clear();
+    }
+
     dag::dag(const dag &other)
     {
       dag *o = (const_cast<dag *>(&other));
       o->linear_traversal([&](std::shared_ptr<dag_vertex> v) {
           dag_vertex tmp = v->clone();
-          add_vertex(tmp);
+          add_vertex(std::move(tmp));
         }
       );
     }
@@ -411,11 +432,52 @@ namespace uber
       dag &o = *(const_cast<dag *>(&rhs));
       o.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
           dag_vertex tmp = v->clone();
-          add_vertex(tmp);
+          add_vertex(std::move(tmp));
         }
       );
 
       return (*this);
+    }
+
+    bool operator==(const dag &lhs, const dag &rhs)
+    {
+      bool ret = true;
+
+      ret &= (lhs.graph_.size() == rhs.graph_.size());
+
+      dag lhs_clone = (*const_cast<dag *>(&lhs)).clone();
+      dag rhs_clone = (*const_cast<dag *>(&rhs)).clone();
+
+      std::sort(lhs_clone.graph_.begin(), lhs_clone.graph_.end(),
+        [](std::shared_ptr<dag_vertex> a, std::shared_ptr<dag_vertex> b) {
+          return a->label() < b->label();
+        }
+      );
+      std::sort(rhs_clone.graph_.begin(), rhs_clone.graph_.end(),
+        [](std::shared_ptr<dag_vertex> a, std::shared_ptr<dag_vertex> b) {
+          return a->label() < b->label();
+        }
+      );
+
+      std::size_t index = 0;
+      for (auto v : lhs.graph_) {
+        ret &= ((*v) == (*(rhs.graph_[index])));
+        auto o = rhs.graph_[index]; // Force use count up.
+        ret &= (v.use_count() == o.use_count());
+
+        if (!ret) {
+          break;
+        }
+
+        ++index;
+      }
+
+      return ret;
+    }
+
+    bool operator!=(const dag &lhs, const dag &rhs)
+    {
+      return !(lhs == rhs);
     }
   }
 }

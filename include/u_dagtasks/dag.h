@@ -27,9 +27,12 @@ namespace uber
         class dag_exception : public std::runtime_error
         {
         public:
-            explicit dag_exception(const char *message);
+          explicit dag_exception(const char *message);
 
-            virtual const char *what() const throw();
+          virtual const char *what() const throw();
+
+        private:
+          std::string what_;
         };
 
     public:
@@ -41,7 +44,7 @@ namespace uber
 
       dag clone();
 
-      bool add_vertex(dag_vertex &v);
+      bool add_vertex(dag_vertex &&v);
 
       std::weak_ptr<dag_vertex> find_vertex(const dag_vertex &v);
       std::weak_ptr<dag_vertex> find_vertex_by_uuid(const uuid &u);
@@ -63,7 +66,7 @@ namespace uber
       bool connect_by_uuid(const uuid &u1, const uuid &u2);
       bool connect_all_by_label(const std::string l1, const std::string l2);
 
-      bool add_and_connect(dag_vertex &v1, dag_vertex &v2);
+      bool add_and_connect(dag_vertex &&v1, dag_vertex &&v2);
 
       bool are_connected(const dag_vertex &v1, const dag_vertex &v2);
       bool are_connected_by_uuid(const uuid &u1, const uuid &u2);
@@ -76,14 +79,17 @@ namespace uber
       std::size_t vertex_count() const;
       std::size_t edge_count() const;
 
+      void reset();
+
+      friend bool operator==(const dag &lhs, const dag &rhs);
+      friend bool operator!=(const dag &lhs, const dag &rhs);
+
     private:
       dag(const dag &other);
       dag &operator=(const dag &rhs);
 
       typedef std::vector<std::shared_ptr<dag_vertex>> dag_graph;
       dag_graph graph_;
-      // TODO: Add this in.
-      // std::unordered_map<std::string, std::shared_ptr<dag_vertex>> lu_;
     };
   }
 }
