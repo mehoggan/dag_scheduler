@@ -10,6 +10,11 @@ namespace uber
 {
   namespace u_dagtasks
   {
+    dag_vertex::dag_vertex() :
+      current_status_(status::initialized),
+      incomming_edge_count_(0)
+    {}
+
     dag_vertex::dag_vertex(const std::string &label) :
       current_status_(status::initialized),
       label_(label),
@@ -19,6 +24,7 @@ namespace uber
     dag_vertex::~dag_vertex()
     {
       current_status_ = status::invalid;
+      label_.clear();
       incomming_edge_count_.store(0);
     }
 
@@ -55,21 +61,20 @@ namespace uber
       return (*this);
     }
 
-    void dag_vertex::visit_all_edges(
-      std::function<void (const dag_edge &)> cb) const
+    bool dag_vertex::connect(std::shared_ptr<dag_vertex> other)
     {
-      std::for_each(edges_.begin(), edges_.end(),
-        [&](const std::unique_ptr<dag_edge> &e) {
-          cb(*e);
-        }
-      );
-    }
+      bool ret = false;
 
-    const dag_edge &dag_vertex::get_edge(std::size_t index) const
-    {
-      assert(index < edge_count());
+      if (!contains_connection_to(*other)) {
+        std::unique_ptr<dag_edge> e(new dag_edge);
+        e->connect_to(other);
+        edges_.push_back(std::move(e));
+        ret = true;
+        assert(!edges_.empty());
+        assert(edges_.back()->is_a_connection_to(*other));
+      }
 
-      return (*edges_[index]);
+      return ret;
     }
 
     bool dag_vertex::contains_connection_to(const dag_vertex &other)
@@ -86,20 +91,19 @@ namespace uber
       return ret;
     }
 
-    bool dag_vertex::connect(std::shared_ptr<dag_vertex> other)
+    std::size_t dag_vertex::edge_count() const
     {
-      bool ret = false;
+      return edges_.size();
+    }
 
-      if (!contains_connection_to(*other)) {
-        std::unique_ptr<dag_edge> e(new dag_edge);
-        e->connect_to(other);
-        edges_.push_back(std::move(e));
-        ret = true;
-        assert(!edges_.empty());
-        assert(edges_.back()->is_a_connection_to(*other));
-      }
-
-      return ret;
+    void dag_vertex::visit_all_edges(
+      std::function<void (const dag_edge &)> cb) const
+    {
+      std::for_each(edges_.begin(), edges_.end(),
+        [&](const std::unique_ptr<dag_edge> &e) {
+          cb(*e);
+        }
+      );
     }
 
     const uuid &dag_vertex::get_uuid() const
@@ -151,12 +155,7 @@ namespace uber
       return label_;
     }
 
-    std::size_t dag_vertex::edge_count() const
-    {
-      return edges_.size();
-    }
-
-    bool dag_vertex::has_incomming_edge() const
+    bool dag_vertex::has_incomming_edges() const
     {
       return (incomming_edge_count_ > 0);
     }

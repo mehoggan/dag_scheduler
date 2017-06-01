@@ -107,34 +107,59 @@ namespace uber
     dag_edge::dag_edge(const dag_edge &other) :
       uuid_(const_cast<dag_edge *>(&other)->uuid_.clone()),
       current_status_(other.current_status()),
-      connection_()
+      connection_(/*We cannot connect because we do NOT own.*/)
     {}
 
     dag_edge &dag_edge::operator=(const dag_edge &rhs)
     {
       uuid_ = const_cast<dag_edge *>(&rhs)->uuid_.clone();
       current_status_ = rhs.current_status();
-      connection_.reset();
+      connection_.reset(/*We cannot connect because we do NOT own.*/);
 
       return (*this);
+    }
+
+    std::ostream &operator<<(std::ostream &out, const std::nullptr_t n)
+    {
+      out << "nullptr";
+
+      return out;
     }
 
     std::ostream &operator<<(std::ostream &out, const dag_edge &e)
     {
       out << "uuid_ = " << e.uuid_ << " current_status_ = "
-        << "(" << e.current_status_as_string() << ")";
+        << "(" << e.current_status_as_string() << ") connection = "
+        << (*(e.connection_.lock().get()));
 
       return out;
     }
 
     bool operator==(const dag_edge &lhs, const dag_edge &rhs)
     {
-      return lhs.uuid_.as_string() == rhs.uuid_.as_string();
+      bool ret = true;
+
+      ret &= (lhs.uuid_.as_string() == rhs.uuid_.as_string());
+      ret &= (lhs.connection_.lock().use_count() ==
+        rhs.connection_.lock().use_count());
+      ret &= (lhs.current_status_ == rhs.current_status_);
+
+      if (lhs.connection_.lock() && rhs.connection_.lock()) {
+        ret &= ((*(lhs.connection_.lock().get()) ==
+          (*(rhs.connection_.lock().get()))));
+      } else {
+        ret &= (!lhs.connection_.lock().get() &&
+          !rhs.connection_.lock().get());
+      }
+
+      return ret;
     }
 
     bool operator!=(const dag_edge &lhs, const dag_edge &rhs)
     {
-      return !(lhs.uuid_.as_string() == rhs.uuid_.as_string());
+      bool ret = !(lhs == rhs);
+
+      return ret;
     }
   }
 }

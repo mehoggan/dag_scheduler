@@ -178,7 +178,7 @@ namespace uber
       }
 
       dag_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          if (!v->has_incomming_edge()) {
+          if (!v->has_incomming_edges()) {
             entry_vertices.push_back(v);
           }
         }
