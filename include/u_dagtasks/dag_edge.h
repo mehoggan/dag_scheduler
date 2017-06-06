@@ -23,6 +23,7 @@ namespace uber
     private:
       friend class dag;
       friend class dag_vertex;
+      friend struct dag_vertex::dag_vertex_connection;
 
       FRIEND_TEST(TestUDagEdge, copy_ctor);
       FRIEND_TEST(TestUDagEdge, assignment_operator);

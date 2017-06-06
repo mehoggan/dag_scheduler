@@ -129,8 +129,13 @@ namespace uber
     std::ostream &operator<<(std::ostream &out, const dag_edge &e)
     {
       out << "uuid_ = " << e.uuid_ << " current_status_ = "
-        << "(" << e.current_status_as_string() << ") connection = "
-        << (*(e.connection_.lock().get()));
+        << "(" << e.current_status_as_string() << ") connection = ";
+
+        if (e.connection_.lock() == nullptr) {
+          out << "nullptr";
+        } else {
+          out << e.connection_.lock().get();
+        }
 
       return out;
     }
@@ -140,16 +145,20 @@ namespace uber
       bool ret = true;
 
       ret &= (lhs.uuid_.as_string() == rhs.uuid_.as_string());
-      ret &= (lhs.connection_.lock().use_count() ==
-        rhs.connection_.lock().use_count());
       ret &= (lhs.current_status_ == rhs.current_status_);
 
-      if (lhs.connection_.lock() && rhs.connection_.lock()) {
-        ret &= ((*(lhs.connection_.lock().get()) ==
-          (*(rhs.connection_.lock().get()))));
+      std::shared_ptr<dag_vertex> lhs_connection = lhs.connection_.lock();
+      std::shared_ptr<dag_vertex> rhs_connection = rhs.connection_.lock();
+
+      if (lhs_connection != nullptr && rhs_connection != nullptr) {
+        ret &= (lhs.connection_.lock().use_count() ==
+          rhs.connection_.lock().use_count());
+        bool objs_are_same = (*lhs_connection) == (*rhs_connection);
+        ret &= objs_are_same;
+      } else if (lhs_connection == nullptr && rhs_connection == nullptr) {
+        ret &= true;
       } else {
-        ret &= (!lhs.connection_.lock().get() &&
-          !rhs.connection_.lock().get());
+        ret &= false;
       }
 
       return ret;

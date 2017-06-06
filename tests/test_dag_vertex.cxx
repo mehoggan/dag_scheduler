@@ -136,6 +136,49 @@ namespace uber
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
+    TEST_F(TestUDagVertex, copy_ctor_no_edges)
+    {
+      dag_vertex v("1");
+      dag_vertex v_copied(v);
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("1", v_copied.label());
+      EXPECT_EQ(0ul, v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+    }
+
+    TEST_F(TestUDagVertex, assignment_operator_no_edges)
+    {
+      dag_vertex v("1");
+      dag_vertex v_copied;
+      v_copied = v;
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("1", v_copied.label());
+      EXPECT_EQ(0ul, v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+    }
+
     TEST_F(TestUDagVertex, connect_and_contains_connection)
     {
       {
@@ -200,6 +243,43 @@ namespace uber
       ASSERT_EQ(0, get_dag_vertex().edge_count());
     }
 
+    TEST_F(TestUDagVertex, clone_all_edges_and_restablish_connections)
+    {
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> v : connections) {
+        get_dag_vertex().connect(v);
+      }
+      EXPECT_EQ(connections.size(), get_dag_vertex().edge_count());
+
+      std::vector<dag_vertex::dag_vertex_connection> edges =
+        get_dag_vertex().clone_all_connections();
+
+      ASSERT_EQ(edges.size(), connections.size());
+      std::size_t index = 0;
+      get_dag_vertex().visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), edges[index].vertex());
+          ++index;
+        }
+      );
+
+      dag_vertex tmp = get_dag_vertex().clone();
+      std::vector<std::shared_ptr<dag_vertex>> connections_cloned =
+        tmp.restablish_connections(edges);
+      EXPECT_EQ(get_dag_vertex(), tmp);
+
+      get_dag_vertex().clear_edges();
+      ASSERT_EQ(0, get_dag_vertex().edge_count());
+    }
+
     TEST_F(TestUDagVertex, has_incomming_edge_and_incomming_edge_count)
     {
       std::vector<std::shared_ptr<dag_vertex>> connections = {
@@ -229,6 +309,345 @@ namespace uber
       }
       EXPECT_EQ(0, get_dag_vertex_ptr()->edge_count());
       EXPECT_EQ(count, get_dag_vertex_ptr()->incomming_edge_count());
+    }
+
+    TEST_F(TestUDagVertex, move_ctor_with_edges)
+    {
+      dag_vertex v("orig");
+
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+
+      dag_vertex v_moved = std::move(v);
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_NE(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_NE(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      index = 0;
+      v_moved.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_moved.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_moved.current_status_as_string());
+      EXPECT_EQ("orig", v_moved.label());
+      EXPECT_EQ(connections.size(), v_moved.edge_count());
+      EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_moved.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::invalid, v.current_status());
+      EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
+      EXPECT_EQ("", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_TRUE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+
+      v.clear_edges();
+      EXPECT_EQ(0, v.edge_count());
+
+      v_moved.clear_edges();
+      EXPECT_EQ(0, v_moved.edge_count());
+    }
+
+    TEST_F(TestUDagVertex, assignment_move_operator_with_edges)
+    {
+      dag_vertex v("orig");
+      dag_vertex v_moved;
+
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+
+      v_moved = std::move(v);
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_NE(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_NE(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      index = 0;
+      v_moved.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_moved.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_moved.current_status_as_string());
+      EXPECT_EQ("orig", v_moved.label());
+      EXPECT_EQ(connections.size(), v_moved.edge_count());
+      EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_moved.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::invalid, v.current_status());
+      EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
+      EXPECT_EQ("", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_TRUE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+
+      v.clear_edges();
+      EXPECT_EQ(0, v.edge_count());
+
+      v_moved.clear_edges();
+      EXPECT_EQ(0, v_moved.edge_count());
+    }
+
+    TEST_F(TestUDagVertex, clone_with_edges)
+    {
+      dag_vertex v("orig");
+
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+      ASSERT_EQ(connections.size(), v.edge_count());
+
+      dag_vertex v_cloned = v.clone();
+      ASSERT_EQ(0ul, v_cloned.edge_count());
+
+      // We cannot add back the connections since the edge adds a weak_ptr
+      // to a dag_vertex we no longer can duplicate. This has to be done
+      // outside the class by the code that is cloning the dag_vertex. dag_graph
+      // should be the object that orchestrates that.
+      std::vector<dag_vertex::dag_vertex_connection> orig_connections =
+      v.clone_all_connections();
+      std::vector<std::shared_ptr<dag_vertex>> cloned_connections =
+        v_cloned.restablish_connections(orig_connections);
+
+      std::size_t v_edge_count = v.edge_count();
+      std::size_t v_cloned_edge_count = v_cloned.edge_count();
+      ASSERT_EQ(v_edge_count, v_cloned_edge_count);
+
+      ASSERT_EQ(v, v_cloned);
+      ASSERT_EQ(v_cloned, v);
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      index = 0;
+      v_cloned.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_NE(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+          (void)e_ref;
+        }
+      );
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_cloned.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_cloned.current_status_as_string());
+      EXPECT_EQ("orig", v_cloned.label());
+      EXPECT_EQ(connections.size(), v_cloned.edge_count());
+      EXPECT_FALSE(v_cloned.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_cloned.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("orig", v.label());
+      EXPECT_EQ(connections.size(), v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+    }
+
+    // TODO: Add in edges.
+    TEST_F(TestUDagVertex, copy_ctor_with_edges)
+    {
+      dag_vertex v("orig");
+
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+      ASSERT_EQ(connections.size(), v.edge_count());
+
+      dag_vertex v_copied(v.clone());
+      ASSERT_EQ(0ul, v_copied.edge_count());
+
+      // We cannot add back the connections since the edge adds a weak_ptr
+      // to a dag_vertex we no longer can duplicate. This has to be done
+      // outside the class by the code that is cloning the dag_vertex. dag_graph
+      // should be the object that orchestrates that.
+      std::vector<dag_vertex::dag_vertex_connection> orig_connections =
+      v.clone_all_connections();
+      std::vector<std::shared_ptr<dag_vertex>> copied_connections =
+        v_copied.restablish_connections(orig_connections);
+
+      std::size_t v_edge_count = v.edge_count();
+      std::size_t v_copied_edge_count = v_copied.edge_count();
+      ASSERT_EQ(v_edge_count, v_copied_edge_count);
+
+      ASSERT_EQ(v, v_copied);
+      ASSERT_EQ(v_copied, v);
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      index = 0;
+      v_copied.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_NE(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+          (void)e_ref;
+        }
+      );
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("orig", v_copied.label());
+      EXPECT_EQ(connections.size(), v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("orig", v.label());
+      EXPECT_EQ(connections.size(), v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+    }
+
+//
+//    // TODO: Add in edges.
+    TEST_F(TestUDagVertex, assignment_operator_with_edges)
+    {
+      dag_vertex v("orig");
+
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+      ASSERT_EQ(connections.size(), v.edge_count());
+
+      dag_vertex v_copied;
+      v_copied = v.clone();
+      ASSERT_EQ(0ul, v_copied.edge_count());
+
+      // We cannot add back the connections since the edge adds a weak_ptr
+      // to a dag_vertex we no longer can duplicate. This has to be done
+      // outside the class by the code that is cloning the dag_vertex. dag_graph
+      // should be the object that orchestrates that.
+      std::vector<dag_vertex::dag_vertex_connection> orig_connections =
+      v.clone_all_connections();
+      std::vector<std::shared_ptr<dag_vertex>> copied_connections =
+        v_copied.restablish_connections(orig_connections);
+
+      std::size_t v_edge_count = v.edge_count();
+      std::size_t v_copied_edge_count = v_copied.edge_count();
+      ASSERT_EQ(v_edge_count, v_copied_edge_count);
+
+      ASSERT_EQ(v, v_copied);
+      ASSERT_EQ(v_copied, v);
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_EQ(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+        }
+      );
+
+      index = 0;
+      v_copied.visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          EXPECT_NE(e_ref.get_connection().lock(), connections[index]);
+          EXPECT_EQ(*(e_ref.get_connection().lock()), *(connections[index]));
+          ++index;
+          (void)e_ref;
+        }
+      );
+
+      EXPECT_EQ(dag_vertex::status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("orig", v_copied.label());
+      EXPECT_EQ(connections.size(), v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("orig", v.label());
+      EXPECT_EQ(connections.size(), v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
     }
   }
 }

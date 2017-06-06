@@ -2,7 +2,6 @@
 
 #include "u_dagtasks/dag_edge.h"
 
-#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -10,6 +9,25 @@ namespace uber
 {
   namespace u_dagtasks
   {
+    dag_vertex::dag_vertex_connection::dag_vertex_connection()
+    {}
+
+    dag_vertex::dag_vertex_connection::dag_vertex_connection(
+      dag_edge &edge, dag_vertex &vertex) :
+      edge_(new dag_edge(edge.clone())),
+      vertex_(new dag_vertex(vertex.clone()))
+    {}
+
+    const dag_edge &dag_vertex::dag_vertex_connection::edge() const
+    {
+      return *edge_;
+    }
+
+    const dag_vertex &dag_vertex::dag_vertex_connection::vertex() const
+    {
+      return *vertex_;
+    }
+
     dag_vertex::dag_vertex() :
       current_status_(status::initialized),
       incomming_edge_count_(0)
@@ -25,14 +43,15 @@ namespace uber
     {
       current_status_ = status::invalid;
       label_.clear();
+      clear_edges();
       incomming_edge_count_.store(0);
     }
 
     dag_vertex::dag_vertex(dag_vertex &&other)
     {
       uuid_ = std::move(other.uuid_);
-      current_status_ = other.current_status_;
       label_ = std::move(other.label_);
+      current_status_ = other.current_status_;
       edges_ = std::move(other.edges_);
       incomming_edge_count_ = other.incomming_edge_count_.load();
 
@@ -44,8 +63,8 @@ namespace uber
     dag_vertex &dag_vertex::operator=(dag_vertex &&rhs)
     {
       uuid_ = std::move(rhs.uuid_);
-      current_status_ = rhs.current_status_;
       label_ = std::move(rhs.label_);
+      current_status_ = rhs.current_status_;
       edges_ = std::move(rhs.edges_);
       incomming_edge_count_ = rhs.incomming_edge_count_.load();
 
@@ -91,6 +110,27 @@ namespace uber
       return ret;
     }
 
+    std::vector<std::shared_ptr<dag_vertex>> dag_vertex::restablish_connections(
+      std::vector<dag_vertex_connection> &connections)
+    {
+      std::vector<std::shared_ptr<dag_vertex>> ret;
+      ret.reserve(connections.size());
+      for (auto &connection : connections) {
+        dag_vertex vertex = *(const_cast<dag_vertex *>(&connection.vertex()));
+        std::shared_ptr<dag_vertex> other = std::make_shared<dag_vertex>(
+          vertex.clone());
+        dag_edge edge = *(const_cast<dag_edge *>(&connection.edge()));
+        std::unique_ptr<dag_edge> tmp_edge(new dag_edge(edge.clone()));
+        tmp_edge->connect_to(other);
+        // We need to preserve the shared_ptr so the edge's weak_ptr does not
+        // expire.
+        ret.push_back(other);
+        edges_.push_back(std::move(tmp_edge));
+      }
+
+      return ret;
+    }
+
     std::size_t dag_vertex::edge_count() const
     {
       return edges_.size();
@@ -99,11 +139,29 @@ namespace uber
     void dag_vertex::visit_all_edges(
       std::function<void (const dag_edge &)> cb) const
     {
+      std::size_t edge_count = edges_.size();
+      (void)edge_count;
+
       std::for_each(edges_.begin(), edges_.end(),
         [&](const std::unique_ptr<dag_edge> &e) {
           cb(*e);
         }
       );
+    }
+
+    std::vector<dag_vertex::dag_vertex_connection>
+    dag_vertex::clone_all_connections()
+    {
+      std::vector<dag_vertex_connection> ret;
+      ret.reserve(edges_.size());
+
+      for (std::unique_ptr<dag_edge> &e : edges_) {
+        dag_edge e_clone = e->clone();
+        dag_vertex v_clone = e->get_connection().lock()->clone();
+        ret.push_back(dag_vertex_connection(e_clone, v_clone));
+      }
+
+      return ret;
     }
 
     const uuid &dag_vertex::get_uuid() const
@@ -186,33 +244,24 @@ namespace uber
       label_(other.label()),
       incomming_edge_count_(other.incomming_edge_count_.load())
     {
-      dag_vertex &t = *(const_cast<dag_vertex *>(&other));
-
-      std::for_each(t.edges_.begin(), t.edges_.end(),
-        [&](std::unique_ptr<dag_edge> &o) {
-          std::unique_ptr<dag_edge> tmp(new dag_edge(o->clone()));
-          edges_.push_back(std::move(tmp));
-          edges_.back()->connect_to(std::make_shared<dag_vertex>(
-            o->get_connection().lock()->clone()));
-      });
+      // We cannot add back the connections since the edge adds a weak_ptr
+      // to a dag_vertex we no longer can duplicate. This has to be done
+      // outside the class by the code that is cloning the dag_vertex. dag_graph
+      // should be the object that orchestrates that.
     }
 
     dag_vertex &dag_vertex::operator=(const dag_vertex &rhs)
     {
-      dag_vertex &r = *(const_cast<dag_vertex *>(&rhs));
+      dag_vertex &t = *(const_cast<dag_vertex *>(&rhs));
 
-      uuid_ = const_cast<dag_vertex *>(&rhs)->uuid_.clone();
-      current_status_ = rhs.current_status_;
+      uuid_ = t.uuid_.clone();
+      current_status_ = t.current_status_;
       label_ = rhs.label();
-      std::for_each(r.edges_.begin(), r.edges_.end(),
-        [&](std::unique_ptr<dag_edge> &o) {
-          std::unique_ptr<dag_edge> tmp(new dag_edge(o->clone()));
-          edges_.push_back(std::move(tmp));
-          edges_.back()->connect_to(std::make_shared<dag_vertex>(
-            o->get_connection().lock()->clone()));
-      });
-
       incomming_edge_count_ = rhs.incomming_edge_count_.load();
+      // We cannot add back the connections since the edge adds a weak_ptr
+      // to a dag_vertex we no longer can duplicate. This has to be done
+      // outside the class by the code that is cloning the dag_vertex. dag_graph
+      // should be the object that orchestrates that.
 
       return (*this);
     }
@@ -239,7 +288,10 @@ namespace uber
 
       ret &= (lhs_str == rhs_str);
       ret &= (lhs.label() == rhs.label());
-      ret &= (lhs.edge_count() == rhs.edge_count());
+
+      std::size_t lhs_edge_count = lhs.edge_count();
+      std::size_t rhs_edge_count = rhs.edge_count();
+      ret &= (lhs_edge_count == rhs_edge_count);
 
       dag_vertex &tmp = *const_cast<dag_vertex *>(&lhs);
 
@@ -250,7 +302,7 @@ namespace uber
             return ((*e) == (*a));
           }
         );
-        if (it == lhs.edges_.end()) {
+        if (it == rhs.edges_.end()) {
           ret &= false;
         }
       }
@@ -260,7 +312,7 @@ namespace uber
 
     bool operator!=(const dag_vertex &lhs, const dag_vertex &rhs)
     {
-      return !(lhs.uuid_.as_string() == rhs.uuid_.as_string());
+      return !(lhs == rhs);
 
     }
   }

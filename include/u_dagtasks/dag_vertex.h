@@ -25,12 +25,35 @@ namespace uber
     private:
       friend class dag_edge;
       friend class dag;
+      friend struct dag_vertex_connection;
 
       FRIEND_TEST(TestUDagVertex, connect_and_contains_connection);
       FRIEND_TEST(TestUDagVertex,
         visit_all_edges_points_to_actual_verticies);
+      FRIEND_TEST(TestUDagVertex, clone_all_edges_and_restablish_connections);
+      FRIEND_TEST(TestUDagVertex, move_ctor_with_edges);
+      FRIEND_TEST(TestUDagVertex, assignment_move_operator_with_edges);
+      FRIEND_TEST(TestUDagVertex, copy_ctor_no_edges);
+      FRIEND_TEST(TestUDagVertex, assignment_operator_no_edges);
+      FRIEND_TEST(TestUDagVertex, clone_all_edges);
+      FRIEND_TEST(TestUDagVertex, copy_ctor_with_edges);
+      FRIEND_TEST(TestUDagVertex, assignment_operator_with_edges);
 
     public:
+      struct dag_vertex_connection
+      {
+      public:
+        dag_vertex_connection(); // For std containers.
+        dag_vertex_connection(dag_edge &edge, dag_vertex &vertex);
+
+        const dag_edge &edge() const;
+        const dag_vertex &vertex() const;
+
+      private:
+        std::unique_ptr<dag_edge> edge_;
+        std::unique_ptr<dag_vertex> vertex_;
+      };
+
       // TODO: Use dag class to manage status.
       enum class status
       {
@@ -54,10 +77,13 @@ namespace uber
 
       bool connect(std::shared_ptr<dag_vertex> other);
       bool contains_connection_to(const dag_vertex &other);
+      std::vector<std::shared_ptr<dag_vertex>> restablish_connections(
+        std::vector<dag_vertex_connection> &connections);
 
       std::size_t edge_count() const;
 
       void visit_all_edges(std::function<void (const dag_edge &)> cb) const;
+      std::vector<dag_vertex_connection> clone_all_connections();
 
       bool has_incomming_edges() const;
       std::size_t incomming_edge_count() const;
