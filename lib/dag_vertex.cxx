@@ -2,6 +2,7 @@
 
 #include "u_dagtasks/dag_edge.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 

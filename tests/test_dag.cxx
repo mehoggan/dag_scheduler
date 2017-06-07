@@ -24,26 +24,38 @@ namespace uber
       dag d_;
     };
 
-    TEST_F(TestUDag, equality_operator_via_clone_no_edges_with_reset)
+    TEST_F(TestUDag, ctor)
     {
-      /*
-      dag d_clone = get_dag().clone();
-      EXPECT_EQ(d_clone, get_dag());
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
 
-      // TODO: Moving a temporary. Move dag_vertex out of add_vertex.
-      // Error only occurs with clang.
-      get_dag().add_vertex(std::move(dag_vertex("1")));
-      get_dag().add_vertex(std::move(dag_vertex("2")));
-      get_dag().add_vertex(std::move(dag_vertex("3")));
-      get_dag().add_vertex(std::move(dag_vertex("4")));
-      EXPECT_NE(d_clone, get_dag());
+    TEST_F(TestUDag, dtor_no_edges_no_vertices)
+    {
+      dag d;
 
-      d_clone = get_dag().clone();
-      EXPECT_EQ(d_clone, get_dag());
+      d.~dag();
+      EXPECT_EQ(0ul, d.edge_count());
+      EXPECT_EQ(0ul, d.vertex_count());
+    }
 
-      get_dag().reset();
-      EXPECT_NE(d_clone, get_dag());
-      */
+    TEST_F(TestUDag, move_ctor_no_edges_no_vertices)
+    {
+      dag d;
+      dag d_moved(std::move(d));
+
+      EXPECT_EQ(0ul, d_moved.edge_count());
+      EXPECT_EQ(0ul, d_moved.vertex_count());
+    }
+
+    TEST_F(TestUDag, assignment_move_operator_no_edges_no_vertices)
+    {
+      dag d;
+      dag d_moved;
+      d_moved = std::move(d);
+
+      EXPECT_EQ(0ul, d_moved.edge_count());
+      EXPECT_EQ(0ul, d_moved.vertex_count());
     }
   }
 }

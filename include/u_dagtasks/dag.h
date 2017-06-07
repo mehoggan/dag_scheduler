@@ -81,15 +81,17 @@ namespace uber
 
       void reset();
 
-      friend bool operator==(const dag &lhs, const dag &rhs);
-      friend bool operator!=(const dag &lhs, const dag &rhs);
-
-    private:
+    protected:
       dag(const dag &other);
       dag &operator=(const dag &rhs);
 
+    private:
       typedef std::vector<std::shared_ptr<dag_vertex>> dag_graph;
       dag_graph graph_;
+
+    public:
+      friend bool operator==(const dag &lhs, const dag &rhs);
+      friend bool operator!=(const dag &lhs, const dag &rhs);
     };
   }
 }

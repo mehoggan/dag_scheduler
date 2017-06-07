@@ -210,7 +210,7 @@ namespace uber
         EXPECT_EQ(4ul, get_dag_vertex().edge_count());
       }
       get_dag_vertex().clear_edges();
-      ASSERT_EQ(0, get_dag_vertex().edge_count());
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestUDagVertex, visit_all_edges_points_to_actual_verticies)
@@ -240,7 +240,7 @@ namespace uber
       EXPECT_EQ(get_dag_vertex().edge_count(), index);
 
       get_dag_vertex().clear_edges();
-      ASSERT_EQ(0, get_dag_vertex().edge_count());
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestUDagVertex, clone_all_edges_and_restablish_connections)
@@ -277,7 +277,7 @@ namespace uber
       EXPECT_EQ(get_dag_vertex(), tmp);
 
       get_dag_vertex().clear_edges();
-      ASSERT_EQ(0, get_dag_vertex().edge_count());
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestUDagVertex, has_incomming_edge_and_incomming_edge_count)
@@ -307,7 +307,7 @@ namespace uber
           }
         );
       }
-      EXPECT_EQ(0, get_dag_vertex_ptr()->edge_count());
+      EXPECT_EQ(0ul, get_dag_vertex_ptr()->edge_count());
       EXPECT_EQ(count, get_dag_vertex_ptr()->incomming_edge_count());
     }
 
@@ -364,10 +364,10 @@ namespace uber
       EXPECT_EQ(0ul, v.incomming_edge_count());
 
       v.clear_edges();
-      EXPECT_EQ(0, v.edge_count());
+      EXPECT_EQ(0ul, v.edge_count());
 
       v_moved.clear_edges();
-      EXPECT_EQ(0, v_moved.edge_count());
+      EXPECT_EQ(0ul, v_moved.edge_count());
     }
 
     TEST_F(TestUDagVertex, assignment_move_operator_with_edges)
@@ -424,10 +424,10 @@ namespace uber
       EXPECT_EQ(0ul, v.incomming_edge_count());
 
       v.clear_edges();
-      EXPECT_EQ(0, v.edge_count());
+      EXPECT_EQ(0ul, v.edge_count());
 
       v_moved.clear_edges();
-      EXPECT_EQ(0, v_moved.edge_count());
+      EXPECT_EQ(0ul, v_moved.edge_count());
     }
 
     TEST_F(TestUDagVertex, clone_with_edges)
@@ -453,8 +453,8 @@ namespace uber
 
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a dag_vertex we no longer can duplicate. This has to be done
-      // outside the class by the code that is cloning the dag_vertex. dag_graph
-      // should be the object that orchestrates that.
+      // outside the class by the code that is cloning the dag_vertex.
+      // dag_graph should be the object that orchestrates that.
       std::vector<dag_vertex::dag_vertex_connection> orig_connections =
       v.clone_all_connections();
       std::vector<std::shared_ptr<dag_vertex>> cloned_connections =
@@ -526,8 +526,8 @@ namespace uber
 
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a dag_vertex we no longer can duplicate. This has to be done
-      // outside the class by the code that is cloning the dag_vertex. dag_graph
-      // should be the object that orchestrates that.
+      // outside the class by the code that is cloning the dag_vertex.
+      // dag_graph should be the object that orchestrates that.
       std::vector<dag_vertex::dag_vertex_connection> orig_connections =
       v.clone_all_connections();
       std::vector<std::shared_ptr<dag_vertex>> copied_connections =

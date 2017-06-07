@@ -23,6 +23,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(../include)
 include_directories(../)
+include_directories(${gtest_SOURCE_DIR}/include)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/win32.cmake)
@@ -34,6 +35,7 @@ endif()
 add_executable(unit_test
   main.cxx
   test_dag.cxx
+  test_dag_algorithms.cxx
   test_dag_edge.cxx
   test_dag_vertex.cxx
   test_uuid.cxx

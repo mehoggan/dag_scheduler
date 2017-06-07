@@ -5,6 +5,8 @@ from clang_helpers import PrepareClangFlags
 compilation_database_folder = ''
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 testdir = os.path.join(scriptdir, 'tests')
+gtest_src_dir = os.path.join(os.path.join(os.path.join(scriptdir, 'build'),
+                             'googletest-src'), 'googletest')
 
 flags = [
          '-std=c++11',
@@ -13,6 +15,7 @@ flags = [
          '-I', '.',
          '-I', os.path.join(scriptdir, 'include'),
          '-I', os.path.join(testdir, 'include'),
+         '-I', os.path.join(gtest_src_dir, 'include'),
          '-D_POSIX_C_SOURCE 199309LL',
          '-D_DARWIN_C_SOURCE',
          '-D_XOPEN_SOURCE 500'

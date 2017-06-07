@@ -13,6 +13,8 @@ endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
 
+include_directories(${gtest_SOURCE_DIR}/include)
+
 add_subdirectory(lib)
 
 if(U_DAGTASKS_TESTS)

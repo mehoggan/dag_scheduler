@@ -113,6 +113,7 @@ namespace uber
       EXPECT_EQ(2l, e.get_connection().lock().use_count());
       EXPECT_FALSE(e.connect_to(nullptr));
       EXPECT_EQ(nullptr, e.get_connection().lock());
+      EXPECT_EQ(0ul, v1->incomming_edge_count());
     }
 
     TEST_F(TestUDagEdge, connections)

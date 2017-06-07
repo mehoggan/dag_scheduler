@@ -1,5 +1,6 @@
 #include "u_dagtasks/dag.h"
 
+#include "u_dagtasks/dag_algorithms.h"
 #include "u_dagtasks/dag_edge.h"
 
 #include <algorithm>
@@ -147,81 +148,22 @@ namespace uber
     {
       bool ret = false;
 
-      std::list<std::shared_ptr<dag_vertex>> sorted_vertices;
-      std::list<std::shared_ptr<dag_vertex>> entry_vertices;
+      std::list<dag_vertex> sorted_vertices;
+      dag graph_clone = clone();
 
-      dag dag_clone = clone();
+      dag_vertex v1_clone = *const_cast<dag_vertex *>(&v1);
+      dag_vertex v2_clone = *const_cast<dag_vertex *>(&v2);
+      graph_clone.add_vertex(std::move(v1_clone));
+      graph_clone.add_vertex(std::move(v2_clone));
+      std::weak_ptr<dag_vertex> v1_found = graph_clone.find_vertex(v1_clone);
+      std::weak_ptr<dag_vertex> v2_found = graph_clone.find_vertex(v2_clone);
+      // Bypass dag interface to prevent infinite recursion.
+      v1_found.lock()->connect(v2_found.lock());
 
-      if (dag_clone != (*this)) {
-        std::stringstream error_str;
-        error_str << "Cloning graph in " << __FUNCTION__ << " failed to "
-          << "produce equal graphs.";
-        throw dag_exception(error_str.str().c_str());
-      }
+      assert((!v1_found.expired() && !v2_found.expired()) &&
+        "There must be a regression in add_vertex.");
 
-      dag_vertex v1_clone = (*const_cast<dag_vertex *>(&v1)).clone();
-      dag_vertex v2_clone = (*const_cast<dag_vertex *>(&v2)).clone();
-
-      dag_clone.add_vertex(std::move(v1_clone));
-      dag_clone.add_vertex(std::move(v2_clone));
-
-      auto v1_ptr = dag_clone.find_vertex(v1);
-      auto v2_ptr = dag_clone.find_vertex(v2);
-
-      assert(!v1_ptr.expired() && "Failed to find vertex 1.");
-      assert(!v2_ptr.expired() && "Failed to find vertex 2.");
-      v1_ptr.lock()->connect(v2_ptr.lock());
-
-      if (v1_ptr.lock()->edge_count() == 0) {
-        //"We just connected these vertices, there must be more than one "
-        //"connection.";
-      }
-
-      dag_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          if (!v->has_incomming_edges()) {
-            entry_vertices.push_back(v);
-          }
-        }
-      );
-
-      if (entry_vertices.empty()) {
-        std::stringstream error_str;
-        error_str << "Connecting " << std::endl << (*(v1_ptr.lock().get()))
-          << std::endl << "to " << std::endl << (*(v1_ptr.lock().get()))
-          << std::endl << " would cause there to be no entry point in the "
-          << "graph.";
-        throw dag_exception(error_str.str().c_str());
-      }
-
-      while (!entry_vertices.empty()) {
-        std::shared_ptr<dag_vertex> n = entry_vertices.front();
-        sorted_vertices.push_back(n);
-        entry_vertices.pop_front();
-
-        std::cout << "Looking at: " << std::endl << (*n) << std::endl;
-
-        n->visit_all_edges([&](const dag_edge &e) {
-            dag_edge &e_tmp = *const_cast<dag_edge *>(&e);
-            std::weak_ptr<dag_vertex> connection = e_tmp.get_connection();
-
-            if (connection.lock()->incomming_edge_count() == 1) {
-              entry_vertices.push_back(connection.lock());
-            }
-
-            // Will reduce incomming connections.
-            e_tmp.connect_to(nullptr);
-          }
-        );
-
-        n->clear_edges();
-      }
-
-      for (auto v : dag_clone.graph_) {
-        if (v->edge_count() != 0) {
-          ret = true;
-          break;
-        }
-      }
+      ret = dag_topological_sort(graph_clone, sorted_vertices);
 
       return ret;
     }

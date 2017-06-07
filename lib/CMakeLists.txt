@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
-
 include_directories(../)
 include_directories(../include/)
+include_directories(${gtest_SOURCE_DIR}/include)
 
 find_package(UUID REQUIRED)
 
@@ -21,6 +21,7 @@ include_directories(
 
 set(SRC
   dag.cxx
+  dag_algorithms.cxx
   dag_edge.cxx
   dag_vertex.cxx
   uuid.cxx

@@ -7,6 +7,7 @@
 #include "u_dagtasks/uuid.h"
 
 #include <functional>
+#include <list>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -24,6 +25,8 @@ namespace uber
       friend class dag;
       friend class dag_vertex;
       friend struct dag_vertex::dag_vertex_connection;
+      friend bool dag_topological_sort(dag &g,
+        std::list<dag_vertex> &sorted_vertices);
 
       FRIEND_TEST(TestUDagEdge, copy_ctor);
       FRIEND_TEST(TestUDagEdge, assignment_operator);
