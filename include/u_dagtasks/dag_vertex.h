@@ -97,6 +97,7 @@ namespace uber
       void add_incomming_edge();
       void sub_incomming_edge();
       void clear_edges();
+      void reset_incomming_edge_count();
 
       dag_vertex(const dag_vertex &other);
       dag_vertex &operator=(const dag_vertex &rhs);

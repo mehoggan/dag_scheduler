@@ -8,6 +8,21 @@ namespace uber
 {
   namespace u_dagtasks
   {
+    std::vector<std::shared_ptr<dag_vertex>>
+    dag_vertices_with_no_incomming_edges(dag &g)
+    {
+      std::vector<std::shared_ptr<dag_vertex>> output;
+
+      g.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+          if (!v->has_incomming_edges()) {
+            output.push_back(v);
+          }
+        }
+      );
+
+      return output;
+    }
+
     bool dag_topological_sort(dag &g,
       std::list<dag_vertex> &sorted_vertices)
     {
@@ -17,14 +32,8 @@ namespace uber
       // Sorted nodes.
       std::list<std::shared_ptr<dag_vertex>> L;
       // Set of nodes with no incomming edges.
-      std::list<std::shared_ptr<dag_vertex>> Q;
-
-      g.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          if (!v->has_incomming_edges()) {
-            Q.push_back(v);
-          }
-        }
-      );
+      auto Qv = dag_vertices_with_no_incomming_edges(g);
+      std::list<std::shared_ptr<dag_vertex>> Q(Qv.begin(), Qv.end());
 
       while (!Q.empty()) {
         std::shared_ptr<dag_vertex> curr = Q.front();
@@ -43,7 +52,7 @@ namespace uber
         );
       }
 
-      ret &= (L.size() == g.vertex_count());
+      ret &= (L.size() != g.vertex_count());
       for (std::shared_ptr<dag_vertex> v : L) {
         sorted_vertices.push_back(v->clone());
       }

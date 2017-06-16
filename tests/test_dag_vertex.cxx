@@ -261,20 +261,30 @@ namespace uber
 
       std::vector<dag_vertex::dag_vertex_connection> edges =
         get_dag_vertex().clone_all_connections();
-
-      ASSERT_EQ(edges.size(), connections.size());
-      std::size_t index = 0;
-      get_dag_vertex().visit_all_edges([&](const dag_edge &e) {
-          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
-          EXPECT_EQ(*(e_ref.get_connection().lock()), edges[index].vertex());
-          ++index;
-        }
-      );
+      // First vertex connects to itself.
+      EXPECT_EQ(connections.size(), edges.size());
 
       dag_vertex tmp = get_dag_vertex().clone();
       std::vector<std::shared_ptr<dag_vertex>> connections_cloned =
         tmp.restablish_connections(edges);
       EXPECT_EQ(get_dag_vertex(), tmp);
+
+      std::size_t index = 0;
+      get_dag_vertex().visit_all_edges([&](const dag_edge &e) {
+          dag_edge &e_ref = *const_cast<dag_edge *>(&e);
+          std::size_t j = 0;
+          tmp.visit_all_edges([&](const dag_edge &e_clone) {
+              if (j == index) {
+                dag_edge &e_ref_clone = *const_cast<dag_edge *>(&e_clone);
+                EXPECT_EQ(*(e_ref.get_connection().lock()),
+                  *(e_ref_clone.get_connection().lock()));
+              }
+              ++j;
+            }
+          );
+          ++index;
+        }
+      );
 
       get_dag_vertex().clear_edges();
       ASSERT_EQ(0ul, get_dag_vertex().edge_count());

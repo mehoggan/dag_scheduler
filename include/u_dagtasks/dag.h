@@ -24,16 +24,16 @@ namespace uber
     class DLLSPEC_U_DAGTASKS dag
     {
     public:
-        class dag_exception : public std::runtime_error
-        {
-        public:
-          explicit dag_exception(const char *message);
+      class dag_exception : public std::runtime_error
+      {
+      public:
+        explicit dag_exception(const char *message);
 
-          virtual const char *what() const throw();
+        virtual const char *what() const throw();
 
-        private:
-          std::string what_;
-        };
+      private:
+        std::string what_;
+      };
 
     public:
       dag();
@@ -82,6 +82,8 @@ namespace uber
       void reset();
 
     protected:
+      void clone_connections(dag_vertex &from, dag_vertex &to);
+
       dag(const dag &other);
       dag &operator=(const dag &rhs);
 

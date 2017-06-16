@@ -50,7 +50,7 @@ namespace uber
     {
       bool ret = false;
 
-      if (!contains_vertex_by_label(v.label())) {
+      if (!contains_vertex(v)) {
         auto graph_vertex = std::make_shared<dag_vertex>(std::move(v));
         graph_.push_back(graph_vertex);
         ret = true;
@@ -61,19 +61,7 @@ namespace uber
 
     std::weak_ptr<dag_vertex> dag::find_vertex(const dag_vertex &v)
     {
-      std::weak_ptr<dag_vertex> ret;
-
-      auto it = std::find_if(graph_.begin(), graph_.end(),
-        [&](std::shared_ptr<dag_vertex> vi) {
-          const dag_vertex &rhs = (*(vi.get()));
-          return (v == rhs);
-        }
-      );
-
-      if (it != graph_.end()) {
-        ret = (*it);
-      }
-
+      std::weak_ptr<dag_vertex> ret = find_vertex_by_uuid(v.get_uuid());
       return ret;
     }
 
@@ -84,6 +72,12 @@ namespace uber
       auto it = std::find_if(graph_.begin(), graph_.end(),
         [&](std::shared_ptr<dag_vertex> vi) {
           const dag_vertex &rhs = (*(vi.get()));
+
+          std::string u_str = u.as_string();
+          std::string rhs_str = rhs.get_uuid().as_string();
+          (void)u_str;
+          (void)rhs_str;
+
           return (u == rhs.get_uuid());
         }
       );
@@ -95,8 +89,8 @@ namespace uber
       return ret;
     }
 
-    std::vector<std::weak_ptr<dag_vertex>> dag::find_all_verticies_with_label(
-      const std::string &l)
+    std::vector<std::weak_ptr<dag_vertex>>
+    dag::find_all_verticies_with_label(const std::string &l)
     {
       std::vector<std::weak_ptr<dag_vertex>> ret;
 
@@ -184,7 +178,7 @@ namespace uber
     bool dag::connection_would_make_cyclic_by_label(const std::string &l1,
       const std::string &l2)
     {
-      bool ret = false;
+      bool ret = true;
 
       std::vector<std::weak_ptr<dag_vertex>> v1;
       v1 = find_all_verticies_with_label(l1);
@@ -192,11 +186,19 @@ namespace uber
       v2 = find_all_verticies_with_label(l2);
 
       for (auto v : v1) {
+        bool good = true;
+
         for (auto u : v2) {
-          ret &= connection_would_make_cyclic(*(v.lock()), *(u.lock()));
+          ret &= (!connection_would_make_cyclic(*(v.lock()), *(u.lock())));
+          if (!ret) {
+            good = false;
+            break;
+          }
+        }
+        if (!good) {
+          break;
         }
       }
-
       return ret;
     }
 
@@ -359,6 +361,23 @@ namespace uber
       graph_.clear();
     }
 
+
+    void dag::clone_connections(dag_vertex &from, dag_vertex &to)
+    {
+      assert(from.get_uuid() == to.get_uuid() &&
+        "Cloning connections on dag_vertices that are not the same is not "
+        "permitted.");
+
+      std::vector<dag_vertex::dag_vertex_connection> from_connections =
+        from.clone_all_connections();
+
+      for (auto &connection : from_connections) {
+        std::weak_ptr<dag_vertex> find = find_vertex(connection.vertex());
+        assert(!find.expired() && "This should never happen.");
+        to.connect(find.lock());
+      }
+    }
+
     dag::dag(const dag &other)
     {
       dag *o = (const_cast<dag *>(&other));
@@ -367,6 +386,10 @@ namespace uber
           add_vertex(std::move(tmp));
         }
       );
+
+      for (std::size_t i = 0; i < graph_.size(); ++i) {
+        clone_connections(*other.graph_[i], *graph_[i]);
+      }
     }
 
     dag &dag::operator=(const dag &rhs)
@@ -377,6 +400,10 @@ namespace uber
           add_vertex(std::move(tmp));
         }
       );
+
+      for (std::size_t i = 0; i < graph_.size(); ++i) {
+        clone_connections(*rhs.graph_[i], *graph_[i]);
+      }
 
       return (*this);
     }
@@ -413,6 +440,9 @@ namespace uber
 
         ++index;
       }
+
+      ret &= (lhs.vertex_count() == rhs.vertex_count());
+      ret &= (lhs.edge_count() == rhs.edge_count());
 
       return ret;
     }
