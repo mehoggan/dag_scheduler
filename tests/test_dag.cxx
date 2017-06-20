@@ -261,6 +261,21 @@ namespace uber
         vertices_cloned[1], vertices_cloned[2]));
       EXPECT_FALSE(get_dag().connection_would_make_cyclic_by_uuid(
         vertices_cloned[1].get_uuid(), vertices_cloned[2].get_uuid()));
+      EXPECT_TRUE(get_dag().connect(vertices_cloned[1], vertices_cloned[2]));
+
+      /* cloned_vertices[0] -> cloned_vertices[2] */
+      EXPECT_FALSE(get_dag().connection_would_make_cyclic(
+        vertices_cloned[0], vertices_cloned[2]));
+      EXPECT_FALSE(get_dag().connection_would_make_cyclic_by_uuid(
+        vertices_cloned[0].get_uuid(), vertices_cloned[2].get_uuid()));
+      EXPECT_TRUE(get_dag().connect(vertices_cloned[0], vertices_cloned[2]));
+
+      /* cloned_vertices[2] -> cloned_vertices[0] */
+      EXPECT_FALSE(get_dag().connection_would_make_cyclic(
+        vertices_cloned[2], vertices_cloned[0]));
+      //EXPECT_FALSE(get_dag().connection_would_make_cyclic_by_uuid(
+      //  vertices_cloned[2].get_uuid(), vertices_cloned[0].get_uuid()));
+      //EXPECT_TRUE(get_dag().connect(vertices_cloned[2], vertices_cloned[0]));
 
       get_dag().reset();
       EXPECT_EQ(0ul, get_dag().edge_count());
