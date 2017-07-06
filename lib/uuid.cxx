@@ -1,10 +1,10 @@
-#include "u_dagtasks/uuid.h"
+#include "dagtasks/uuid.h"
 
 #include <iostream>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     uuid::uuid()
     {

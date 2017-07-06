@@ -3,8 +3,8 @@
 
 #include "declspec.h"
 
-#include "u_dagtasks/dag_vertex.h"
-#include "u_dagtasks/uuid.h"
+#include "dagtasks/dag_vertex.h"
+#include "dagtasks/uuid.h"
 
 #include <functional>
 #include <memory>
@@ -14,14 +14,14 @@
 #include <unordered_map>
 #include <vector>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     class dag_edge;
     class dag_vertex;
 
-    class DLLSPEC_U_DAGTASKS dag
+    class DLLSPEC_DAGTASKS dag
     {
     public:
       class dag_exception : public std::runtime_error

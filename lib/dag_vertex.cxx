@@ -1,14 +1,14 @@
-#include "u_dagtasks/dag_vertex.h"
+#include "dagtasks/dag_vertex.h"
 
-#include "u_dagtasks/dag_edge.h"
+#include "dagtasks/dag_edge.h"
 
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     dag_vertex::dag_vertex_connection::dag_vertex_connection()
     {}
@@ -306,21 +306,10 @@ namespace uber
         std::size_t lhs_edge_count = lhs.edge_count();
         std::size_t rhs_edge_count = rhs.edge_count();
         ret &= (lhs_edge_count == rhs_edge_count);
-
         ret &= (lhs.incomming_edge_count() == rhs.incomming_edge_count());
-        dag_vertex &tmp = *const_cast<dag_vertex *>(&lhs);
-
-        // We are not guaranteed edges are in order. So this is O(e^2).
-        for (std::unique_ptr<dag_edge> &e : tmp.edges_) {
-          auto it = std::find_if(rhs.edges_.begin(), rhs.edges_.end(),
-            [&](const std::unique_ptr<dag_edge> &a) {
-              return ((*e) == (*a));
-            }
-          );
-          if (it == rhs.edges_.end()) {
-            ret &= false;
-          }
-        }
+        /* We omit comparision of edges since a vertex checks its edges
+           in equality which would lead to infinite recursion.
+        */
       } else if (lhs.current_status_ == dag_vertex::status::invalid &&
         rhs.current_status_ == dag_vertex::status::invalid){
         ret = true;

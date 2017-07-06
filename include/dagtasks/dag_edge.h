@@ -3,8 +3,8 @@
 
 #include "declspec.h"
 
-#include "u_dagtasks/dag_vertex.h"
-#include "u_dagtasks/uuid.h"
+#include "dagtasks/dag_vertex.h"
+#include "dagtasks/uuid.h"
 
 #include <functional>
 #include <list>
@@ -15,11 +15,11 @@
 
 #include <gtest/gtest_prod.h>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
-    class DLLSPEC_U_DAGTASKS dag_edge
+    class DLLSPEC_DAGTASKS dag_edge
     {
     private:
       friend class dag;

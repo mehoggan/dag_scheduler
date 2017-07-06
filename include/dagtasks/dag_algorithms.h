@@ -3,15 +3,15 @@
 
 #include "declspec.h"
 
-#include "u_dagtasks/dag.h"
+#include "dagtasks/dag.h"
 
 #include <list>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
-    bool dag_topological_sort(dag &g,
+    DLLSPEC_DAGTASKS bool dag_topological_sort(dag &g,
       std::list<dag_vertex> &sorted_vertices);
   }
 }

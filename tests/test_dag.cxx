@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "u_dagtasks/dag.h"
-#include "u_dagtasks/dag_algorithms.h"
+#include "dagtasks/dag.h"
+#include "dagtasks/dag_algorithms.h"
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     class TestUDag : public ::testing::Test
     {
@@ -271,11 +271,12 @@ namespace uber
       EXPECT_TRUE(get_dag().connect(vertices_cloned[0], vertices_cloned[2]));
 
       /* cloned_vertices[2] -> cloned_vertices[0] */
-      EXPECT_FALSE(get_dag().connection_would_make_cyclic(
+      EXPECT_TRUE(get_dag().connection_would_make_cyclic(
         vertices_cloned[2], vertices_cloned[0]));
-      //EXPECT_FALSE(get_dag().connection_would_make_cyclic_by_uuid(
-      //  vertices_cloned[2].get_uuid(), vertices_cloned[0].get_uuid()));
-      //EXPECT_TRUE(get_dag().connect(vertices_cloned[2], vertices_cloned[0]));
+      EXPECT_TRUE(get_dag().connection_would_make_cyclic_by_uuid(
+        vertices_cloned[2].get_uuid(), vertices_cloned[0].get_uuid()));
+      EXPECT_THROW(get_dag().connect(vertices_cloned[2], vertices_cloned[0]),
+        dag::dag_exception);
 
       get_dag().reset();
       EXPECT_EQ(0ul, get_dag().edge_count());

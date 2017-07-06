@@ -28,11 +28,11 @@ set(SRC
 )
 
 if (BUILD_SHARED_LIBS)
-  add_library(u_dagtasks SHARED ${SRC})
-  add_definitions(-DU_DAGTASKS_SHARED -DU_DAGTASKS_EXPORTS)
+  add_library(dagtasks SHARED ${SRC})
+  add_definitions(-DDAGTASKS_SHARED -DDAGTASKS_EXPORTS)
 else()
-  add_library(u_dagtasks STATIC ${SRC})
-  add_definitions(-DU_DAGTASKS_STATIC)
+  add_library(dagtasks STATIC ${SRC})
+  add_definitions(-DDAGTASKS_STATIC)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -43,7 +43,7 @@ else()
     -fno-strict-aliasing")
 endif()
 
-target_link_libraries(u_dagtasks
+target_link_libraries(dagtasks
   ${Boost_LIBRARIES}
   ${UUID_LIBRARIES}
 )

@@ -8,11 +8,11 @@
 #include <ostream>
 #include <string>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
-    class DLLSPEC_U_DAGTASKS uuid
+    class DLLSPEC_DAGTASKS uuid
     {
     public:
       uuid();

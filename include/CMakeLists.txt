@@ -1,1 +1,1 @@
-add_subdirectory(u_dagtasks)
+add_subdirectory(dagtasks)

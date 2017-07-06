@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include "u_dagtasks/dag_edge.h"
-#include "u_dagtasks/dag_vertex.h"
+#include "dagtasks/dag_edge.h"
+#include "dagtasks/dag_vertex.h"
 
 #include <iostream>
 #include <memory>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     class TestUDagEdge : public ::testing::Test
     {

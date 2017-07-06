@@ -1,12 +1,13 @@
-#include "u_dagtasks/dag_algorithms.h"
+#include "dagtasks/dag_algorithms.h"
 
-#include "u_dagtasks/dag_edge.h"
+#include "dagtasks/dag_edge.h"
+#include "dagtasks/dag_vertex.h"
 
 #include <cassert>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     std::vector<std::shared_ptr<dag_vertex>>
     dag_vertices_with_no_incomming_edges(dag &g)

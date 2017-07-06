@@ -1,10 +1,10 @@
-#include "u_dagtasks/dag_edge.h"
+#include "dagtasks/dag_edge.h"
 
 #include <iostream>
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     dag_edge::dag_edge() :
       current_status_(status::initialized)
@@ -153,8 +153,8 @@ namespace uber
       if (lhs_connection != nullptr && rhs_connection != nullptr) {
         ret &= (lhs.connection_.lock().use_count() ==
           rhs.connection_.lock().use_count());
-        bool objs_are_same = (*lhs_connection) == (*rhs_connection);
-        ret &= objs_are_same;
+        //bool objs_are_same = (*lhs_connection) == (*rhs_connection);
+        //ret &= objs_are_same;
       } else if (lhs_connection == nullptr && rhs_connection == nullptr) {
         ret &= true;
       } else {

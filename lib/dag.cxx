@@ -1,7 +1,7 @@
-#include "u_dagtasks/dag.h"
+#include "dagtasks/dag.h"
 
-#include "u_dagtasks/dag_algorithms.h"
-#include "u_dagtasks/dag_edge.h"
+#include "dagtasks/dag_algorithms.h"
+#include "dagtasks/dag_edge.h"
 
 #include <algorithm>
 #include <cassert>
@@ -11,9 +11,9 @@
 
 // TODO: Test this entire file.
 
-namespace uber
+namespace com
 {
-  namespace u_dagtasks
+  namespace dagtasks
   {
     dag::dag_exception::dag_exception(const char *message) :
       std::runtime_error(message),

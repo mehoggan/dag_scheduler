@@ -42,7 +42,7 @@ add_executable(unit_test
 )
 
 target_link_libraries(unit_test
-  u_dagtasks
+  dagtasks
   gtest
   gtest_main
   gmock
@@ -50,7 +50,7 @@ target_link_libraries(unit_test
   ${Boost_LIBRARIES}
 )
 target_link_libraries(unit_test
-  debug u_dagtasks
+  debug dagtasks
   gtest
   gtest_main
   gmock
