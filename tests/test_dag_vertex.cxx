@@ -512,7 +512,82 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    // TODO: Add in edges.
+    TEST_F(TestUDagVertex, add_incomming_edge)
+    {
+      dag_vertex v("orig");
+      v.add_incomming_edge();
+      EXPECT_EQ(1, v.incomming_edge_count());
+    }
+
+    TEST_F(TestUDagVertex, sub_incomming_edge)
+    {
+      dag_vertex v("orig");
+      v.add_incomming_edge();
+      v.add_incomming_edge();
+      v.sub_incomming_edge();
+      EXPECT_EQ(1, v.incomming_edge_count());
+    }
+
+    TEST_F(TestUDagVertex, clear_edges)
+    {
+      dag_vertex v("orig");
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+      EXPECT_EQ(6, v.edge_count());
+      v.clear_edges();
+      EXPECT_EQ(0, v.edge_count());
+    }
+
+    TEST_F(TestUDagVertex, reset_incomming_edge_count)
+    {
+      dag_vertex v("orig");
+      v.add_incomming_edge();
+      v.add_incomming_edge();
+      v.add_incomming_edge();
+      v.add_incomming_edge();
+      v.add_incomming_edge();
+      EXPECT_EQ(5, v.incomming_edge_count());
+      v.reset_incomming_edge_count();
+      EXPECT_EQ(0, v.incomming_edge_count());
+    }
+
+    TEST_F(TestUDagVertex, get_edge_at)
+    {
+      dag_vertex v("orig");
+      std::vector<std::shared_ptr<dag_vertex>> connections = {
+        std::make_shared<dag_vertex>("1"),
+        std::make_shared<dag_vertex>("2"),
+        std::make_shared<dag_vertex>("3"),
+        std::make_shared<dag_vertex>("4"),
+        std::make_shared<dag_vertex>("5"),
+        std::make_shared<dag_vertex>("6"),
+      };
+
+      for (std::shared_ptr<dag_vertex> c : connections) {
+        v.connect(c);
+      }
+
+      // Make use_count the same.
+      connections.clear();
+
+      std::size_t index = 0;
+      v.visit_all_edges([&](const dag_edge &e) {
+          EXPECT_EQ(e, v.get_edge_at(index));
+          ++index;
+        }
+      );
+    }
+
     TEST_F(TestUDagVertex, copy_ctor_with_edges)
     {
       dag_vertex v("orig");
@@ -585,8 +660,6 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-//
-//    // TODO: Add in edges.
     TEST_F(TestUDagVertex, assignment_operator_with_edges)
     {
       dag_vertex v("orig");

@@ -25,7 +25,12 @@ namespace com
       return what_.c_str();
     }
 
-    dag::dag()
+    dag::dag() :
+      dag("")
+    {}
+
+    dag::dag(const std::string &title) :
+      title_(title)
     {}
 
     dag::~dag()
@@ -246,7 +251,7 @@ namespace com
     bool dag::connect_all_by_label(const std::string l1,
       const std::string l2)
     {
-      bool ret = false;
+      bool ret = true;
 
       std::vector<std::weak_ptr<dag_vertex>> v1;
       v1 = find_all_verticies_with_label(l1);
@@ -266,15 +271,16 @@ namespace com
     {
       bool ret = false;
 
-      std::string l1 = v1.label();
-      std::string l2 = v2.label();
+      dag_vertex v1_clone = v1.clone();
+      dag_vertex v2_clone = v2.clone();
 
       add_vertex(std::move(v1));
       add_vertex(std::move(v2));
 
-      if (!connection_would_make_cyclic(v1, v2)) {
-        ret = connect_all_by_label(l1, l2);
-      }
+      std::weak_ptr<dag_vertex> v1_ptr = find_vertex(v1_clone);
+      std::weak_ptr<dag_vertex> v2_ptr = find_vertex(v2_clone);
+
+      ret = connect(*(v1_ptr.lock().get()), *(v2_ptr.lock().get()));
 
       return ret;
     }
@@ -323,6 +329,8 @@ namespace com
       std::vector<std::weak_ptr<dag_vertex>> v2;
       v2 = find_all_verticies_with_label(l2);
 
+      ret &= (!v1.empty() && !v2.empty());
+
       for (auto vfrom : v1) {
         for (auto vto : v2) {
           ret &= are_connected(*(vfrom.lock()), *(vto.lock()));
@@ -356,11 +364,21 @@ namespace com
       return ret;
     }
 
+    const std::string &dag::title() const
+    {
+      return title_;
+    }
+
     void dag::reset()
     {
       graph_.clear();
     }
 
+    std::shared_ptr<dag_vertex> dag::get_vertex_at(std::size_t i)
+    {
+      assert(i < graph_.size() && "Index out of bounds.");
+      return graph_[i];
+    }
 
     void dag::clone_connections(dag_vertex &from, dag_vertex &to)
     {
@@ -408,6 +426,16 @@ namespace com
       return (*this);
     }
 
+    std::ostream &operator<<(std::ostream &out, const dag &g)
+    {
+      out << "Title: --" << g.title_ << "--" << std::endl;
+      for (std::shared_ptr<dag_vertex> v : g.graph_) {
+        out << (*v) << std::endl;
+      }
+
+      return out;
+    }
+
     bool operator==(const dag &lhs, const dag &rhs)
     {
       bool ret = true;
@@ -440,7 +468,6 @@ namespace com
 
         ++index;
       }
-
       ret &= (lhs.vertex_count() == rhs.vertex_count());
       ret &= (lhs.edge_count() == rhs.edge_count());
 

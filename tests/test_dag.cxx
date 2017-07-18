@@ -3,6 +3,8 @@
 #include "dagtasks/dag.h"
 #include "dagtasks/dag_algorithms.h"
 
+#include <iostream>
+
 namespace com
 {
   namespace dagtasks
@@ -22,7 +24,7 @@ namespace com
       std::vector<dag_vertex> fill_dag_default()
       {
         dag_vertex v0("1"), v1("1"), v2("1a"), v3("1b"), v4("2"), v5("2"),
-          v6("2"), v7("3"), v8("4"), v9("5");
+          v6("2"), v7("3"), v8("3"), v9("4"), v10("5");
         std::vector<dag_vertex> vertices_to_add;
         vertices_to_add.push_back(std::move(v0));
         vertices_to_add.push_back(std::move(v1));
@@ -34,6 +36,7 @@ namespace com
         vertices_to_add.push_back(std::move(v7));
         vertices_to_add.push_back(std::move(v8));
         vertices_to_add.push_back(std::move(v9));
+        vertices_to_add.push_back(std::move(v10));
 
         std::vector<dag_vertex> vertices_cloned;
         vertices_cloned.reserve(vertices_to_add.size());
@@ -65,6 +68,15 @@ namespace com
     {
       EXPECT_EQ(0ul, get_dag().edge_count());
       EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, ctor_with_title)
+    {
+      dag test_dag("test_dag");
+
+      EXPECT_EQ(0ul, test_dag.edge_count());
+      EXPECT_EQ(0ul, test_dag.vertex_count());
+      EXPECT_EQ(std::string("test_dag"), test_dag.title());
     }
 
     TEST_F(TestUDag, dtor_no_edges_no_vertices)
@@ -283,8 +295,225 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, clone_with_multiple_vertices_and_connections)
+    TEST_F(TestUDag, coonect_all_by_label_and_acyclic_check)
     {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+
+      EXPECT_TRUE(get_dag().connect_all_by_label("1", "2"));
+      EXPECT_THROW(get_dag().connect_all_by_label("2", "1"),
+        dag::dag_exception);
+      EXPECT_TRUE(get_dag().connect_all_by_label("1a", "5"));
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, add_and_connect_and_acyclic_check)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+      dag test_dag("test_dag");
+
+      {
+        dag_vertex clone0 = vertices_cloned[0].clone();
+        dag_vertex clone1 = vertices_cloned[1].clone();
+        EXPECT_TRUE(test_dag.add_and_connect(
+            std::move(clone0),
+            std::move(clone1)
+          )
+        );
+      }
+
+      {
+        dag_vertex clone0 = vertices_cloned[1].clone();
+        dag_vertex clone1 = vertices_cloned[0].clone();
+        EXPECT_THROW(test_dag.add_and_connect(
+            std::move(clone0),
+            std::move(clone1)
+          ),
+          dag::dag_exception
+        );
+      }
+
+      {
+        dag_vertex clone0 = vertices_cloned[2].clone();
+        dag_vertex clone1 = vertices_cloned[3].clone();
+        EXPECT_TRUE(test_dag.add_and_connect(
+            std::move(clone0),
+            std::move(clone1)
+          )
+        );
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, are_connected)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+
+      {
+        dag_vertex clone0 = vertices_cloned[0].clone();
+        dag_vertex clone1 = vertices_cloned[1].clone();
+        dag_vertex clone2 = vertices_cloned[2].clone();
+        EXPECT_TRUE(get_dag().connect(clone0, clone1));
+        EXPECT_TRUE(get_dag().are_connected(clone0, clone1));
+        EXPECT_FALSE(get_dag().are_connected(clone1, clone2));
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, are_connected_by_uuid)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+
+      {
+        dag_vertex clone0 = vertices_cloned[0].clone();
+        dag_vertex clone1 = vertices_cloned[1].clone();
+        dag_vertex clone2 = vertices_cloned[2].clone();
+        EXPECT_TRUE(get_dag().connect(clone0, clone1));
+        EXPECT_TRUE(get_dag().are_connected_by_uuid(
+            clone0.get_uuid(),
+            clone1.get_uuid()
+          )
+        );
+        EXPECT_FALSE(get_dag().are_connected_by_uuid(
+            clone1.get_uuid(),
+            clone2.get_uuid()
+          )
+        );
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, all_are_connected_by_label)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+
+      EXPECT_TRUE(get_dag().connect_all_by_label("1", "2"));
+      EXPECT_TRUE(get_dag().connect_all_by_label("1a", "5"));
+
+      EXPECT_TRUE(get_dag().all_are_connected_by_label("1", "2"));
+      EXPECT_TRUE(get_dag().all_are_connected_by_label("1a", "5"));
+      EXPECT_FALSE(get_dag().all_are_connected_by_label("3", "5"));
+      EXPECT_FALSE(get_dag().all_are_connected_by_label("5", "3"));
+
+      EXPECT_TRUE(get_dag().connect_all_by_label("3", "5"));
+      EXPECT_TRUE(get_dag().all_are_connected_by_label("3", "5"));
+      EXPECT_FALSE(get_dag().all_are_connected_by_label("5", "3"));
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, get_vertex_at)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+      ASSERT_EQ(vertices_cloned.size(), get_dag().vertex_count());
+      for (std::size_t i = 0; i < vertices_cloned.size(); ++i) {
+        EXPECT_EQ(vertices_cloned[i], *(get_dag().get_vertex_at(i)));
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, clone_connections)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+      for (std::size_t i = 1; i < vertices_cloned.size(); ++i) {
+        get_dag().connect(vertices_cloned[0], vertices_cloned[i]);
+      }
+      dag_vertex v = vertices_cloned[0].clone();
+      get_dag().clone_connections(*(get_dag().get_vertex_at(0)), v);
+      EXPECT_EQ(v, *(get_dag().get_vertex_at(0)));
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, copy_ctor)
+    {
+      {
+        dag d_copy(get_dag());
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+
+      {
+        std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+        dag d_copy(get_dag());
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+
+      {
+        std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+        get_dag().connect_all_by_label("1", "2");
+        get_dag().connect_all_by_label("2", "3");
+        get_dag().connect_all_by_label("3", "5");
+        dag d_copy(get_dag());
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestUDag, assignment_operator)
+    {
+      {
+        dag d_copy;
+        d_copy = get_dag();
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+
+      {
+        std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+        dag d_copy;
+        d_copy = get_dag();
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+
+      {
+        std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+        get_dag().connect_all_by_label("1", "2");
+        get_dag().connect_all_by_label("2", "3");
+        get_dag().connect_all_by_label("3", "5");
+        dag d_copy;
+        d_copy = get_dag();
+        EXPECT_EQ(d_copy, get_dag());
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
     }
   }
 }

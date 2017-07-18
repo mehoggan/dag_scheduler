@@ -38,6 +38,11 @@ namespace com
       FRIEND_TEST(TestUDagVertex, clone_all_edges);
       FRIEND_TEST(TestUDagVertex, copy_ctor_with_edges);
       FRIEND_TEST(TestUDagVertex, assignment_operator_with_edges);
+      FRIEND_TEST(TestUDagVertex, add_incomming_edge);
+      FRIEND_TEST(TestUDagVertex, sub_incomming_edge);
+      FRIEND_TEST(TestUDagVertex, clear_edges);
+      FRIEND_TEST(TestUDagVertex, reset_incomming_edge_count);
+      FRIEND_TEST(TestUDagVertex, get_edge_at);
 
     public:
       struct dag_vertex_connection
@@ -98,6 +103,7 @@ namespace com
       void sub_incomming_edge();
       void clear_edges();
       void reset_incomming_edge_count();
+      const dag_edge &get_edge_at(std::size_t i) const;
 
       dag_vertex(const dag_vertex &other);
       dag_vertex &operator=(const dag_vertex &rhs);

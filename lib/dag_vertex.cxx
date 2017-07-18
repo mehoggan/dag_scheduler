@@ -251,6 +251,12 @@ namespace com
       incomming_edge_count_.store(0);
     }
 
+    const dag_edge &dag_vertex::get_edge_at(std::size_t i) const
+    {
+      assert(i < edges_.size() && "Index out of bounds.");
+      return *(edges_[i]);
+    }
+
     dag_vertex::dag_vertex(const dag_vertex &other) :
       uuid_(const_cast<dag_vertex *>(&other)->uuid_.clone()),
       current_status_(other.current_status_),
@@ -282,8 +288,9 @@ namespace com
     {
       out << "uuid_ = " << v.uuid_ << " current_status_ = "
         << v.current_status_as_string() << " label = " << v.label_ << " "
-        << "incomming_edge_count = " << v.incomming_edge_count_
-        << std::endl << "edges(" << v.edge_count() << "): ";
+        << "incomming_edge_count = " << v.incomming_edge_count_ << " "
+        << " edges = " << std::endl;
+        //<< std::endl << "edges(" << v.edge_count() << "): ";
       v.visit_all_edges([&](const dag_edge &e) {
           out << "\t" << e << std::endl;
         }

@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <gtest/gtest_prod.h>
+
 namespace com
 {
   namespace dagtasks
@@ -23,6 +25,12 @@ namespace com
 
     class DLLSPEC_DAGTASKS dag
     {
+    private:
+      FRIEND_TEST(TestUDag, get_vertex_at);
+      FRIEND_TEST(TestUDag, clone_connections);
+      FRIEND_TEST(TestUDag, copy_ctor);
+      FRIEND_TEST(TestUDag, assignment_operator);
+
     public:
       class dag_exception : public std::runtime_error
       {
@@ -37,6 +45,7 @@ namespace com
 
     public:
       dag();
+      explicit dag(const std::string &title);
       ~dag();
 
       dag(dag &&other);
@@ -78,10 +87,12 @@ namespace com
 
       std::size_t vertex_count() const;
       std::size_t edge_count() const;
+      const std::string &title() const;
 
       void reset();
 
     protected:
+      std::shared_ptr<dag_vertex> get_vertex_at(std::size_t i);
       void clone_connections(dag_vertex &from, dag_vertex &to);
 
       dag(const dag &other);
@@ -90,8 +101,10 @@ namespace com
     private:
       typedef std::vector<std::shared_ptr<dag_vertex>> dag_graph;
       dag_graph graph_;
+      std::string title_;
 
     public:
+      friend std::ostream &operator<<(std::ostream &out, const dag &g);
       friend bool operator==(const dag &lhs, const dag &rhs);
       friend bool operator!=(const dag &lhs, const dag &rhs);
     };
