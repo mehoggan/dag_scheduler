@@ -3,8 +3,8 @@
 
 #include "declspec.h"
 
-#include "dagtasks/dag_vertex.h"
-#include "dagtasks/uuid.h"
+#include "dag_scheduler/dag_vertex.h"
+#include "dag_scheduler/uuid.h"
 
 #include <functional>
 #include <list>
@@ -17,7 +17,7 @@
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     class DLLSPEC_DAGTASKS dag_edge
     {

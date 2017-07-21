@@ -1,13 +1,13 @@
 #include <gtest/gtest.h>
 
-#include "dagtasks/dag.h"
-#include "dagtasks/dag_algorithms.h"
+#include "dag_scheduler/dag.h"
+#include "dag_scheduler/dag_algorithms.h"
 
 #include <iostream>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     class TestUDag : public ::testing::Test
     {

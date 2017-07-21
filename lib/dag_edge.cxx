@@ -1,10 +1,10 @@
-#include "dagtasks/dag_edge.h"
+#include "dag_scheduler/dag_edge.h"
 
 #include <iostream>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     dag_edge::dag_edge() :
       current_status_(status::initialized)

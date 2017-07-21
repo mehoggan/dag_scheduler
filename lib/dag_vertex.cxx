@@ -1,6 +1,6 @@
-#include "dagtasks/dag_vertex.h"
+#include "dag_scheduler/dag_vertex.h"
 
-#include "dagtasks/dag_edge.h"
+#include "dag_scheduler/dag_edge.h"
 
 #include <algorithm>
 #include <cassert>
@@ -8,7 +8,7 @@
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     dag_vertex::dag_vertex_connection::dag_vertex_connection()
     {}

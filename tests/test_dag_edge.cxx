@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include "dagtasks/dag_edge.h"
-#include "dagtasks/dag_vertex.h"
+#include "dag_scheduler/dag_edge.h"
+#include "dag_scheduler/dag_vertex.h"
 
 #include <iostream>
 #include <memory>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     class TestUDagEdge : public ::testing::Test
     {

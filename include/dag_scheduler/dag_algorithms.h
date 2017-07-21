@@ -3,13 +3,13 @@
 
 #include "declspec.h"
 
-#include "dagtasks/dag.h"
+#include "dag_scheduler/dag.h"
 
 #include <list>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     DLLSPEC_DAGTASKS bool dag_topological_sort(dag &g,
       std::list<dag_vertex> &sorted_vertices);

@@ -10,7 +10,7 @@
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     class DLLSPEC_DAGTASKS uuid
     {

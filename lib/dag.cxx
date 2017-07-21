@@ -1,7 +1,7 @@
-#include "dagtasks/dag.h"
+#include "dag_scheduler/dag.h"
 
-#include "dagtasks/dag_algorithms.h"
-#include "dagtasks/dag_edge.h"
+#include "dag_scheduler/dag_algorithms.h"
+#include "dag_scheduler/dag_edge.h"
 
 #include <algorithm>
 #include <cassert>
@@ -13,7 +13,7 @@
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     dag::dag_exception::dag_exception(const char *message) :
       std::runtime_error(message),

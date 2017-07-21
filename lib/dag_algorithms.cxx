@@ -1,13 +1,13 @@
-#include "dagtasks/dag_algorithms.h"
+#include "dag_scheduler/dag_algorithms.h"
 
-#include "dagtasks/dag_edge.h"
-#include "dagtasks/dag_vertex.h"
+#include "dag_scheduler/dag_edge.h"
+#include "dag_scheduler/dag_vertex.h"
 
 #include <cassert>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     std::vector<std::shared_ptr<dag_vertex>>
     dag_vertices_with_no_incomming_edges(dag &g)

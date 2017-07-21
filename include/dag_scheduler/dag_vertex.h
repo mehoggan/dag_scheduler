@@ -3,7 +3,7 @@
 
 #include "declspec.h"
 
-#include "dagtasks/uuid.h"
+#include "dag_scheduler/uuid.h"
 
 #include <atomic>
 #include <memory>
@@ -15,7 +15,7 @@
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     class dag_edge;
     class dag;

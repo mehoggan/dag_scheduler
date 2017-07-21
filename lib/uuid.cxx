@@ -1,10 +1,10 @@
-#include "dagtasks/uuid.h"
+#include "dag_scheduler/uuid.h"
 
 #include <iostream>
 
 namespace com
 {
-  namespace dagtasks
+  namespace dag_scheduler
   {
     uuid::uuid()
     {
