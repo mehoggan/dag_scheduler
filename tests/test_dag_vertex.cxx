@@ -9,13 +9,13 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestUDagVertex : public ::testing::Test
+    class TestDagVertex : public ::testing::Test
     {
     protected:
       virtual void SetUp()
       {
-        v_ptr_ = std::make_shared<dag_vertex>("TestUDagVertexPtr");
-        v_ = dag_vertex("TestUDagVertex");
+        v_ptr_ = std::make_shared<dag_vertex>("TestDagVertexPtr");
+        v_ = dag_vertex("TestDagVertex");
       }
 
       virtual void TearDown()
@@ -38,7 +38,7 @@ namespace com
       dag_vertex v_;
     };
 
-    TEST_F(TestUDagVertex, ctor)
+    TEST_F(TestDagVertex, ctor)
     {
       dag_vertex v;
       EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
@@ -49,7 +49,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, string_ctor)
+    TEST_F(TestDagVertex, string_ctor)
     {
       dag_vertex v("1");
       EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
@@ -60,7 +60,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, dtor_no_edges)
+    TEST_F(TestDagVertex, dtor_no_edges)
     {
       dag_vertex v("1");
       v.~dag_vertex();
@@ -72,7 +72,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, move_ctor_no_edges)
+    TEST_F(TestDagVertex, move_ctor_no_edges)
     {
       dag_vertex v("1");
       dag_vertex v_moved = std::move(v);
@@ -93,7 +93,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, assignment_move_operator_no_edges)
+    TEST_F(TestDagVertex, assignment_move_operator_no_edges)
     {
       dag_vertex v("1");
       dag_vertex v_moved;
@@ -115,7 +115,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, clone_no_edges)
+    TEST_F(TestDagVertex, clone_no_edges)
     {
       dag_vertex v("1");
       dag_vertex v_cloned = v.clone();
@@ -136,7 +136,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, copy_ctor_no_edges)
+    TEST_F(TestDagVertex, copy_ctor_no_edges)
     {
       dag_vertex v("1");
       dag_vertex v_copied(v);
@@ -157,7 +157,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, assignment_operator_no_edges)
+    TEST_F(TestDagVertex, assignment_operator_no_edges)
     {
       dag_vertex v("1");
       dag_vertex v_copied;
@@ -179,7 +179,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, connect_and_contains_connection)
+    TEST_F(TestDagVertex, connect_and_contains_connection)
     {
       {
         std::shared_ptr<dag_vertex> v = std::make_shared<dag_vertex>("2");
@@ -213,7 +213,7 @@ namespace com
       ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
-    TEST_F(TestUDagVertex, visit_all_edges_points_to_actual_verticies)
+    TEST_F(TestDagVertex, visit_all_edges_points_to_actual_verticies)
     {
       std::vector<std::shared_ptr<dag_vertex>> connections = {
         std::make_shared<dag_vertex>("1"),
@@ -243,7 +243,7 @@ namespace com
       ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
-    TEST_F(TestUDagVertex, clone_all_edges_and_restablish_connections)
+    TEST_F(TestDagVertex, clone_all_edges_and_restablish_connections)
     {
       std::vector<std::shared_ptr<dag_vertex>> connections = {
         std::make_shared<dag_vertex>("1"),
@@ -290,7 +290,7 @@ namespace com
       ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
-    TEST_F(TestUDagVertex, has_incomming_edge_and_incomming_edge_count)
+    TEST_F(TestDagVertex, has_incomming_edge_and_incomming_edge_count)
     {
       std::vector<std::shared_ptr<dag_vertex>> connections = {
         std::make_shared<dag_vertex>("1"),
@@ -321,7 +321,7 @@ namespace com
       EXPECT_EQ(count, get_dag_vertex_ptr()->incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, move_ctor_with_edges)
+    TEST_F(TestDagVertex, move_ctor_with_edges)
     {
       dag_vertex v("orig");
 
@@ -380,7 +380,7 @@ namespace com
       EXPECT_EQ(0ul, v_moved.edge_count());
     }
 
-    TEST_F(TestUDagVertex, assignment_move_operator_with_edges)
+    TEST_F(TestDagVertex, assignment_move_operator_with_edges)
     {
       dag_vertex v("orig");
       dag_vertex v_moved;
@@ -440,7 +440,7 @@ namespace com
       EXPECT_EQ(0ul, v_moved.edge_count());
     }
 
-    TEST_F(TestUDagVertex, clone_with_edges)
+    TEST_F(TestDagVertex, clone_with_edges)
     {
       dag_vertex v("orig");
 
@@ -512,14 +512,14 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, add_incomming_edge)
+    TEST_F(TestDagVertex, add_incomming_edge)
     {
       dag_vertex v("orig");
       v.add_incomming_edge();
       EXPECT_EQ(1, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, sub_incomming_edge)
+    TEST_F(TestDagVertex, sub_incomming_edge)
     {
       dag_vertex v("orig");
       v.add_incomming_edge();
@@ -528,7 +528,7 @@ namespace com
       EXPECT_EQ(1, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, clear_edges)
+    TEST_F(TestDagVertex, clear_edges)
     {
       dag_vertex v("orig");
       std::vector<std::shared_ptr<dag_vertex>> connections = {
@@ -548,7 +548,7 @@ namespace com
       EXPECT_EQ(0, v.edge_count());
     }
 
-    TEST_F(TestUDagVertex, reset_incomming_edge_count)
+    TEST_F(TestDagVertex, reset_incomming_edge_count)
     {
       dag_vertex v("orig");
       v.add_incomming_edge();
@@ -561,7 +561,7 @@ namespace com
       EXPECT_EQ(0, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, get_edge_at)
+    TEST_F(TestDagVertex, get_edge_at)
     {
       dag_vertex v("orig");
       std::vector<std::shared_ptr<dag_vertex>> connections = {
@@ -588,7 +588,7 @@ namespace com
       );
     }
 
-    TEST_F(TestUDagVertex, copy_ctor_with_edges)
+    TEST_F(TestDagVertex, copy_ctor_with_edges)
     {
       dag_vertex v("orig");
 
@@ -660,7 +660,7 @@ namespace com
       EXPECT_EQ(0ul, v.incomming_edge_count());
     }
 
-    TEST_F(TestUDagVertex, assignment_operator_with_edges)
+    TEST_F(TestDagVertex, assignment_operator_with_edges)
     {
       dag_vertex v("orig");
 

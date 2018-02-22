@@ -9,7 +9,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestUDag : public ::testing::Test
+    class TestDag : public ::testing::Test
     {
     protected:
       virtual void SetUp() {}
@@ -64,13 +64,13 @@ namespace com
       dag d_;
     };
 
-    TEST_F(TestUDag, ctor)
+    TEST_F(TestDag, ctor)
     {
       EXPECT_EQ(0ul, get_dag().edge_count());
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, ctor_with_title)
+    TEST_F(TestDag, ctor_with_title)
     {
       dag test_dag("test_dag");
 
@@ -79,7 +79,7 @@ namespace com
       EXPECT_EQ(std::string("test_dag"), test_dag.title());
     }
 
-    TEST_F(TestUDag, dtor_no_edges_no_vertices)
+    TEST_F(TestDag, dtor_no_edges_no_vertices)
     {
       dag d;
 
@@ -88,7 +88,7 @@ namespace com
       EXPECT_EQ(0ul, d.vertex_count());
     }
 
-    TEST_F(TestUDag, move_ctor_no_edges_no_vertices)
+    TEST_F(TestDag, move_ctor_no_edges_no_vertices)
     {
       dag d;
 
@@ -97,7 +97,7 @@ namespace com
       EXPECT_EQ(0ul, d_moved.vertex_count());
     }
 
-    TEST_F(TestUDag, assignment_move_operator_no_edges_no_vertices)
+    TEST_F(TestDag, assignment_move_operator_no_edges_no_vertices)
     {
       dag d;
 
@@ -107,7 +107,7 @@ namespace com
       EXPECT_EQ(0ul, d_moved.vertex_count());
     }
 
-    TEST_F(TestUDag, clone_no_edges_no_vertices)
+    TEST_F(TestDag, clone_no_edges_no_vertices)
     {
       dag d;
 
@@ -116,7 +116,7 @@ namespace com
       EXPECT_EQ(0ul, d_cloned.vertex_count());
     }
 
-    TEST_F(TestUDag, add_vertex_and_reset)
+    TEST_F(TestDag, add_vertex_and_reset)
     {
       dag_vertex v1("1");
       get_dag().add_vertex(std::move(v1));
@@ -128,7 +128,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, add_single_vertex_and_find_vertex_by_vertex_and_uuid)
+    TEST_F(TestDag, add_single_vertex_and_find_vertex_by_vertex_and_uuid)
     {
       dag_vertex v1("1");
       dag_vertex v1_cloned = v1.clone();
@@ -151,7 +151,7 @@ namespace com
       EXPECT_TRUE(v2_weak.expired());
     }
 
-    TEST_F(TestUDag, add_single_vertex_and_find_vertex_by_label)
+    TEST_F(TestDag, add_single_vertex_and_find_vertex_by_label)
     {
       dag_vertex v1("1");
       dag_vertex v1_cloned = v1.clone();
@@ -168,7 +168,7 @@ namespace com
       EXPECT_TRUE(vertices[0].expired());
     }
 
-    TEST_F(TestUDag, add_vertices_with_same_and_different_labels)
+    TEST_F(TestDag, add_vertices_with_same_and_different_labels)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -233,7 +233,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, clone_with_multiple_vertices_no_connections)
+    TEST_F(TestDag, clone_with_multiple_vertices_no_connections)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
       dag dag_cloned = get_dag().clone();
@@ -249,7 +249,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, connect_and_acyclic_check)
+    TEST_F(TestDag, connect_and_acyclic_check)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -295,7 +295,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, coonect_all_by_label_and_acyclic_check)
+    TEST_F(TestDag, coonect_all_by_label_and_acyclic_check)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -309,7 +309,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, add_and_connect_and_acyclic_check)
+    TEST_F(TestDag, add_and_connect_and_acyclic_check)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
       dag test_dag("test_dag");
@@ -350,7 +350,38 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, are_connected)
+    TEST_F(TestDag, connect_by_uuid)
+    {
+      std::vector<dag_vertex> vertices_cloned = fill_dag_default();
+      dag test_dag("test_dag");
+
+      {
+        dag_vertex clone0 = vertices_cloned[0].clone();
+        dag_vertex clone1 = vertices_cloned[1].clone();
+        test_dag.add_vertex(vertices_cloned[0].clone());
+        test_dag.add_vertex(vertices_cloned[1].clone());
+        EXPECT_TRUE(test_dag.connect_by_uuid(
+            clone0.get_uuid(),
+            clone1.get_uuid()
+          )
+        );
+
+        std::weak_ptr<dag_vertex> clone0_confirm = test_dag.find_vertex(
+          clone0);
+        EXPECT_NE(nullptr, clone0_confirm.lock());
+        std::weak_ptr<dag_vertex> clone1_confirm = test_dag.find_vertex(
+          clone1);
+        EXPECT_NE(nullptr, clone1_confirm.lock());
+        EXPECT_TRUE(clone0_confirm.lock()->contains_connection_to(
+          *(clone1_confirm.lock().get())));
+      }
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestDag, are_connected)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -368,7 +399,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, are_connected_by_uuid)
+    TEST_F(TestDag, are_connected_by_uuid)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -394,7 +425,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, all_are_connected_by_label)
+    TEST_F(TestDag, all_are_connected_by_label)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -415,7 +446,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, get_vertex_at)
+    TEST_F(TestDag, get_vertex_at)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
       ASSERT_EQ(vertices_cloned.size(), get_dag().vertex_count());
@@ -428,7 +459,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, clone_connections)
+    TEST_F(TestDag, clone_connections)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
       for (std::size_t i = 1; i < vertices_cloned.size(); ++i) {
@@ -443,7 +474,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, copy_ctor)
+    TEST_F(TestDag, copy_ctor)
     {
       {
         dag d_copy(get_dag());
@@ -478,7 +509,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestUDag, assignment_operator)
+    TEST_F(TestDag, assignment_operator)
     {
       {
         dag d_copy;

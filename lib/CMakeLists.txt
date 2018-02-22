@@ -5,14 +5,17 @@ include_directories(${gtest_SOURCE_DIR}/include)
 
 find_package(UUID REQUIRED)
 
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS
+  date_time
   filesystem
-  program_options
-  regex
+  log
+  log_setup
   system
+  thread
+  program_options
 )
 include_directories(
   ${Boost_INCLUDE_DIRS}
@@ -24,6 +27,7 @@ set(SRC
   dag_algorithms.cxx
   dag_edge.cxx
   dag_vertex.cxx
+  logging.cxx
   uuid.cxx
 )
 
@@ -44,6 +48,6 @@ else()
 endif()
 
 target_link_libraries(dagtasks
-  ${Boost_LIBRARIES}
   ${UUID_LIBRARIES}
+  ${Boost_LIBRARIES}
 )

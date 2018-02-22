@@ -10,14 +10,17 @@ enable_testing()
 add_test(unit_test unit_test --report_level=no --log_level=all
   --output_format=xml --log_sink=${CMAKE_BINARY_DIR}/test_logs/${name}.xml)
 
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS
+  date_time
   filesystem
-  program_options
-  regex
+  log
+  log_setup
   system
+  thread
+  program_options
 )
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -38,19 +41,12 @@ add_executable(unit_test
   test_dag_algorithms.cxx
   test_dag_edge.cxx
   test_dag_vertex.cxx
+  test_logging.cxx
   test_uuid.cxx
 )
 
 target_link_libraries(unit_test
   dagtasks
-  gtest
-  gtest_main
-  gmock
-  gmock_main
-  ${Boost_LIBRARIES}
-)
-target_link_libraries(unit_test
-  debug dagtasks
   gtest
   gtest_main
   gmock

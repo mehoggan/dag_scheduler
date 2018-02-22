@@ -10,14 +10,14 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestUDagEdge : public ::testing::Test
+    class TestDagEdge : public ::testing::Test
     {
     protected:
       virtual void SetUp() {}
       virtual void TearDown() {}
     };
 
-    TEST_F(TestUDagEdge, ctor)
+    TEST_F(TestDagEdge, ctor)
     {
       dag_edge e;
       EXPECT_EQ(dag_edge::status::initialized, e.current_status());
@@ -25,7 +25,7 @@ namespace com
       EXPECT_FALSE(e.get_uuid().as_string().empty());
     }
 
-    TEST_F(TestUDagEdge, dtor)
+    TEST_F(TestDagEdge, dtor)
     {
       dag_edge e;
       e.~dag_edge();
@@ -34,7 +34,7 @@ namespace com
       EXPECT_EQ(nullptr, e.get_connection().lock().get());
     }
 
-    TEST_F(TestUDagEdge, mtor)
+    TEST_F(TestDagEdge, mtor)
     {
       dag_edge e1;
       dag_edge e2(std::move(e1));
@@ -54,7 +54,7 @@ namespace com
       EXPECT_EQ(nullptr, e3.get_connection().lock().get());
     }
 
-    TEST_F(TestUDagEdge, massign)
+    TEST_F(TestDagEdge, massign)
     {
       dag_edge e1;
       dag_edge e2;
@@ -69,7 +69,7 @@ namespace com
       EXPECT_EQ(nullptr, e2.get_connection().lock().get());
     }
 
-    TEST_F(TestUDagEdge, connect_and_clone)
+    TEST_F(TestDagEdge, connect_and_clone)
     {
       dag_edge e;
       std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
@@ -103,7 +103,7 @@ namespace com
       EXPECT_EQ(e, clone);
     }
 
-    TEST_F(TestUDagEdge, connect_to_null)
+    TEST_F(TestDagEdge, connect_to_null)
     {
       dag_edge e;
       std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
@@ -116,7 +116,7 @@ namespace com
       EXPECT_EQ(0ul, v1->incomming_edge_count());
     }
 
-    TEST_F(TestUDagEdge, connections)
+    TEST_F(TestDagEdge, connections)
     {
       dag_edge e;
       std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
@@ -130,7 +130,7 @@ namespace com
       EXPECT_FALSE(e.is_a_connection_to(*v1));
     }
 
-    TEST_F(TestUDagEdge, copy_ctor)
+    TEST_F(TestDagEdge, copy_ctor)
     {
       dag_edge e;
       dag_edge e_copy(e);
@@ -158,7 +158,7 @@ namespace com
       EXPECT_EQ(e, e_copy_post_connect);
     }
 
-    TEST_F(TestUDagEdge, assignment_operator)
+    TEST_F(TestDagEdge, assignment_operator)
     {
       dag_edge e;
       dag_edge e_copy;
@@ -188,7 +188,7 @@ namespace com
       EXPECT_EQ(e, e_copy_post_connect);
     }
 
-    TEST_F(TestUDagEdge, equality_operators_no_connection)
+    TEST_F(TestDagEdge, equality_operators_no_connection)
     {
       dag_edge e;
       dag_edge e_copy = e.clone();
@@ -199,7 +199,7 @@ namespace com
       EXPECT_FALSE(e_copy != e);
     }
 
-    TEST_F(TestUDagEdge, equality_operators_with_connection)
+    TEST_F(TestDagEdge, equality_operators_with_connection)
     {
       dag_edge e;
       dag_edge e_clone = e.clone();

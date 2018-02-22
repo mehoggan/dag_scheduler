@@ -9,8 +9,6 @@
 #include <iostream>
 #include <sstream>
 
-// TODO: Test this entire file.
-
 namespace com
 {
   namespace dag_scheduler
