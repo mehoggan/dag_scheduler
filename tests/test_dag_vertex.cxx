@@ -43,7 +43,7 @@ namespace com
       dag_vertex v;
       EXPECT_EQ(dag_vertex::status::initialized, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
-      EXPECT_EQ("", v.label());
+      EXPECT_EQ(v.get_uuid().as_string(), v.label());
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());

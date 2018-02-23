@@ -152,26 +152,129 @@ namespace com
       */
       dag_vertex clone();
 
-      //! A connect a ref counted instance of a \ref dag_vertex to this.
+      //! Connects a ref counted instance of a \ref dag_vertex to this.
       /*!
+        A member function of \ref dag_vertex that creates a \ref dag_edge
+        to \ref other.
+
+        \param[in] other The \ref dag_vertex for which an \ref dag_edge is
+                          drawn to.
+        \return True if connection is made false otherwise.
       */
       bool connect(std::shared_ptr<dag_vertex> other);
 
+      //! Checks for the existance of a \ref dag_edge to \ref other.
+      /*!
+        A member fucntion of \ref dag_vertex that checks if \ref this
+        contains a \ref dag_edge to \ref other.
+
+        \param[in] other The \ref dag_vertex which we are checking for a
+                         \ref dag_edge that is drawn to it.
+       */
       bool contains_connection_to(const dag_vertex &other);
+
+      //! A utility function used by \ref dag to reconnect after a clone.
+      /*!
+        A member function of \ref dag_vertex that is to be used after
+        \ref clone. Because a clone does not preserve connections users who
+        choose to use this class outside of a \ref dag will need a way to
+        reconnect the \ref dag_eged (s) that existed from \ref this before
+        \ref clone was called. To get the \ref connections users must call
+        \ref the member function \ref clone_all_connections before calling
+        this member function.
+
+        \param[in] connections A collection of \ref dag_vertex_connection
+                               that contains the results of calling
+                                \ref clone_all_connections.
+        \return A \ref std::vector<\ref std::shared_ptr<\ref dag_vertex>>
+                which contains ref counted instances of the connections
+                restablished by calling this function.
+      */
       std::vector<std::shared_ptr<dag_vertex>> restablish_connections(
         std::vector<dag_vertex_connection> &connections);
 
+      //! Used to get the number of \ref dag_vertex (s) this points to.
+      /*!
+        A member function of \ref dag_vertex that returns the number of
+        current connections from \ref this to other \ref dag_vertex via
+        a \ref dag_edge.
+
+        \return A positive integer with the number of \ref dag_edge (s) that
+                extend from \ref this to other \ref dag_vertex (s).
+      */
       std::size_t edge_count() const;
 
+      //! A utility function that visits all \ref dag_edge (s) of this.
+      /*!
+        A utility member function of \ref dag_vertex that visits each
+        \ref dag_edge in the order they were added to the collection of
+        \ref dag_edge (s) \ref this contains.
+
+        \param[in] cb A user defined function that is called once per
+                      \ref dag_edge that \ref this contains in the order
+                      that the \ref dag_edge (s) were added.
+      */
       void visit_all_edges(std::function<void (const dag_edge &)> cb) const;
+
+      //! A utility function used with \ref clone to preserve connections.
+      /*!
+        A utility member function of \ref dag_vertex that is to be used with
+        the member function of \ref dag_vertex, \ref clone to make it
+        possible for user's code to preserve connections after a \ref clone.
+        To restablish the connections the user would call the member function
+        \ref restablish_connections with the return value.
+
+        \return A \ref std::vector<\ref dag_vertex_connections> of the
+                \ref dag_edge (s) and their associate \ref dag_vertex.
+      */
       std::vector<dag_vertex_connection> clone_all_connections();
 
+      //*! A utility function to see if any \ref dag_edges point to this.
+      /*!
+        A utility member function of \ref dag_vertex that returns a boolean
+        value of \ref true if any \ref dag_edge (s) point at \ref this.
+
+        \return True if \ref dag_edge::connect_to was called with \ref this
+                provided as the ref counted object proveded as an argument to
+                the aforementioned function of \ref dag_edge. If the
+                contrary, then \ref false is returned.
+     */
       bool has_incomming_edges() const;
+
+      //*! A utility function used to get the number of \ref dag_edge (s)
+      //*! that point at this.
+      /*!
+        A utility function of \ref dag_vertex that returns a positive integer
+        for the number of \ref dag_edge (s) that point at \ref this.
+
+        \return A positive integer that represents the number of
+                \ref dag_edge (s) that point at this.
+      */
       std::size_t incomming_edge_count() const;
 
+      //*! A getter for the unique id owned by a instance of \ref dag_edge.
+      /*!
+        A member getter function for \ref dag_vertex for the unique id owned
+        by a instance or any clone of that instance of a \ref dag_edge.
+
+        \return A \ref uuid owned by the instance of \ref this.
+      */
       const uuid &get_uuid() const;
+
+      //*! TODO (mhoggan): Add doc string.
       const status &current_status() const;
+
+      //*! TODO (mhoggan): Add doc string.
       std::string current_status_as_string() const;
+
+      //*! A getter for the label used to visualize a \ref dag_vertex.
+      /*!
+        A member getter function for \ref dag_vertex for the label that
+        helps identify a instance of \ref dag_vertex. Note that it is not
+        guaranteed to be unique.
+
+        \return A string representation of that label.
+      */
       const std::string &label() const;
 
     protected:

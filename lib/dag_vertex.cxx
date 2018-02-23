@@ -31,6 +31,7 @@ namespace com
 
     dag_vertex::dag_vertex() :
       current_status_(status::initialized),
+      label_(uuid_.as_string()),
       incomming_edge_count_(0)
     {}
 
