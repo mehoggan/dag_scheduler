@@ -9,19 +9,22 @@ namespace com
 {
   namespace dag_scheduler
   {
-    std::vector<std::shared_ptr<dag_vertex>>
-    dag_vertices_with_no_incomming_edges(dag &g)
+    namespace detail
     {
-      std::vector<std::shared_ptr<dag_vertex>> output;
+      std::vector<std::shared_ptr<dag_vertex>>
+      dag_vertices_with_no_incomming_edges(dag &g)
+      {
+        std::vector<std::shared_ptr<dag_vertex>> output;
 
-      g.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          if (!v->has_incomming_edges()) {
-            output.push_back(v);
+        g.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+            if (!v->has_incomming_edges()) {
+              output.push_back(v);
+            }
           }
-        }
-      );
+        );
 
-      return output;
+        return output;
+      }
     }
 
     bool dag_topological_sort(dag &g,
@@ -33,7 +36,7 @@ namespace com
       // Sorted nodes.
       std::list<std::shared_ptr<dag_vertex>> L;
       // Set of nodes with no incomming edges.
-      auto Qv = dag_vertices_with_no_incomming_edges(g);
+      auto Qv = detail::dag_vertices_with_no_incomming_edges(g);
       std::list<std::shared_ptr<dag_vertex>> Q(Qv.begin(), Qv.end());
 
       while (!Q.empty()) {
@@ -58,6 +61,19 @@ namespace com
         sorted_vertices.push_back(v->clone());
       }
 
+      return ret;
+    }
+
+
+    bool process_dag(dag &g)
+    {
+      bool ret = false;
+
+      std::vector<std::shared_ptr<dag_vertex>>
+        dag_vertices_with_no_incomming_edges =
+          detail::dag_vertices_with_no_incomming_edges(g);
+
+      (void)dag_vertices_with_no_incomming_edges;
       return ret;
     }
   }
