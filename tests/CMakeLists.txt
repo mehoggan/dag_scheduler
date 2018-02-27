@@ -37,6 +37,7 @@ endif()
 
 add_executable(unit_test
   main.cxx
+  test_concurrent_queue.cxx
   test_dag.cxx
   test_dag_algorithms.cxx
   test_dag_edge.cxx

@@ -79,15 +79,6 @@ namespace com
       EXPECT_EQ(std::string("test_dag"), test_dag.title());
     }
 
-    TEST_F(TestDag, dtor_no_edges_no_vertices)
-    {
-      dag d;
-
-      d.~dag();
-      EXPECT_EQ(0ul, d.edge_count());
-      EXPECT_EQ(0ul, d.vertex_count());
-    }
-
     TEST_F(TestDag, move_ctor_no_edges_no_vertices)
     {
       dag d;
@@ -295,7 +286,7 @@ namespace com
       EXPECT_EQ(0ul, get_dag().vertex_count());
     }
 
-    TEST_F(TestDag, coonect_all_by_label_and_acyclic_check)
+    TEST_F(TestDag, connect_all_by_label_and_acyclic_check)
     {
       std::vector<dag_vertex> vertices_cloned = fill_dag_default();
 
@@ -545,6 +536,96 @@ namespace com
       get_dag().reset();
       EXPECT_EQ(0ul, get_dag().edge_count());
       EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestDag, remove_vertex)
+    {
+      fill_dag_default();
+      dag g_clone = get_dag().clone();
+
+      auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+      ASSERT_EQ(1u, find_v_1a.size());
+      EXPECT_EQ("1a", find_v_1a[0].lock()->label());
+      g_clone.connect_all_by_label("1a", "1");
+      g_clone.connect_all_by_label("1a", "1b");
+      g_clone.connect_all_by_label("1a", "2");
+      g_clone.connect_all_by_label("1a", "3");
+      g_clone.connect_all_by_label("1a", "4");
+      g_clone.connect_all_by_label("1a", "5");
+      g_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+          ASSERT_NE(nullptr, v.get());
+          if (v->label() != "1a") {
+            EXPECT_EQ(1u, v->incomming_edge_count());
+          } else {
+            EXPECT_EQ(0u, v->incomming_edge_count());
+          }
+        });
+
+      ASSERT_TRUE(g_clone.remove_vertex(*(find_v_1a[0].lock())));
+
+      EXPECT_EQ(0u, g_clone.find_all_verticies_with_label("1a").size());
+      g_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+          ASSERT_NE(nullptr, v.get());
+          EXPECT_EQ(0u, v->incomming_edge_count());
+        });
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestDag, remove_vertex_by_uuid)
+    {
+      fill_dag_default();
+      dag g_clone = get_dag().clone();
+
+      auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+      g_clone.connect_all_by_label("1a", "1");
+      g_clone.connect_all_by_label("1a", "1b");
+      g_clone.connect_all_by_label("1a", "2");
+      g_clone.connect_all_by_label("1a", "3");
+      g_clone.connect_all_by_label("1a", "4");
+      g_clone.connect_all_by_label("1a", "5");
+      ASSERT_EQ(11u, g_clone.vertex_count());
+      ASSERT_EQ(1u, find_v_1a.size());
+      EXPECT_EQ("1a", find_v_1a[0].lock()->label());
+
+      ASSERT_TRUE(
+        g_clone.remove_vertex_by_uuid(find_v_1a[0].lock()->get_uuid()));
+
+      EXPECT_EQ(0u, g_clone.find_all_verticies_with_label("1a").size());
+      g_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+          ASSERT_NE(nullptr, v.get());
+          EXPECT_EQ(0u, v->incomming_edge_count());
+        });
+
+      get_dag().reset();
+      EXPECT_EQ(0ul, get_dag().edge_count());
+      EXPECT_EQ(0ul, get_dag().vertex_count());
+    }
+
+    TEST_F(TestDag, remove_vertices_with_label)
+    {
+      fill_dag_default();
+      dag g_clone = get_dag().clone();
+
+      auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+      g_clone.connect_all_by_label("1a", "1");
+      g_clone.connect_all_by_label("1a", "1b");
+      g_clone.connect_all_by_label("1a", "2");
+      g_clone.connect_all_by_label("1a", "3");
+      g_clone.connect_all_by_label("1a", "4");
+      g_clone.connect_all_by_label("1a", "5");
+      g_clone.connect_all_by_label("1", "2");
+      EXPECT_EQ(11u, g_clone.vertex_count());
+      ASSERT_TRUE(g_clone.remove_all_vertex_with_label("1"));
+      ASSERT_TRUE(g_clone.remove_all_vertex_with_label("1a"));
+      EXPECT_EQ(8u, g_clone.vertex_count());
+
+      g_clone.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
+          ASSERT_NE(nullptr, v.get());
+          EXPECT_EQ(0u, v->incomming_edge_count());
+        });
     }
   }
 }

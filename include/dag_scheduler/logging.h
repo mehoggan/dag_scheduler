@@ -5,13 +5,17 @@
 
 #include "declspec.h"
 
-#include <boost/log/trivial.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/log/trivial.hpp>
+
+#include <gtest/gtest_prod.h>
 
 #include <atomic>
 #include <sstream>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 #include <thread>
 #include <mutex>
 
@@ -127,6 +131,9 @@ namespace com
     class DLLSPEC_DAGTASKS logging
     {
     private:
+      FRIEND_TEST(TestLogging, test_clear_all);
+
+    private:
       template<typename T>
       static void log_string_builder(std::stringstream &ss, T &&arg)
       {
@@ -142,6 +149,9 @@ namespace com
       }
 
     public:
+      typedef boost::log::sinks::synchronous_sink<
+        boost::log::sinks::text_ostream_backend> text_sink;
+
       //! Used to create a stdout source tied to a \ref log_tag.
       /*!
           A static function used to create a stdout source tied to a tag.
@@ -150,7 +160,7 @@ namespace com
                          stdout stream.
           \param[in] level A filter for a give sink and the \ref tag.
        */
-      static void add_std_cout_logger(const log_tag &tag,
+      static bool add_std_cout_logger(const log_tag &tag,
         boost::log::trivial::severity_level level = DAG_SCHEDULER_INFO);
 
       //! Used to create a stderr source tied to a \ref log_tag.
@@ -161,7 +171,7 @@ namespace com
                          stderr stream.
           \param[in] level A filter for a give sink and the \ref tag.
        */
-      static void add_std_cerr_logger(const log_tag &tag,
+      static bool add_std_cerr_logger(const log_tag &tag,
         boost::log::trivial::severity_level level = DAG_SCHEDULER_ERROR);
 
       //! Used to create a stdlog source tied to a \ref log_tag.
@@ -172,7 +182,7 @@ namespace com
                          stdlog stream.
           \param[in] level A filter for a give sink and the \ref tag.
        */
-      static void add_std_log_logger(const log_tag &tag,
+      static bool add_std_log_logger(const log_tag &tag,
         boost::log::trivial::severity_level level = DAG_SCHEDULER_TRACE);
 
       //! Used to create a file source tied to a \ref log_tag.
@@ -183,7 +193,7 @@ namespace com
                          a specific file stream.
           \param[in] level A filter for a give sink and the \ref tag.
        */
-      static void add_file_logger(const log_tag &tag,
+      static bool add_file_logger(const log_tag &tag,
         const boost::filesystem::path &log_path,
         boost::log::trivial::severity_level level = DAG_SCHEDULER_INFO);
 
@@ -323,6 +333,14 @@ namespace com
         write_severity_log(tag, DAG_SCHEDULER_FATAL, ss.str());
       }
 
+      //! Removes all sinks and clears the tags.
+      /*!
+        A static function that clears all loggers.
+
+        \return True if successful, false otherwise.
+      */
+      static bool clear_all();
+
     private:
       static void write_severity_log(
         const log_tag &tag,
@@ -334,7 +352,8 @@ namespace com
 
     private:
       static std::atomic<bool> init_;
-      static std::unordered_set<log_tag> loggers_;
+      static std::unordered_map<log_tag, boost::shared_ptr<text_sink>>
+        loggers_;
       static std::mutex loggers_mutex_;
     };
   }

@@ -4,6 +4,7 @@
 #include "declspec.h"
 
 #include "dag_scheduler/dag_vertex.h"
+#include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/uuid.h"
 
 #include <functional>
@@ -32,7 +33,8 @@ namespace com
       If any connection would make the graph acyclic then an exception is
       thrown and the connection is not made.
     */
-    class DLLSPEC_DAGTASKS dag
+    class DLLSPEC_DAGTASKS dag :
+      public logged_class<dag>
     {
     private:
       FRIEND_TEST(TestDag, get_vertex_at);
@@ -402,6 +404,41 @@ namespace com
         \return A \ref std::string which contains a optional title.
       */
       const std::string &title() const;
+
+      //! A function that removes a \ref dag_vertex and its \ref dag_edges.
+      /*!
+        A member function of \ref dag that removes a \ref dag_vertex \ref v
+        and all its \ref dag_edge from an instance of \ref dag.
+
+        \param[in] v The \ref dag_vertex to find and remove.
+        \return True if \ref v was found and removed. False otherwise.
+      */
+      bool remove_vertex(const dag_vertex &v);
+
+      //! A function that removes a \ref dag_vertex and its \ref dag_edges.
+      /*!
+        A member function of \ref dag that removes a \ref dag_vertex \ref v
+        based on its \ref uuid and all its \ref dag_edge from an instance of
+        \ref dag.
+
+        \param[in] u The \ref uuid of a \ref dag_vertex to find and remove.
+        \return True if \ref v was found and removed. False otherwise.
+      */
+      bool remove_vertex_by_uuid(const uuid &id);
+
+      //! A function that removes a \ref dag_vertex (s) and their
+      //! \ref dag_edges.
+      /*!
+        A member function of \ref dag that remove a set of \ref dag_vertex
+        based on a label. All \ref dag_edge (s) that extend from that set
+        are also removed from the \ref dag.
+
+        \param[in] label A string used to find any \ref dag_vertex requested
+                         to be removed from an instance of a \ref dag.
+        \return True if any \ref dag_vertex was found with \ref label and
+                removed. False otherwise.
+      */
+      bool remove_all_vertex_with_label(const std::string &label);
 
       //! A function that clears a instance of \ref dag.
       /*!

@@ -28,6 +28,7 @@ namespace com
     {}
 
     dag::dag(const std::string &title) :
+      logged_class(*this),
       title_(title)
     {}
 
@@ -35,6 +36,7 @@ namespace com
     {}
 
     dag::dag(dag &&other) :
+      logged_class(*this),
       graph_(std::move(other.graph_))
     {}
 
@@ -367,6 +369,78 @@ namespace com
       return title_;
     }
 
+    bool dag::remove_vertex(const dag_vertex &v)
+    {
+      bool ret = false;
+
+      graph_.erase(std::remove_if(graph_.begin(), graph_.end(),
+        [&](std::shared_ptr<dag_vertex> o) {
+          bool found = ((o.get() != nullptr) && (*(o.get()) == v));
+          if (found) {
+            o->visit_all_edges([&](const dag_edge &e){
+                if (e.connection_.lock() != nullptr) {
+                  e.connection_.lock()->sub_incomming_edge();
+                }
+              });
+            o->clear_edges();
+            ret = true;
+          }
+          return found;
+        }), graph_.end());
+
+      return ret;
+    }
+
+    bool dag::remove_vertex_by_uuid(const uuid &id)
+    {
+      bool ret = false;
+
+      std::vector<std::shared_ptr<dag_vertex>>::iterator remove_it =
+        std::remove_if(graph_.begin(), graph_.end(),
+          [&](std::shared_ptr<dag_vertex> o) {
+            bool found = ((o.get() != nullptr) && (o->get_uuid() == id));
+            if (found) {
+              o->visit_all_edges([&](const dag_edge &e){
+                  if (e.connection_.lock() != nullptr) {
+                    e.connection_.lock()->sub_incomming_edge();
+                  }
+                });
+              o->clear_edges();
+              ret = true;
+            }
+            return found;
+          });
+      graph_.erase(remove_it, graph_.end());
+
+      return ret;
+    }
+
+    bool dag::remove_all_vertex_with_label(const std::string &label)
+    {
+      bool ret = false;
+
+      std::vector<std::shared_ptr<dag_vertex>> found_with_label;
+
+      std::copy_if(graph_.begin(), graph_.end(),
+        std::back_inserter(found_with_label),
+        [&](std::shared_ptr<dag_vertex> v) {
+          return (v.get() && (v->label() == label));
+        });
+
+      ret = !(found_with_label.empty());
+
+      if (ret) {
+        std::for_each(found_with_label.begin(), found_with_label.end(),
+          [&](std::shared_ptr<dag_vertex> v) {
+            if (v != nullptr) {
+              remove_vertex(*v);
+            }
+          });
+      }
+
+      return ret;
+    }
+
     void dag::reset()
     {
       graph_.clear();
@@ -394,7 +468,8 @@ namespace com
       }
     }
 
-    dag::dag(const dag &other)
+    dag::dag(const dag &other) :
+      logged_class(*this)
     {
       dag *o = (const_cast<dag *>(&other));
       o->linear_traversal([&](std::shared_ptr<dag_vertex> v) {

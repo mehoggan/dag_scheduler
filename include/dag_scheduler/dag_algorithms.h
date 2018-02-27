@@ -21,8 +21,7 @@ namespace com
       \param[in] g The \ref dag to sort.
       \param[out] sorted_vertices The topological sorted \ref dag_vertex
                                   from \ref g.
-      \return True if all vertices were visited or false if there was a
-              cycle in \ref g.
+      \return True \ref dag has a cycle, false otherwise.
     */
     DLLSPEC_DAGTASKS bool dag_topological_sort(dag &g,
       std::list<dag_vertex> &sorted_vertices);

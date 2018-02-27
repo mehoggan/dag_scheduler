@@ -26,6 +26,21 @@ namespace com
       {}
     };
 
+    TEST_F(TestLogging, add_loggers_no_duplicates)
+    {
+      log_tag tag1("tag1");
+      //log_tag tag2("tag2");
+
+      EXPECT_TRUE(logging::add_std_cout_logger(tag1));
+      // EXPECT_FALSE(logging::add_std_cout_logger(tag1));
+      // EXPECT_TRUE(logging::add_std_cerr_logger(tag1));
+      // EXPECT_FALSE(logging::add_std_cerr_logger(tag1));
+      // EXPECT_TRUE(logging::add_std_log_logger(tag1));
+      // EXPECT_FALSE(logging::add_std_log_logger(tag1));
+      // EXPECT_TRUE(logging::add_file_logger(tag1, ""));
+      // EXPECT_FALSE(logging::add_file_logger(tag1, ""));
+    }
+
     TEST_F(TestLogging, does_tag_sink_filtering_work)
     {
       logging::add_std_log_logger(log_tag("TAGA"), DAG_SCHEDULER_INFO);
@@ -69,6 +84,16 @@ namespace com
 
 
       boost::filesystem::remove_all(tmpdir);
+    }
+
+    TEST_F(TestLogging, test_clear_all)
+    {
+      log_tag tag("test_clear_all");
+      logging::add_std_log_logger(tag, DAG_SCHEDULER_DEBUG);
+      EXPECT_EQ(1u, logging::loggers_.size());
+      ASSERT_TRUE(logging::clear_all());
+      EXPECT_EQ(0u, logging::loggers_.size());
+      logging::info(tag, "Check to see if log write to stdout.");
     }
   }
 }
