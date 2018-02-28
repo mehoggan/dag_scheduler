@@ -72,9 +72,6 @@ namespace com
         logging::dict::iterator it = std::find_if(
           dict.begin(), dict.end(), [&](logging::dict::value_type &v) {
             bool ret = std::string(v.first.tag()) == std::string(tag.tag());
-            if (ret) {
-              int x = 0; x = x;
-            }
             return ret;
           });
         return it;

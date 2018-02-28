@@ -63,6 +63,35 @@ namespace com
       dag d_;
     };
 
+    TEST_F(TestDagAlgorithms, dag_vertices_with_no_incomming_edges)
+    {
+      {
+        std::vector<dag_vertex> vertices = fill_dag_default();
+
+        get_dag().connect(vertices[0], vertices[1]); // a -> b
+        get_dag().connect(vertices[0], vertices[2]); // a -> c
+        get_dag().connect(vertices[0], vertices[4]); // a -> e
+        get_dag().connect(vertices[1], vertices[3]); // b -> d
+        get_dag().connect(vertices[1], vertices[5]); // b -> f
+        get_dag().connect(vertices[2], vertices[3]); // c -> d
+        get_dag().connect(vertices[4], vertices[5]); // e -> f
+        get_dag().connect(vertices[4], vertices[6]); // e -> g
+        get_dag().connect(vertices[5], vertices[6]); // f -> g
+        get_dag().connect(vertices[5], vertices[7]); // f -> h
+        get_dag().connect(vertices[5], vertices[8]); // f -> i
+        get_dag().connect(vertices[5], vertices[9]); // f -> j
+        get_dag().connect(vertices[6], vertices[7]); // g -> h
+
+        std::vector<std::shared_ptr<dag_vertex>> actual =
+          dag_vertices_with_no_incomming_edges(get_dag());
+
+        EXPECT_EQ(1u, actual.size());
+        EXPECT_EQ("a", actual[0]->label());
+
+        get_dag().reset();
+      }
+    }
+
     TEST_F(TestDagAlgorithms, dag_topological_sort)
     {
       std::vector<dag_vertex> vertices = fill_dag_default();
@@ -168,7 +197,27 @@ namespace com
         get_dag().connect(vertices[5], vertices[9]); // f -> j
         get_dag().connect(vertices[6], vertices[7]); // g -> h
 
-        EXPECT_TRUE(process_dag(get_dag()));
+        processed_order_type ordered_batches;
+
+        EXPECT_TRUE(process_dag(get_dag(), ordered_batches));
+
+        ASSERT_EQ(5u, ordered_batches.size());
+        ASSERT_EQ(1u, ordered_batches[0].size());
+        EXPECT_EQ("a", ordered_batches[0][0].label());
+        ASSERT_EQ(3u, ordered_batches[1].size());
+        EXPECT_EQ("b", ordered_batches[1][0].label());
+        EXPECT_EQ("c", ordered_batches[1][1].label());
+        EXPECT_EQ("e", ordered_batches[1][2].label());
+        ASSERT_EQ(2u, ordered_batches[2].size());
+        EXPECT_EQ("d", ordered_batches[2][0].label());
+        EXPECT_EQ("f", ordered_batches[2][1].label());
+        ASSERT_EQ(3u, ordered_batches[3].size());
+        EXPECT_EQ("g", ordered_batches[3][0].label());
+        EXPECT_EQ("i", ordered_batches[3][1].label());
+        EXPECT_EQ("j", ordered_batches[3][2].label());
+        ASSERT_EQ(1u, ordered_batches[4].size());
+        EXPECT_EQ("h", ordered_batches[4][0].label());
+
         get_dag().reset();
       }
     }
@@ -195,7 +244,9 @@ namespace com
         std::weak_ptr<dag_vertex> v0 = get_dag().find_vertex(vertices[0]);
         v7.lock().get()->connect(v0.lock());
 
-        EXPECT_FALSE(process_dag(get_dag()));
+        processed_order_type ordered_batches;
+
+        EXPECT_FALSE(process_dag(get_dag(), ordered_batches));
         get_dag().reset();
       }
     }
