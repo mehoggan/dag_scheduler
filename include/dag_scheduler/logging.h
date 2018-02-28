@@ -111,8 +111,7 @@ namespace std
   template<>
   struct hash<com::dag_scheduler::log_tag>
   {
-    size_t
-    operator()(const com::dag_scheduler::log_tag &obj) const
+    size_t operator()(const com::dag_scheduler::log_tag &obj) const
     {
       return hash<std::string>()(obj.tag());
     }
@@ -151,6 +150,7 @@ namespace com
     public:
       typedef boost::log::sinks::synchronous_sink<
         boost::log::sinks::text_ostream_backend> text_sink;
+      typedef std::unordered_map<log_tag, boost::shared_ptr<text_sink>> dict;
 
       //! Used to create a stdout source tied to a \ref log_tag.
       /*!
@@ -352,8 +352,7 @@ namespace com
 
     private:
       static std::atomic<bool> init_;
-      static std::unordered_map<log_tag, boost::shared_ptr<text_sink>>
-        loggers_;
+      static dict loggers_;
       static std::mutex loggers_mutex_;
     };
   }

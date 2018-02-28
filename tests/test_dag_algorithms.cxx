@@ -171,30 +171,33 @@ namespace com
         EXPECT_TRUE(process_dag(get_dag()));
         get_dag().reset();
       }
+    }
 
-      // {
-      //   std::vector<dag_vertex> vertices = fill_dag_default();
+    TEST_F(TestDagAlgorithms, process_dag_cyclic)
+    {
+      {
+        std::vector<dag_vertex> vertices = fill_dag_default();
 
-      //   get_dag().connect(vertices[0], vertices[1]); // a -> b
-      //   get_dag().connect(vertices[0], vertices[2]); // a -> c
-      //   get_dag().connect(vertices[0], vertices[4]); // a -> e
-      //   get_dag().connect(vertices[1], vertices[3]); // b -> d
-      //   get_dag().connect(vertices[1], vertices[5]); // b -> f
-      //   get_dag().connect(vertices[2], vertices[3]); // c -> d
-      //   get_dag().connect(vertices[4], vertices[5]); // e -> f
-      //   get_dag().connect(vertices[4], vertices[6]); // e -> g
-      //   get_dag().connect(vertices[5], vertices[6]); // f -> g
-      //   get_dag().connect(vertices[5], vertices[7]); // f -> h
-      //   get_dag().connect(vertices[5], vertices[8]); // f -> i
-      //   get_dag().connect(vertices[5], vertices[9]); // f -> j
-      //   get_dag().connect(vertices[6], vertices[7]); // g -> h
-      //   std::weak_ptr<dag_vertex> v7 = get_dag().find_vertex(vertices[7]);
-      //   std::weak_ptr<dag_vertex> v0 = get_dag().find_vertex(vertices[0]);
-      //   v7.lock().get()->connect(v0.lock());
+        get_dag().connect(vertices[0], vertices[1]); // a -> b
+        get_dag().connect(vertices[0], vertices[2]); // a -> c
+        get_dag().connect(vertices[0], vertices[4]); // a -> e
+        get_dag().connect(vertices[1], vertices[3]); // b -> d
+        get_dag().connect(vertices[1], vertices[5]); // b -> f
+        get_dag().connect(vertices[2], vertices[3]); // c -> d
+        get_dag().connect(vertices[4], vertices[5]); // e -> f
+        get_dag().connect(vertices[4], vertices[6]); // e -> g
+        get_dag().connect(vertices[5], vertices[6]); // f -> g
+        get_dag().connect(vertices[5], vertices[7]); // f -> h
+        get_dag().connect(vertices[5], vertices[8]); // f -> i
+        get_dag().connect(vertices[5], vertices[9]); // f -> j
+        get_dag().connect(vertices[6], vertices[7]); // g -> h
+        std::weak_ptr<dag_vertex> v7 = get_dag().find_vertex(vertices[7]);
+        std::weak_ptr<dag_vertex> v0 = get_dag().find_vertex(vertices[0]);
+        v7.lock().get()->connect(v0.lock());
 
-      //   EXPECT_FALSE(process_dag(get_dag()));
-      //   get_dag().reset();
-      // }
+        EXPECT_FALSE(process_dag(get_dag()));
+        get_dag().reset();
+      }
     }
   }
 }

@@ -29,16 +29,20 @@ namespace com
     TEST_F(TestLogging, add_loggers_no_duplicates)
     {
       log_tag tag1("tag1");
-      //log_tag tag2("tag2");
 
+      logging::clear_all();
       EXPECT_TRUE(logging::add_std_cout_logger(tag1));
-      // EXPECT_FALSE(logging::add_std_cout_logger(tag1));
-      // EXPECT_TRUE(logging::add_std_cerr_logger(tag1));
-      // EXPECT_FALSE(logging::add_std_cerr_logger(tag1));
-      // EXPECT_TRUE(logging::add_std_log_logger(tag1));
-      // EXPECT_FALSE(logging::add_std_log_logger(tag1));
-      // EXPECT_TRUE(logging::add_file_logger(tag1, ""));
-      // EXPECT_FALSE(logging::add_file_logger(tag1, ""));
+      EXPECT_FALSE(logging::add_std_cout_logger(tag1));
+      logging::clear_all();
+      EXPECT_TRUE(logging::add_std_cerr_logger(tag1));
+      EXPECT_FALSE(logging::add_std_cerr_logger(tag1));
+      logging::clear_all();
+      EXPECT_TRUE(logging::add_std_log_logger(tag1));
+      EXPECT_FALSE(logging::add_std_log_logger(tag1));
+      logging::clear_all();
+      EXPECT_TRUE(logging::add_file_logger(tag1, ""));
+      EXPECT_FALSE(logging::add_file_logger(tag1, ""));
+      logging::clear_all();
     }
 
     TEST_F(TestLogging, does_tag_sink_filtering_work)
@@ -88,6 +92,7 @@ namespace com
 
     TEST_F(TestLogging, test_clear_all)
     {
+      ASSERT_TRUE(logging::clear_all());
       log_tag tag("test_clear_all");
       logging::add_std_log_logger(tag, DAG_SCHEDULER_DEBUG);
       EXPECT_EQ(1u, logging::loggers_.size());

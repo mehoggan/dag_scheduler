@@ -65,6 +65,20 @@ namespace com
         sink->set_filter(severity >= level &&
           (boost::log::expressions::has_attr(tag_attr) && tag_attr == tag));
       }
+
+      logging::dict::iterator find_sink(const log_tag &tag,
+        logging::dict &dict)
+      {
+        logging::dict::iterator it = std::find_if(
+          dict.begin(), dict.end(), [&](logging::dict::value_type &v) {
+            bool ret = std::string(v.first.tag()) == std::string(tag.tag());
+            if (ret) {
+              int x = 0; x = x;
+            }
+            return ret;
+          });
+        return it;
+      }
     }
 
     log_tag::log_tag(const ::std::string &tag) :
@@ -100,7 +114,9 @@ namespace com
       bool ret = false;
 
       std::lock_guard<std::mutex> lock(logging::loggers_mutex_);
-      if (logging::loggers_.find(tag) == logging::loggers_.end()) {
+      auto end_it = logging::loggers_.end();
+      auto tag_it = detail::find_sink(tag, logging::loggers_);
+      if (tag_it == end_it) {
         boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::cout,
           boost::null_deleter());
@@ -119,7 +135,9 @@ namespace com
       bool ret = false;
 
       std::lock_guard<std::mutex> lock(logging::loggers_mutex_);
-      if (logging::loggers_.find(tag) == logging::loggers_.end()) {
+      auto end_it = logging::loggers_.end();
+      auto tag_it = detail::find_sink(tag, logging::loggers_);
+      if (tag_it == end_it) {
         boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::cerr,
           boost::null_deleter());
@@ -138,7 +156,9 @@ namespace com
       bool ret = false;
 
       std::lock_guard<std::mutex> lock(logging::loggers_mutex_);
-      if (logging::loggers_.find(tag) == logging::loggers_.end()) {
+      auto end_it = logging::loggers_.end();
+      auto tag_it = detail::find_sink(tag, logging::loggers_);
+      if (tag_it == end_it) {
         boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::clog,
           boost::null_deleter());
@@ -158,7 +178,9 @@ namespace com
       bool ret = false;
 
       std::lock_guard<std::mutex> lock(logging::loggers_mutex_);
-      if (logging::loggers_.find(tag) == logging::loggers_.end()) {
+      auto end_it = logging::loggers_.end();
+      auto tag_it = detail::find_sink(tag, logging::loggers_);
+      if (tag_it == end_it) {
         boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
         sink->locked_backend()->add_stream(
           boost::make_shared<std::ofstream>(log_path.string()));
@@ -195,13 +217,12 @@ namespace com
       std::for_each(logging::loggers_.begin(), logging::loggers_.end(),
         [&](std::unordered_map<log_tag,
           boost::shared_ptr<text_sink>>::value_type &pair) {
-            std::cout << "Removing " << pair.first << " from backend."
-              << std::endl;
-            std::cout.flush();
             boost::log::core::get()->remove_sink(pair.second);
             pair.second.reset();
           });
       logging::loggers_.clear();
+      // Get rid of default sink.
+      boost::log::core::get()->remove_all_sinks();
       ret = logging::loggers_.empty();
 
       return ret;

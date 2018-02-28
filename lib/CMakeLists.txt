@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 include_directories(../)
 include_directories(../include/)
+message(STATUS "gtest_SOURCE_DIR = ${gtest_SOURCE_DIR}")
 include_directories(${gtest_SOURCE_DIR}/include)
 
 find_package(UUID REQUIRED)
@@ -51,3 +52,4 @@ target_link_libraries(dagtasks
   ${UUID_LIBRARIES}
   ${Boost_LIBRARIES}
 )
+add_dependencies(dagtasks gtest)
