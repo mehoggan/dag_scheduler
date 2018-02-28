@@ -43,6 +43,7 @@ add_executable(unit_test
   test_dag_edge.cxx
   test_dag_vertex.cxx
   test_logging.cxx
+  test_task.cxx
   test_uuid.cxx
 )
 

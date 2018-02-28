@@ -29,6 +29,8 @@ set(SRC
   dag_edge.cxx
   dag_vertex.cxx
   logging.cxx
+  task.cxx
+  task_scheduler.cxx
   uuid.cxx
 )
 
