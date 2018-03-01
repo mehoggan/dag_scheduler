@@ -57,9 +57,18 @@ namespace com
         Pure virutal function used to run what a derived \task is supposed
         to do.
 
-        \return True if task was run successfully. False otherwise.
+        \return True if task was started successfully. False otherwise.
       */
       virtual bool run() = 0;
+
+      //! Pure virtual function used to check if task is running.
+      /*!
+        This is up to the derived class to define what this means, but
+        it is recomended that it return true only if \ref run was called.
+
+        \return True if task was run successfully, false otherwise.
+      */
+      virtual bool is_running() const = 0;
 
       //! Pure virtual function used to run a \ref task.
       /*!

@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <type_traits>
 
 namespace com
 {
@@ -33,6 +34,13 @@ namespace com
       };
 
     public:
+      concurrent_queue()
+      {
+        static_assert(std::is_move_assignable<DataType>::value &&
+          std::is_move_constructible<DataType>::value,
+          "Your DataType does is not movable.");
+      }
+
       //! A function to check how many items are on the queue.
       /*!
         WARNING: The accuracy of this function depends on the use case
@@ -55,7 +63,7 @@ namespace com
       void push(DataType const& data)
       {
         std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(data);
+        queue_.push(std::move(data));
         condition_variable_.notify_all();
       }
 
@@ -105,7 +113,7 @@ namespace com
         std::lock_guard<std::mutex> lock(mutex_);
         bool ret = false;
         if(!queue_.empty()) {
-          popped_value = queue_.front();
+          popped_value = std::move(queue_.front());
           queue_.pop();
           ret = true;
         }
@@ -131,7 +139,7 @@ namespace com
         std::unique_lock<std::mutex> lock(mutex_);
         condition_variable_.wait(lock, queue_not_empty(queue_));
         assert(!queue_.empty());
-        popped_value = queue_.front();
+        popped_value = std::move(queue_.front());
         queue_.pop();
       }
 
@@ -162,7 +170,7 @@ namespace com
           return false;
         }
 
-        popped_value = queue_.front();
+        popped_value = std::move(queue_.front());
         queue_.pop();
         return true;
       }

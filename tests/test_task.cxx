@@ -3,51 +3,70 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
+#include <atomic>
+
 namespace com
 {
   namespace dag_scheduler
   {
-    class test_task :
-      public task,
-      public logged_class<test_task>
+
+    class TestTaskImpl :
+      public logged_class<TestTaskImpl>,
+      public task
     {
     public:
-      test_task() :
+      TestTaskImpl() :
+        logged_class<TestTaskImpl>(*this),
         task(),
-        logged_class<test_task>(*this)
+        running_(false)
       {}
 
-      test_task(const std::string &label) :
+      TestTaskImpl(const std::string &label) :
+        logged_class<TestTaskImpl>(*this),
         task(label),
-        logged_class<test_task>(*this)
+        running_(false)
       {}
 
-      virtual ~test_task()
+      virtual ~TestTaskImpl()
       {}
 
       virtual bool run()
       {
+        running_.store(true);
         return true;
+      }
+
+      virtual bool is_running() const
+      {
+        return running_.load();
       }
 
       virtual bool kill()
       {
-        return true;
+        bool ret = false;
+        if (running_.load()) {
+          running_.store(false);
+          ret = true;
+        }
+        return ret;
       }
 
       virtual std::unique_ptr<task> clone()
       {
-        return std::unique_ptr<task>(new test_task(*this));
+        return std::unique_ptr<task>(new TestTaskImpl(*this));
       }
 
     private:
-      test_task(const test_task &other) :
-        task(),
-        logged_class<test_task>(*this)
+      TestTaskImpl(const TestTaskImpl &other) :
+        logged_class<TestTaskImpl>(*this),
+        task()
       {
         uuid_ = const_cast<uuid &>(other.get_uuid()).clone();
         label_ = other.label();
       }
+
+    private:
+      std::atomic_bool running_;
     };
 
     class TestTask :
@@ -66,14 +85,14 @@ namespace com
 
     TEST_F(TestTask, default_ctor)
     {
-      std::unique_ptr<task> test(new test_task());
+      std::unique_ptr<task> test(new TestTaskImpl);
       EXPECT_NE(nullptr, test);
       EXPECT_EQ(test->get_uuid().as_string(), test->label());
     }
 
     TEST_F(TestTask, label_ctor)
     {
-      std::unique_ptr<task> test(new test_task("test_label"));
+      std::unique_ptr<task> test(new TestTaskImpl("test_label"));
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
@@ -81,11 +100,31 @@ namespace com
 
     TEST_F(TestTask, run)
     {
-      test_task tt;
+      TestTaskImpl tt;
       EXPECT_TRUE(tt.run());
 
-      std::unique_ptr<task> tt_ptr(new test_task);
+      std::unique_ptr<task> tt_ptr(new TestTaskImpl);
       EXPECT_TRUE(tt_ptr->run());
+    }
+
+    TEST_F(TestTask, kill_if_is_running)
+    {
+      TestTaskImpl tt;
+      EXPECT_FALSE(tt.kill());
+
+      std::unique_ptr<task> tt_ptr(new TestTaskImpl);
+      EXPECT_FALSE(tt_ptr->kill());
+      EXPECT_TRUE(tt_ptr->run());
+      EXPECT_TRUE(tt_ptr->is_running());
+      EXPECT_TRUE(tt_ptr->kill());
+    }
+
+    TEST_F(TestTask, clone)
+    {
+      TestTaskImpl tt;
+      std::unique_ptr<task> tt_clone = tt.clone();
+      EXPECT_EQ(tt.get_uuid(), tt_clone->get_uuid());
+      EXPECT_EQ(tt.label(), tt_clone->label());
     }
   }
 }
