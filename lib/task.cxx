@@ -19,6 +19,12 @@ namespace com
     task::~task()
     {}
 
+    task::task(const task &other) :
+      label_(other.label_)
+    {
+      uuid_ = const_cast<uuid &>(other.uuid_).clone();
+    }
+
     const std::string &task::label() const
     {
       return label_;

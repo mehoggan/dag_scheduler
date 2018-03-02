@@ -18,17 +18,21 @@ namespace com
       TestTaskImpl() :
         logged_class<TestTaskImpl>(*this),
         task(),
-        running_(false)
+        running_(false),
+        nasty_user_defined_pointer_(new int(10))
       {}
 
       TestTaskImpl(const std::string &label) :
         logged_class<TestTaskImpl>(*this),
         task(label),
-        running_(false)
+        running_(false),
+        nasty_user_defined_pointer_(new int(10))
       {}
 
       virtual ~TestTaskImpl()
-      {}
+      {
+        cleanup();
+      }
 
       virtual bool run()
       {
@@ -51,6 +55,11 @@ namespace com
         return ret;
       }
 
+      virtual void cleanup()
+      {
+        delete nasty_user_defined_pointer_;
+      }
+
       virtual std::unique_ptr<task> clone()
       {
         return std::unique_ptr<task>(new TestTaskImpl(*this));
@@ -63,10 +72,13 @@ namespace com
       {
         uuid_ = const_cast<uuid &>(other.get_uuid()).clone();
         label_ = other.label();
+        nasty_user_defined_pointer_ =
+          new int(*(other.nasty_user_defined_pointer_));
       }
 
     private:
       std::atomic_bool running_;
+      int *nasty_user_defined_pointer_;
     };
 
     class TestTask :

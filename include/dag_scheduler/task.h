@@ -36,6 +36,12 @@ namespace com
       */
       virtual ~task();
 
+      //! Copy constructor for a \ref task
+      /*!
+        A copy constructor for a \ref task
+      */
+      task(const task &other);
+
       //! Getter for the user firendly label that identifies this task.
       /*!
         Each \ref task should be easily identifed by users. This is done
@@ -78,6 +84,14 @@ namespace com
         \return True if task was killed successfully. False otherwise.
       */
       virtual bool kill() = 0;
+
+      //! Pure virtual function used to force users to cleanup their tasks.
+      /*!
+        Because tasks can be interrupted and users wil have allocated
+        resources a task should be responsible for cleaning up after
+        itself.
+      */
+      virtual void cleanup() = 0;
 
       //! Pure virtual function that clones a derived class.
       /*!

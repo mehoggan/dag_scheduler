@@ -60,7 +60,7 @@ namespace com
 
         \param[in] data The \ref DataType to push onto the queue.
       */
-      void push(DataType const& data)
+      void push(DataType const&& data)
       {
         std::lock_guard<std::mutex> lock(mutex_);
         queue_.push(std::move(data));
