@@ -185,11 +185,11 @@ namespace com
       return kill_.load();
     }
 
-    bool task_scheduler::queue_task(std::unique_ptr<task> &t)
+    bool task_scheduler::queue_task(std::unique_ptr<task> &&t)
     {
       bool ret = false;
 
-      queue_.push(t);
+      queue_.push(std::move(t));
 
       return ret;
     }

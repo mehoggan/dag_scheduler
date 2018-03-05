@@ -21,9 +21,8 @@ namespace com
     private:
       struct queue_not_empty
       {
-        std::queue<DataType>& queue_;
-
-        queue_not_empty(std::queue<DataType>& queue)
+      public:
+        queue_not_empty(std::deque<DataType>& queue)
           : queue_(queue)
         {}
 
@@ -31,6 +30,9 @@ namespace com
         {
           return !queue_.empty();
         }
+
+      private:
+        std::deque<DataType>& queue_;
       };
 
     public:
@@ -60,10 +62,10 @@ namespace com
 
         \param[in] data The \ref DataType to push onto the queue.
       */
-      void push(DataType const&& data)
+      void push(DataType &&data)
       {
         std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(std::move(data));
+        queue_.push_back(std::move(data));
         condition_variable_.notify_all();
       }
 
@@ -92,7 +94,7 @@ namespace com
       void clear()
       {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::queue<DataType> empty;
+        std::deque<DataType> empty;
         std::swap(queue_, empty);
         condition_variable_.notify_all();
       }
@@ -114,7 +116,7 @@ namespace com
         bool ret = false;
         if(!queue_.empty()) {
           popped_value = std::move(queue_.front());
-          queue_.pop();
+          queue_.pop_front();
           ret = true;
         }
 
@@ -140,7 +142,7 @@ namespace com
         condition_variable_.wait(lock, queue_not_empty(queue_));
         assert(!queue_.empty());
         popped_value = std::move(queue_.front());
-        queue_.pop();
+        queue_.pop_front();
       }
 
       //! A function that removes \ref DataType from queue if it is not empty
@@ -171,7 +173,7 @@ namespace com
         }
 
         popped_value = std::move(queue_.front());
-        queue_.pop();
+        queue_.pop_front();
         return true;
       }
 
@@ -190,7 +192,7 @@ namespace com
       friend std::ostream &operator<<(std::ostream &out,
         const concurrent_queue<DataType> &q)
       {
-        std::queue<DataType> tmp = q.queue_;
+        std::deque<DataType> tmp = q.queue_;
 
         {
           std::unique_lock<std::mutex> lock(q.mutex_);
@@ -199,7 +201,7 @@ namespace com
 
         while (!tmp.empty()) {
           out << tmp.front();
-          tmp.pop();
+          tmp.pop_front();
         }
 
         assert(tmp.empty() && "Failed to empty queue.");
@@ -208,7 +210,7 @@ namespace com
       }
 
     private:
-       std::queue<DataType> queue_;
+       std::deque<DataType> queue_;
        mutable std::mutex mutex_;
        std::condition_variable condition_variable_;
     };

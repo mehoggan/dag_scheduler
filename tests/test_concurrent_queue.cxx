@@ -43,7 +43,7 @@ namespace com
 
       std::thread t([&]() {
           for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-            queue.push(i);
+            queue.push(std::move(i));
           }
         });
 
@@ -59,7 +59,7 @@ namespace com
 
       std::thread t([&]() {
           for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-            queue.push(i);
+            queue.push(std::move(i));
           }
         });
 

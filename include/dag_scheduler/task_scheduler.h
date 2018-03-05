@@ -68,7 +68,7 @@ namespace com
 
       bool startup();
 
-      bool queue_task(std::unique_ptr<task> &t);
+      bool queue_task(std::unique_ptr<task> &&t);
 
       bool kill_task(const task &t);
 
