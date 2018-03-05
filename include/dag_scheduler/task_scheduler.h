@@ -7,29 +7,41 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
+#include <gtest/gtest_prod.h>
+
 namespace com
 {
   namespace dag_scheduler
   {
     namespace detail
     {
-      class task_scheduler;
+      class thread_pool;
 
       class interruptible_thread :
-        public logged_class<task_scheduler>
+        public logged_class<interruptible_thread>
       {
-      public:
+      private:
+        friend class thread_pool;
+
+      private:
+        FRIEND_TEST(TestInterruptibleThread, default_ctor_no_task);
+        FRIEND_TEST(TestInterruptibleThread, default_ctor_with_task);
+
+      private:
         interruptible_thread();
 
         bool set_task(std::unique_ptr<task> &t);
 
         bool has_task();
 
-        void get_task(std::function<void (std::unique_ptr<task> &)> &cb);
+        void get_task(
+          const std::function<void (std::unique_ptr<task> &)> &cb);
 
         bool check_for_interrupt();
 
         void set_interrupt();
+
+        std::thread &get_thread_object();
 
       private:
         std::atomic_bool interrupt_check_;

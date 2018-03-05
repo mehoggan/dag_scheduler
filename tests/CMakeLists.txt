@@ -27,6 +27,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(../include)
 include_directories(../)
 include_directories(${gtest_SOURCE_DIR}/include)
+include_directories(./utils)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/win32.cmake)
@@ -44,7 +45,9 @@ add_executable(unit_test
   test_dag_vertex.cxx
   test_logging.cxx
   test_task.cxx
+  test_task_scheduler.cxx
   test_uuid.cxx
+  utils/test_task.cxx
 )
 
 target_link_libraries(unit_test

@@ -11,8 +11,9 @@ namespace com
     namespace detail
     {
       interruptible_thread::interruptible_thread() :
-        logged_class<task_scheduler>(*this),
-        interrupt_check_(false)
+        logged_class<interruptible_thread>(*this),
+        interrupt_check_(false),
+        t_(nullptr)
       {
         const std::chrono::milliseconds wait_duration(2000);
         thread_ = std::thread([&] {
@@ -45,11 +46,6 @@ namespace com
             }
           }
         });
-
-        logging::info(LOG_TAG, "Waiting for thread id", thread_.get_id(),
-          "to terminate.");
-
-        thread_.join();
       }
 
       bool interruptible_thread::set_task(std::unique_ptr<task> &t)
@@ -77,7 +73,7 @@ namespace com
       }
 
       void interruptible_thread::get_task(
-        std::function<void (std::unique_ptr<task> &)> &cb)
+        const std::function<void (std::unique_ptr<task> &)> &cb)
       {
         std::unique_lock<std::mutex> lock(task_lock_);
         cb(t_);
@@ -92,7 +88,14 @@ namespace com
       {
         interrupt_check_.store(true);
         std::unique_lock<std::mutex> lock(task_lock_);
-        t_->kill();
+        if (t_ != nullptr) {
+          t_->kill();
+        }
+      }
+
+      std::thread &interruptible_thread::get_thread_object()
+      {
+        return thread_;
       }
 
       thread_pool::thread_pool(std::size_t size) :
