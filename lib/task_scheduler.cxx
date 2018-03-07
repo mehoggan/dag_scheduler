@@ -106,14 +106,28 @@ namespace com
           [&](std::unique_ptr<interruptible_thread> &u) {
             u.reset(new interruptible_thread);
           });
+
+        std::for_each(pool_.begin(), pool_.end(),
+          [&](std::unique_ptr<interruptible_thread> &thread) {
+            thread->get_thread_object().join();
+          });
       }
 
       thread_pool::~thread_pool()
       {
+        kill();
+      }
+
+      bool thread_pool::kill()
+      {
+        bool ret = true;
+
         std::for_each(pool_.begin(), pool_.end(),
           [&](std::unique_ptr<interruptible_thread> &thread) {
             thread->set_interrupt();
           });
+
+        return ret;
       }
 
       bool thread_pool::add_task(std::unique_ptr<task> &t)

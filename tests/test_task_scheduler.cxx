@@ -90,6 +90,30 @@ namespace com
         it.get_thread_object().join();
         EXPECT_FALSE(it.get_thread_object().joinable());
       }
+
+      class TestThreadPool :
+        public ::testing::Test,
+        public logged_class<TestThreadPool>
+      {
+      public:
+        TestThreadPool() :
+          logged_class<TestThreadPool>(*this)
+        {}
+
+      protected:
+        virtual void SetUp() {}
+        virtual void TearDown() {}
+      };
+
+      TEST_F(TestThreadPool, default_ctor)
+      {
+        std::thread thread_pool_thread([&]() {
+            thread_pool pool;
+            EXPECT_TRUE(pool.kill());
+          });
+
+        ASSERT_TRUE(true) << "If this is not hit threads were not killed.";
+      }
     }
   }
 }

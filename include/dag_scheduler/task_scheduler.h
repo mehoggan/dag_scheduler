@@ -61,6 +61,8 @@ namespace com
 
         ~thread_pool();
 
+        bool kill();
+
         bool add_task(std::unique_ptr<task> &t);
 
         bool kill_task(const task &t);
