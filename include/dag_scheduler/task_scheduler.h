@@ -32,7 +32,7 @@ namespace com
 
         bool set_task(std::unique_ptr<task> &t);
 
-        bool has_task();
+        bool has_task() const;
 
         void get_task(
           const std::function<void (std::unique_ptr<task> &)> &cb);
@@ -48,7 +48,7 @@ namespace com
         std::thread thread_;
         std::mutex mutex_;
         std::condition_variable cv_;
-        std::mutex task_lock_;
+        mutable std::mutex task_lock_;
         std::unique_ptr<task> t_;
       };
 
@@ -57,19 +57,27 @@ namespace com
         boost::noncopyable
       {
       public:
-        explicit thread_pool(std::size_t size = 10);
+        thread_pool();
 
         ~thread_pool();
+
+        void start_up(std::size_t size = 10);
+
+        void join();
 
         bool kill();
 
         bool add_task(std::unique_ptr<task> &t);
 
+        bool has_tasks() const;
+
+        std::size_t current_task_count() const;
+
         bool kill_task(const task &t);
 
       private:
         std::vector<std::unique_ptr<interruptible_thread>> pool_;
-        std::mutex pool_lock_;
+        mutable std::mutex pool_lock_;
       };
     }
 

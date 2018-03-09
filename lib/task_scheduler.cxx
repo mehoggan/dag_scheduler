@@ -61,7 +61,7 @@ namespace com
         return ret.load();
       }
 
-      bool interruptible_thread::has_task()
+      bool interruptible_thread::has_task() const
       {
         std::atomic_bool ret(false);
         if (task_lock_.try_lock()) {
@@ -98,30 +98,33 @@ namespace com
         return thread_;
       }
 
-      thread_pool::thread_pool(std::size_t size) :
+      thread_pool::thread_pool() :
         logged_class<thread_pool>(*this)
-      {
-        pool_.resize(size);
-        std::for_each(pool_.begin(), pool_.end(),
-          [&](std::unique_ptr<interruptible_thread> &u) {
-            u.reset(new interruptible_thread);
-          });
-
-        std::for_each(pool_.begin(), pool_.end(),
-          [&](std::unique_ptr<interruptible_thread> &thread) {
-            thread->get_thread_object().join();
-          });
-      }
+      {}
 
       thread_pool::~thread_pool()
+      {}
+
+      void thread_pool::start_up(std::size_t size)
       {
-        kill();
+        pool_.resize(size);
+      }
+
+      void thread_pool::join()
+      {
+        std::for_each(pool_.begin(), pool_.end(),
+            [&](std::unique_ptr<interruptible_thread> &thread) {
+              if (thread->get_thread_object().joinable()) {
+                thread->get_thread_object().join();
+              }
+          });
       }
 
       bool thread_pool::kill()
       {
         bool ret = true;
 
+        std::unique_lock<std::mutex> lock(pool_lock_);
         std::for_each(pool_.begin(), pool_.end(),
           [&](std::unique_ptr<interruptible_thread> &thread) {
             thread->set_interrupt();
@@ -142,6 +145,35 @@ namespace com
           ret.store(true);
           (*it)->set_task(t);
         }
+        return ret;
+      }
+
+      bool thread_pool::has_tasks() const
+      {
+        std::atomic_bool ret(false);
+        std::unique_lock<std::mutex> lock(pool_lock_);
+        std::for_each(pool_.cbegin(), pool_.cend(),
+          [&](const std::unique_ptr<interruptible_thread> &u) {
+            if (u->has_task()) {
+              ret = true;
+            }
+          });
+
+        return ret;
+      }
+
+      std::size_t thread_pool::current_task_count() const
+      {
+        std::atomic<std::size_t> ret(0);
+
+        std::unique_lock<std::mutex> lock(pool_lock_);
+        std::for_each(pool_.cbegin(), pool_.cend(),
+          [&](const std::unique_ptr<interruptible_thread> &u) {
+            if (u->has_task()) {
+              ret.store(ret.load() + 1u);
+            }
+          });
+
         return ret;
       }
 

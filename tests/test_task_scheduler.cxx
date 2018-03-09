@@ -14,6 +14,39 @@ namespace com
   {
     namespace detail
     {
+      class LocalTestTaskImpl :
+        public TestTaskImpl
+      {
+      public:
+        LocalTestTaskImpl(const std::chrono::milliseconds &sleep_time) :
+          TestTaskImpl(),
+          ran_(false),
+          sleep_time_(sleep_time)
+        {}
+
+        virtual bool run() override
+        {
+          ran_.store(true);
+
+          std::size_t sleep_time = sleep_time_.count() / 1000;
+          logging::info(LOG_TAG, "Sleeping for", sleep_time, "seconds.");
+          std::this_thread::sleep_for(sleep_time_);
+          logging::info(LOG_TAG, "Done sleeping for", sleep_time,
+            "seconds.");
+
+          return ran_.load();
+        }
+
+        bool was_ran() const
+        {
+          return ran_.load();
+        }
+
+      private:
+        std::atomic_bool ran_;
+        std::chrono::milliseconds sleep_time_;
+      };
+
       class TestInterruptibleThread :
         public ::testing::Test,
         public logged_class<TestInterruptibleThread>
@@ -44,41 +77,14 @@ namespace com
 
       TEST_F(TestInterruptibleThread, default_ctor_with_task)
       {
-        class LocalTestTaskImpl :
-          public TestTaskImpl
-        {
-        public:
-          LocalTestTaskImpl() :
-            TestTaskImpl(),
-            ran_(false)
-          {}
-
-          virtual bool run() override
-          {
-            ran_.store(true);
-            const std::size_t sec = 5;
-            logging::info(LOG_TAG, "Sleeping for", sec, "seconds.");
-            std::this_thread::sleep_for(std::chrono::seconds(sec));
-            logging::info(LOG_TAG, "Done sleeping for", sec, "seconds.");
-            return ran_.load();
-          }
-
-          bool was_ran() const
-          {
-            return ran_.load();
-          }
-
-        private:
-          std::atomic_bool ran_;
-        };
-
         interruptible_thread it;
         EXPECT_FALSE(it.has_task());
         it.get_task([&](std::unique_ptr<task> &u) {
             EXPECT_EQ(nullptr, u.get());
           });
         // We sleep in run for N seconds this should hold true.
-        std::unique_ptr<task> ltti(new LocalTestTaskImpl);
+        std::unique_ptr<task> ltti(new LocalTestTaskImpl(
+          std::chrono::milliseconds(5000)));
         it.set_task(ltti);
         it.get_task([&](std::unique_ptr<task> &u) {
             EXPECT_NE(nullptr, u.get());
@@ -105,14 +111,36 @@ namespace com
         virtual void TearDown() {}
       };
 
-      TEST_F(TestThreadPool, default_ctor)
+      TEST_F(TestThreadPool, start_up_kill_no_tasks)
       {
+        thread_pool tp;
         std::thread thread_pool_thread([&]() {
-            thread_pool pool;
-            EXPECT_TRUE(pool.kill());
+            tp.start_up();
           });
 
-        ASSERT_TRUE(true) << "If this is not hit threads were not killed.";
+        EXPECT_FALSE(tp.has_tasks());
+        EXPECT_EQ(0u, tp.current_task_count());
+
+        tp.join();
+        thread_pool_thread.join();
+      }
+
+      TEST_F(TestThreadPool, start_up_kill_task_count)
+      {
+        thread_pool tp;
+        std::thread thread_pool_thread([&]() {
+            tp.start_up();
+          });
+
+        for (auto i : {0, 1, 2}) {
+          std::unique_ptr<task> ltti(new LocalTestTaskImpl(
+            std::chrono::milliseconds(5000)));
+          //tp.add_task(ltti);
+          (void)i;
+        }
+
+        tp.join();
+        thread_pool_thread.join();
       }
     }
   }
