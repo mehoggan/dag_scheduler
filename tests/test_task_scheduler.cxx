@@ -133,10 +133,10 @@ namespace com
           });
 
         for (auto i : {0, 1, 2}) {
+          (void)i;
           std::unique_ptr<task> ltti(new LocalTestTaskImpl(
             std::chrono::milliseconds(5000)));
-          //tp.add_task(ltti);
-          (void)i;
+          tp.add_task(ltti);
         }
 
         tp.join();
