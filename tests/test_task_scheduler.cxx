@@ -18,17 +18,17 @@ namespace com
         public TestTaskImpl
       {
       public:
-        LocalTestTaskImpl(const std::chrono::milliseconds &sleep_time) :
-          TestTaskImpl(),
+        explicit LocalTestTaskImpl(
+          const std::chrono::milliseconds &sleep_time) :
           ran_(false),
           sleep_time_(sleep_time)
         {}
 
-        virtual bool run() override
+        bool run() override
         {
           ran_.store(true);
 
-          std::size_t sleep_time = sleep_time_.count() / 1000;
+          const long int sleep_time = sleep_time_.count() / 1000;
           logging::info(LOG_TAG, "Sleeping for", sleep_time, "seconds.");
           std::this_thread::sleep_for(sleep_time_);
           logging::info(LOG_TAG, "Done sleeping for", sleep_time,
@@ -46,102 +46,75 @@ namespace com
         std::atomic_bool ran_;
         std::chrono::milliseconds sleep_time_;
       };
+    }
 
-      class TestInterruptibleThread :
-        public ::testing::Test,
-        public logged_class<TestInterruptibleThread>
-      {
-      public:
-        TestInterruptibleThread() :
-          logged_class<TestInterruptibleThread>(*this)
-        {}
+    TEST(TestTaskScheduler, default_ctor)
+    {
+      task_scheduler ts;
+      EXPECT_TRUE(ts.is_paused());
+      EXPECT_TRUE(ts.is_shutdown()) << "User must call startup";
+    }
 
-      protected:
-        virtual void SetUp() {}
-        virtual void TearDown() {}
-      };
+    TEST(TestTaskScheduler, startup)
+    {
+      task_scheduler ts;
 
-      TEST_F(TestInterruptibleThread, default_ctor_no_task)
-      {
-        interruptible_thread it;
-        EXPECT_FALSE(it.has_task());
-        it.get_task([&](std::unique_ptr<task> &u) {
-            EXPECT_EQ(nullptr, u.get());
-          });
-        EXPECT_FALSE(it.check_for_interrupt());
-        it.set_interrupt();
-        EXPECT_TRUE(it.check_for_interrupt());
-        it.get_thread_object().join();
-        EXPECT_FALSE(it.get_thread_object().joinable());
+      std::thread ts_thread([&]() {
+        ASSERT_TRUE(ts.startup());
+      });
+
+      const std::chrono::milliseconds millis(3);
+      std::this_thread::sleep_for(millis);
+
+      EXPECT_FALSE(ts.is_paused());
+      EXPECT_FALSE(ts.is_shutdown()) << "User must call startup";
+
+      ts.shutdown();
+
+      EXPECT_TRUE(ts.is_paused());
+      EXPECT_TRUE(ts.is_shutdown()) << "User must call startup";
+
+      ts_thread.join();
+    }
+
+    TEST(TestTaskScheduler, pause_resume)
+    {
+      task_scheduler ts;
+
+      std::thread ts_thread([&]() {
+        ASSERT_TRUE(ts.startup());
+      });
+
+      for (auto i : {0u, 1u, 2u, 3u, 4u, 5u}) {
+        (void)i;
+
+        ts.pause();
+        EXPECT_TRUE(ts.is_paused());
+
+        ts.resume();
+        EXPECT_FALSE(ts.is_paused());
       }
+      ts.shutdown();
 
-      TEST_F(TestInterruptibleThread, default_ctor_with_task)
-      {
-        interruptible_thread it;
-        EXPECT_FALSE(it.has_task());
-        it.get_task([&](std::unique_ptr<task> &u) {
-            EXPECT_EQ(nullptr, u.get());
-          });
-        // We sleep in run for N seconds this should hold true.
-        std::unique_ptr<task> ltti(new LocalTestTaskImpl(
-          std::chrono::milliseconds(5000)));
-        it.set_task(ltti);
-        it.get_task([&](std::unique_ptr<task> &u) {
-            EXPECT_NE(nullptr, u.get());
-          });
+      ts_thread.join();
+    }
 
-        EXPECT_FALSE(it.check_for_interrupt());
-        it.set_interrupt();
-        EXPECT_TRUE(it.check_for_interrupt());
-        it.get_thread_object().join();
-        EXPECT_FALSE(it.get_thread_object().joinable());
-      }
+    TEST(TestTaskScheduler, queue_task)
+    {
+      task_scheduler ts;
 
-      class TestThreadPool :
-        public ::testing::Test,
-        public logged_class<TestThreadPool>
-      {
-      public:
-        TestThreadPool() :
-          logged_class<TestThreadPool>(*this)
-        {}
+      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+        std::chrono::milliseconds(3)));
+      ts.queue_task(std::move(ltti));
+      ASSERT_EQ(nullptr, ltti.get());
+    }
 
-      protected:
-        virtual void SetUp() {}
-        virtual void TearDown() {}
-      };
-
-      TEST_F(TestThreadPool, start_up_kill_no_tasks)
-      {
-        thread_pool tp;
-        std::thread thread_pool_thread([&]() {
-            tp.start_up();
-          });
-
-        EXPECT_FALSE(tp.has_tasks());
-        EXPECT_EQ(0u, tp.current_task_count());
-
-        tp.join();
-        thread_pool_thread.join();
-      }
-
-      TEST_F(TestThreadPool, start_up_kill_task_count)
-      {
-        thread_pool tp;
-        std::thread thread_pool_thread([&]() {
-            tp.start_up();
-          });
-
-        for (auto i : {0, 1, 2}) {
-          (void)i;
-          std::unique_ptr<task> ltti(new LocalTestTaskImpl(
-            std::chrono::milliseconds(5000)));
-          tp.add_task(ltti);
-        }
-
-        tp.join();
-        thread_pool_thread.join();
-      }
+    TEST(TestTaskScheduler, kill_task)
+    {
+      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+        std::chrono::milliseconds(3)));
+      task_scheduler ts;
+      EXPECT_TRUE(ts.kill_task(*(ltti)));
     }
   }
 }

@@ -13,74 +13,6 @@ namespace com
 {
   namespace dag_scheduler
   {
-    namespace detail
-    {
-      class thread_pool;
-
-      class interruptible_thread :
-        public logged_class<interruptible_thread>
-      {
-      private:
-        friend class thread_pool;
-
-      private:
-        FRIEND_TEST(TestInterruptibleThread, default_ctor_no_task);
-        FRIEND_TEST(TestInterruptibleThread, default_ctor_with_task);
-
-      private:
-        interruptible_thread();
-
-        bool set_task(std::unique_ptr<task> &t);
-
-        bool has_task() const;
-
-        void get_task(
-          const std::function<void (std::unique_ptr<task> &)> &cb);
-
-        bool check_for_interrupt();
-
-        void set_interrupt();
-
-        std::thread &get_thread_object();
-
-      private:
-        std::atomic_bool interrupt_check_;
-        std::thread thread_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
-        mutable std::mutex task_lock_;
-        std::unique_ptr<task> t_;
-      };
-
-      class thread_pool :
-        public logged_class<thread_pool>,
-        boost::noncopyable
-      {
-      public:
-        thread_pool();
-
-        ~thread_pool();
-
-        void start_up(std::size_t size = 10);
-
-        void join();
-
-        bool kill();
-
-        bool add_task(std::unique_ptr<task> &t);
-
-        bool has_tasks() const;
-
-        std::size_t current_task_count() const;
-
-        bool kill_task(const task &t);
-
-      private:
-        std::vector<std::unique_ptr<interruptible_thread>> pool_;
-        mutable std::mutex pool_lock_;
-      };
-    }
-
     class DLLSPEC_DAGTASKS task_scheduler :
       public logged_class<task_scheduler>,
       public boost::noncopyable
@@ -90,19 +22,24 @@ namespace com
 
       bool startup();
 
-      bool queue_task(std::unique_ptr<task> &&t);
+      void queue_task(std::unique_ptr<task> &&t);
 
       bool kill_task(const task &t);
 
       void pause();
 
+      void resume();
+
+      bool is_paused();
+
       void shutdown();
+
+      bool is_shutdown();
 
     private:
       concurrent_queue<std::unique_ptr<task>> queue_;
       std::atomic_bool pause_;
       std::atomic_bool kill_;
-      detail::thread_pool pool_;
     };
   }
 }
