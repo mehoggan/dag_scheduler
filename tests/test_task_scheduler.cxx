@@ -29,7 +29,7 @@ namespace com
         {
           ran_.store(true);
 
-          const long int sleep_time = sleep_time_.count() / 1000;
+          const float sleep_time = sleep_time_.count() / 1000.0f;
           logging::info(LOG_TAG, "Sleeping for", sleep_time, "seconds.");
           std::this_thread::sleep_for(sleep_time_);
           logging::info(LOG_TAG, "Done sleeping for", sleep_time,
@@ -41,6 +41,19 @@ namespace com
         bool was_ran() const
         {
           return ran_.load();
+        }
+
+        std::unique_ptr<task> clone() final
+        {
+          return std::unique_ptr<task>(new LocalTestTaskImpl(*this));
+        }
+
+      private:
+        LocalTestTaskImpl(const LocalTestTaskImpl &other) :
+          TestTaskImpl()
+        {
+          ran_.store(other.ran_.load());
+          sleep_time_ = other.sleep_time_;
         }
 
       private:
@@ -112,6 +125,27 @@ namespace com
         std::chrono::milliseconds(3)));
       task_scheduler ts;
       EXPECT_TRUE(ts.kill_task(*(ltti)));
+    }
+
+    TEST(TestTaskScheduler, queue_task_and_let_it_run)
+    {
+      task_scheduler ts;
+      std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
+      // Give time for thread to start up before we fire and kill.
+      auto wait_time = std::chrono::milliseconds(10);
+      std::this_thread::sleep_for(wait_time);
+      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+        std::chrono::milliseconds(1000)));
+
+      ts.queue_task(std::move(ltti));
+
+      // From a unit test perspective we need to give the task time to
+      // be scheduled and then run. One second should be sufficient.
+      auto wait_time_sec = std::chrono::seconds(1);
+      std::this_thread::sleep_for(wait_time_sec);
+
+      ts.shutdown();
+      ts_thread.join();
     }
   }
 }

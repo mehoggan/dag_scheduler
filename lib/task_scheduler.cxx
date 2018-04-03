@@ -27,12 +27,16 @@ namespace com
               std::unique_ptr<task> next_task = nullptr;
               queue_.wait_for_and_pop(next_task, refresh_time);
               if (next_task != nullptr) {
-                logging::info(LOG_TAG, "next task = ", (*next_task));
+                logging::info(LOG_TAG, "next task =", (*next_task));
                 while (true) {
                   if (kill_.load()) {
                     break;
                   }
                   if (!pause_.load()) {
+                    // TODO (mhoggan): Actually put task into thread pool.
+                    // For now just run the task then kill it.
+                    next_task->run();
+                    next_task.reset();
                   }
                 }
               }
@@ -40,7 +44,6 @@ namespace com
           }
         });
       runner.join();
-      logging::info(LOG_TAG, "task_scheduler has ended.");
 
       return true;
     }
@@ -52,6 +55,10 @@ namespace com
 
     bool task_scheduler::kill_task(const task &t)
     {
+      // TODO (mhoggan): Please implement.
+      // There are two cases to consider here:
+      //    1. The task is still in the queue.
+      //    2. The task is actually running in the thread pool.
       return true;
     }
 
@@ -74,7 +81,6 @@ namespace com
     {
       pause();
       kill_.store(true);
-      logging::info(LOG_TAG, "kill =", ((kill_.load()) ? "true" : "false"));
     }
 
     bool task_scheduler::is_shutdown()

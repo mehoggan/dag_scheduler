@@ -31,7 +31,7 @@ namespace com
 
       virtual std::unique_ptr<task> clone();
 
-    private:
+    protected:
       TestTaskImpl(const TestTaskImpl &other);
 
     private:
