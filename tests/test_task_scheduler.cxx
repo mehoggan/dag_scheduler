@@ -7,6 +7,7 @@
 #include "utils/test_task.h"
 
 #include <atomic>
+#include <thread>
 
 namespace com
 {
@@ -80,22 +81,18 @@ namespace com
     TEST(TestTaskScheduler, pause_resume)
     {
       task_scheduler ts;
-
-      std::thread ts_thread([&]() {
-        ASSERT_TRUE(ts.startup());
-      });
-
+      std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
+      // Give time for thread to start up before we fire and kill.
+      auto wait_time = std::chrono::milliseconds(10);
+      std::this_thread::sleep_for(wait_time);
       for (auto i : {0u, 1u, 2u, 3u, 4u, 5u}) {
         (void)i;
-
         ts.pause();
         EXPECT_TRUE(ts.is_paused());
-
         ts.resume();
         EXPECT_FALSE(ts.is_paused());
       }
       ts.shutdown();
-
       ts_thread.join();
     }
 

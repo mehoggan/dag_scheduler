@@ -38,8 +38,8 @@ namespace com
 
     private:
       concurrent_queue<std::unique_ptr<task>> queue_;
-      std::atomic_bool pause_;
-      std::atomic_bool kill_;
+      volatile std::atomic_bool pause_;
+      volatile std::atomic_bool kill_;
     };
   }
 }

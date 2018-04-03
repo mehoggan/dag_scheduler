@@ -21,11 +21,13 @@ namespace com
       auto refresh_time = std::chrono::milliseconds(5);
       std::thread runner([&]() {
           while (!kill_.load()) {
-            bool should_get_next = !(kill_.load() || pause_.load());
+            bool should_get_next = !(
+              kill_.load() || pause_.load());
             if (should_get_next) {
               std::unique_ptr<task> next_task = nullptr;
               queue_.wait_for_and_pop(next_task, refresh_time);
               if (next_task != nullptr) {
+                logging::info(LOG_TAG, "next task = ", (*next_task));
                 while (true) {
                   if (kill_.load()) {
                     break;
@@ -38,6 +40,7 @@ namespace com
           }
         });
       runner.join();
+      logging::info(LOG_TAG, "task_scheduler has ended.");
 
       return true;
     }
@@ -71,6 +74,7 @@ namespace com
     {
       pause();
       kill_.store(true);
+      logging::info(LOG_TAG, "kill =", ((kill_.load()) ? "true" : "false"));
     }
 
     bool task_scheduler::is_shutdown()
