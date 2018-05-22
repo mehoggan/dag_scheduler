@@ -28,6 +28,7 @@ set(SRC
   dag_algorithms.cxx
   dag_edge.cxx
   dag_vertex.cxx
+  interruptible_task_thread.cxx
   logging.cxx
   task.cxx
   task_scheduler.cxx

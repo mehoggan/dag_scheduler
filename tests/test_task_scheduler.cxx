@@ -77,8 +77,8 @@ namespace com
         ASSERT_TRUE(ts.startup());
       });
 
-      const std::chrono::milliseconds millis(3);
-      std::this_thread::sleep_for(millis);
+      std::chrono::milliseconds give_ts_thread_time(500);
+      std::this_thread::sleep_for(give_ts_thread_time);
 
       EXPECT_FALSE(ts.is_paused());
       EXPECT_FALSE(ts.is_shutdown()) << "User must call startup";
@@ -95,9 +95,8 @@ namespace com
     {
       task_scheduler ts;
       std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
-      // Give time for thread to start up before we fire and kill.
-      auto wait_time = std::chrono::milliseconds(10);
-      std::this_thread::sleep_for(wait_time);
+      std::chrono::milliseconds give_ts_thread_time(500);
+      std::this_thread::sleep_for(give_ts_thread_time);
       for (auto i : {0u, 1u, 2u, 3u, 4u, 5u}) {
         (void)i;
         ts.pause();
@@ -132,8 +131,6 @@ namespace com
       task_scheduler ts;
       std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
       // Give time for thread to start up before we fire and kill.
-      auto wait_time = std::chrono::milliseconds(10);
-      std::this_thread::sleep_for(wait_time);
       std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
         std::chrono::milliseconds(1000)));
 

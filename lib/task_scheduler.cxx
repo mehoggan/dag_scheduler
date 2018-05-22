@@ -19,31 +19,28 @@ namespace com
       pause_.store(false);
       kill_.store(false);
       auto refresh_time = std::chrono::milliseconds(5);
-      std::thread runner([&]() {
-          while (!kill_.load()) {
-            bool should_get_next = !(
-              kill_.load() || pause_.load());
-            if (should_get_next) {
-              std::unique_ptr<task> next_task = nullptr;
-              queue_.wait_for_and_pop(next_task, refresh_time);
-              if (next_task != nullptr) {
-                logging::info(LOG_TAG, "next task =", (*next_task));
-                while (true) {
-                  if (kill_.load()) {
-                    break;
-                  }
-                  if (!pause_.load()) {
-                    // TODO (mhoggan): Actually put task into thread pool.
-                    // For now just run the task then kill it.
-                    next_task->run();
-                    next_task.reset();
-                  }
-                }
+      while (!kill_.load()) {
+        bool should_get_next = !(
+          kill_.load() || pause_.load());
+        if (should_get_next) {
+          std::unique_ptr<task> next_task = nullptr;
+          queue_.wait_for_and_pop(next_task, refresh_time);
+          if (next_task != nullptr) {
+            logging::info(LOG_TAG, "next task =", (*next_task));
+            while (true) {
+              if (kill_.load()) {
+                break;
+              }
+              if (!pause_.load()) {
+                // TODO (mhoggan): Actually put task into thread pool.
+                // For now just run the task then kill it.
+                next_task->run();
+                next_task.reset();
               }
             }
           }
-        });
-      runner.join();
+        }
+      }
 
       return true;
     }
