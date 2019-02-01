@@ -29,34 +29,32 @@ namespace com
   namespace dag_scheduler
   {
     std::atomic<bool> logging::init_(false);
-    std::unordered_map<log_tag, boost::shared_ptr<logging::text_sink>>
+    std::unordered_map<log_tag, boost::weak_ptr<logging::TextSink>>
       logging::loggers_;
     std::mutex logging::loggers_mutex_;
 
-    namespace detail
-    {
+    namespace detail {
       boost::log::formatter fmt = boost::log::expressions::stream
-        << "(" << std::setw(10) << std::setfill('0') << line_id << ")"
+        << boost::log::expressions::format_date_time<
+          boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S")
+        << " [" << boost::log::expressions::attr<
+          boost::log::attributes::current_thread_id::value_type>("ThreadID")
+        << "] "
         << boost::log::expressions::if_(
           boost::log::expressions::has_attr(tag_attr))[
-          boost::log::expressions::stream << "[" << tag_attr << "]"]
-        << "<" << boost::log::expressions::attr<
-        boost::log::attributes::current_thread_id::value_type>("ThreadID")
-        << ">"
-        << "[" << boost::log::expressions::format_date_time<
-        boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S") << "]"
-        << "[" << std::setw(5) << std::setfill(' ') << severity << "]"
-        << " -- \'" << boost::log::expressions::smessage << "\'";
+            boost::log::expressions::stream << tag_attr]
+        << " " << severity
+        << "(" << line_id << ")"
+        << " - \'" << boost::log::expressions::smessage << "\'";
 
-
-      boost::shared_ptr<logging::text_sink> make_sink()
+      boost::shared_ptr<logging::TextSink> make_sink()
       {
-        boost::shared_ptr<logging::text_sink> sink =
-          boost::make_shared<logging::text_sink>();
+        boost::shared_ptr<logging::TextSink> sink =
+          boost::make_shared<logging::TextSink>();
         return sink;
       }
 
-      void configure_sink(boost::shared_ptr<logging::text_sink> sink,
+      void configure_sink(boost::shared_ptr<logging::TextSink> sink,
         boost::log::trivial::severity_level level,
         const std::string &tag)
       {
@@ -66,11 +64,11 @@ namespace com
           (boost::log::expressions::has_attr(tag_attr) && tag_attr == tag));
       }
 
-      logging::dict::iterator find_sink(const log_tag &tag,
-        logging::dict &dict)
+      logging::Dict::iterator find_sink(const log_tag &tag,
+        logging::Dict &dict)
       {
-        logging::dict::iterator it = std::find_if(
-          dict.begin(), dict.end(), [&](logging::dict::value_type &v) {
+        logging::Dict::iterator it = std::find_if(
+          dict.begin(), dict.end(), [&](logging::Dict::value_type &v) {
             bool ret = std::string(v.first.tag()) == std::string(tag.tag());
             return ret;
           });
@@ -114,7 +112,7 @@ namespace com
       auto end_it = logging::loggers_.end();
       auto tag_it = detail::find_sink(tag, logging::loggers_);
       if (tag_it == end_it) {
-        boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
+        boost::shared_ptr<logging::TextSink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::cout,
           boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
@@ -135,7 +133,7 @@ namespace com
       auto end_it = logging::loggers_.end();
       auto tag_it = detail::find_sink(tag, logging::loggers_);
       if (tag_it == end_it) {
-        boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
+        boost::shared_ptr<logging::TextSink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::cerr,
           boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
@@ -156,7 +154,7 @@ namespace com
       auto end_it = logging::loggers_.end();
       auto tag_it = detail::find_sink(tag, logging::loggers_);
       if (tag_it == end_it) {
-        boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
+        boost::shared_ptr<logging::TextSink> sink = detail::make_sink();
         boost::shared_ptr<std::ostream> stream(&std::clog,
           boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
@@ -178,7 +176,7 @@ namespace com
       auto end_it = logging::loggers_.end();
       auto tag_it = detail::find_sink(tag, logging::loggers_);
       if (tag_it == end_it) {
-        boost::shared_ptr<logging::text_sink> sink = detail::make_sink();
+        boost::shared_ptr<logging::TextSink> sink = detail::make_sink();
         sink->locked_backend()->add_stream(
           boost::make_shared<std::ofstream>(log_path.string()));
         detail::configure_sink(sink, level, tag.tag());
@@ -213,8 +211,8 @@ namespace com
 
       std::for_each(logging::loggers_.begin(), logging::loggers_.end(),
         [&](std::unordered_map<log_tag,
-          boost::shared_ptr<text_sink>>::value_type &pair) {
-            boost::log::core::get()->remove_sink(pair.second);
+          boost::weak_ptr<TextSink>>::value_type &pair) {
+            boost::log::core::get()->remove_sink(pair.second.lock());
             pair.second.reset();
           });
       logging::loggers_.clear();

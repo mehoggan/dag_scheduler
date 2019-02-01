@@ -1,12 +1,11 @@
 #ifndef CONCURRENT_QUEUE_H
 #define CONCURRENT_QUEUE_H
 
-#include <queue>
-
 #include <boost/noncopyable.hpp>
 
 #include <condition_variable>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <type_traits>
 

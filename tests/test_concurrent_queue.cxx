@@ -30,8 +30,8 @@ namespace com
       EXPECT_EQ(1u, non_empty_queue.size());
 
       std::thread t([&]() {
-          non_empty_queue.push(2);
-        });
+        non_empty_queue.push(2);
+      });
 
       t.join();
       EXPECT_EQ(2u, non_empty_queue.size());
@@ -42,10 +42,10 @@ namespace com
       concurrent_queue<int> queue;
 
       std::thread t([&]() {
-          for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-            queue.push(std::move(i));
-          }
-        });
+        for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
+          queue.push(std::move(i));
+        }
+      });
 
       t.join();
       int j = -1;
@@ -58,10 +58,10 @@ namespace com
       concurrent_queue<int> queue;
 
       std::thread t([&]() {
-          for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-            queue.push(std::move(i));
-          }
-        });
+        for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
+          queue.push(std::move(i));
+        }
+      });
 
       int j = -1;
       bool found = queue.wait_for_and_pop(j, std::chrono::milliseconds(5));
@@ -69,6 +69,16 @@ namespace com
       EXPECT_EQ(0, j) << queue << std::endl;
 
       t.join();
+    }
+
+    TEST_F(TestConcurrentQueue, test_empty)
+    {
+      concurrent_queue<int> queue;
+      EXPECT_TRUE(queue.empty());
+      queue.push(1);
+      EXPECT_FALSE(queue.empty());
+      queue.clear();
+      EXPECT_TRUE(queue.empty());
     }
   }
 }

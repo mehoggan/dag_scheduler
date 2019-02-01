@@ -14,22 +14,30 @@ namespace com
       If you inherrit from this class you will get a logger added to logging
       for specific instance of this class.
     */
-
     template <typename DerivedType>
     class logged_class
     {
     public:
-      logged_class(const DerivedType &d,
-        boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
-        boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR)
-        : LOG_TAG(logging::log_tag_for_this(d))
+      explicit logged_class(const DerivedType &d,
+        boost::log::trivial::severity_level coutLevel = DAG_SCHEDULER_INFO,
+        boost::log::trivial::severity_level cerrLevel = DAG_SCHEDULER_ERROR) :
+        LOG_TAG(logging::log_tag_for_this(d))
       {
-        logging::add_std_cout_logger(LOG_TAG);
-        logging::add_std_cerr_logger(LOG_TAG);
+        logging::add_std_cout_logger(LOG_TAG, coutLevel);
+        logging::add_std_cerr_logger(LOG_TAG, cerrLevel);
       }
+
+      virtual ~logged_class()
+      {}
 
     protected:
       log_tag LOG_TAG;
+
+    private:
+      logged_class(const logged_class &other) = delete;
+      logged_class &operator=(const logged_class &rhs) = delete;
+      logged_class(logged_class &&rhs) = delete;
+      logged_class &operator=(logged_class &&rhs) = delete;
     };
   }
 }

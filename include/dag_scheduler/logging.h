@@ -9,6 +9,7 @@
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <gtest/gtest_prod.h>
 
@@ -34,7 +35,7 @@ namespace com
     /*!
       A generic class used to identify a specific log and its source.
     */
-    struct DLLSPEC_DAGTASKS log_tag
+    struct log_tag
     {
     public:
       //! A constructor for a \ref log_tag.
@@ -44,7 +45,7 @@ namespace com
         \param[in] tag A string used in the logs to identify the source and
                        to uniquly identify a log.
       */
-      explicit log_tag(const::std::string &tag);
+      explicit log_tag(const std::string &tag);
 
       //! A getter for the string used to represent the \ref log_tag.
       /*!
@@ -113,7 +114,7 @@ namespace std
   {
     size_t operator()(const com::dag_scheduler::log_tag &obj) const
     {
-      return hash<std::string>()(obj.tag());
+      return hash<std::string> {}(obj.tag());
     }
   };
 }
@@ -127,7 +128,7 @@ namespace com
       A generic class used to log to various sinks or sources based of a
       \ref log_tag.
     */
-    class DLLSPEC_DAGTASKS logging
+    class logging
     {
     private:
       FRIEND_TEST(TestLogging, test_clear_all);
@@ -149,8 +150,8 @@ namespace com
 
     public:
       typedef boost::log::sinks::synchronous_sink<
-        boost::log::sinks::text_ostream_backend> text_sink;
-      typedef std::unordered_map<log_tag, boost::shared_ptr<text_sink>> dict;
+        boost::log::sinks::text_ostream_backend> TextSink;
+      typedef std::unordered_map<log_tag, boost::weak_ptr<TextSink>> Dict;
 
       //! Used to create a stdout source tied to a \ref log_tag.
       /*!
@@ -352,9 +353,27 @@ namespace com
 
     private:
       static std::atomic<bool> init_;
-      static dict loggers_;
+      static Dict loggers_;
       static std::mutex loggers_mutex_;
     };
+
+    //! Adds a logger for a type \t T to the logger.
+    /*!
+      A template function that takes a type T and generates a unique string
+      to be used in a log_tag.
+
+      \param[in] t An instance to a type T used in RTTI to generate a log_tag.
+    */
+    template <class T>
+    log_tag add_std_cout_std_err_logger_for_type_instance(const T &t,
+      boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
+      boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR)
+    {
+      log_tag LOG_TAG = logging::log_tag_for_this(t);
+      logging::add_std_cout_logger(LOG_TAG, cout_level);
+      logging::add_std_cerr_logger(LOG_TAG, cerr_level);
+      return LOG_TAG;
+    }
   }
 }
 #endif

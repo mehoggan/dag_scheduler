@@ -86,7 +86,6 @@ namespace com
         ++i;
       }
 
-
       boost::filesystem::remove_all(tmpdir);
     }
 
