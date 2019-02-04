@@ -30,6 +30,7 @@ set(SRC
   dag_vertex.cxx
   interruptible_task_thread.cxx
   logging.cxx
+  stop_watch.cxx
   task.cxx
   task_scheduler.cxx
   uuid.cxx

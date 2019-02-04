@@ -6,6 +6,7 @@ install(FILES
   dag_vertex.h
   interruptible_task_thread.h
   logging.h
+  stop_watch.h
   task.h
   task_scheduler.h
   uuid.h

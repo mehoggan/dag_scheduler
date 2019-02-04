@@ -36,6 +36,7 @@ add_executable(unit_test
   test_dag_vertex.cxx
   test_interruptible_task_thread.cxx
   test_logging.cxx
+  test_stop_watch.cxx
   test_task.cxx
   test_task_scheduler.cxx
   test_uuid.cxx
