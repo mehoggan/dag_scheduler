@@ -21,15 +21,15 @@ namespace com
 
       virtual ~TestTaskImpl();
 
-      virtual bool run();
+      virtual bool run() override;
 
-      virtual bool is_running() const;
+      virtual bool is_running() const override;
 
-      virtual bool kill();
+      virtual bool kill() override;
 
-      virtual void cleanup();
+      virtual void cleanup() override;
 
-      virtual std::unique_ptr<task> clone();
+      virtual std::unique_ptr<task> clone() override;
 
     protected:
       TestTaskImpl(const TestTaskImpl &other);

@@ -46,7 +46,10 @@ namespace com
 
     void TestTaskImpl::cleanup()
     {
-      delete nasty_user_defined_pointer_;
+      if (nasty_user_defined_pointer_ != nullptr) {
+        delete nasty_user_defined_pointer_;
+      }
+      nasty_user_defined_pointer_ = nullptr;
     }
 
     std::unique_ptr<task> TestTaskImpl::clone()
