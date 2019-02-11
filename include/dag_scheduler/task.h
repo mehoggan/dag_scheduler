@@ -3,11 +3,13 @@
 
 #include "declspec.h"
 
+#include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
 
 #include <memory>
 #include <sstream>
 #include <ostream>
+#include <vector>
 
 namespace com
 {
@@ -29,7 +31,18 @@ namespace com
 
         \param[in] label The user defined label.
       */
-      explicit task(const std::string &label);
+      explicit task(std::vector<std::unique_ptr<task_stage>> &stages);
+
+      //! A constructor for a task that assigns a user defined label.
+      /*!
+        A constructor for a task that assigns a user defined label to
+        a \ref task.
+
+        \param[in] stages The stages to be run in this task.
+        \param[in] label The user defined label.
+      */
+      task(std::vector<std::unique_ptr<task_stage>> &stages,
+        const std::string &label);
 
       //! Virtual destructor to assit in deletion of derived classes.
       /*!
@@ -41,7 +54,25 @@ namespace com
       /*!
         A copy constructor for a \ref task
       */
-      task(const task &other);
+      task(const task &other) = delete;
+
+      //! Assignment operator for a \ref task
+      /*!
+        A assignment operator for a \ref task
+      */
+      task &operator=(const task &other) = delete;
+
+      //! Move copy constructor for a \ref task
+      /*!
+        A move copy constructor for a \ref task
+      */
+      task(task &&other);
+
+      //! Move assignment operator for a \ref task
+      /*!
+        A move assignment operator for a \ref task
+      */
+      task &operator=(task &&other);
 
       //! Getter for the user firendly label that identifies this task.
       /*!
@@ -58,51 +89,26 @@ namespace com
       */
       const uuid &get_uuid() const;
 
-    public:
-      //! Pure virtual function used to run a \ref task.
+      //! Getter for stages
       /*!
-        Pure virutal function used to run what a derived \task is supposed
-        to do.
+        Every task has a set of stages so that it can be interrupted between
+        stages. Having long running tasks can make it very difficult to
+        kill them. It would lead to long running joins awaiting for threads to
+        complete execution of task related code.
 
-        \return True if task was started successfully. False otherwise.
+        \param[in] next_stage A callback for the next stage to run.
       */
-      virtual bool run() = 0;
+      bool iterate_stages(
+        const std::function<bool (task_stage &)> &next_stage);
 
-      //! Pure virtual function used to check if task is running.
+      //! Function used to kill a \ref task and all its \ref task_stages.
       /*!
-        This is up to the derived class to define what this means, but
-        it is recomended that it return true only if \ref run was called.
-
-        \return True if task was run successfully, false otherwise.
-      */
-      virtual bool is_running() const = 0;
-
-      //! Pure virtual function used to run a \ref task.
-      /*!
-        Pure virutal function used to kill what a derived \task is supposed
+        Function used to kill what a derived \task is supposed
         to do.
 
         \return True if task was killed successfully. False otherwise.
       */
-      virtual bool kill() = 0;
-
-      //! Pure virtual function used to force users to cleanup their tasks.
-      /*!
-        Because tasks can be interrupted and users wil have allocated
-        resources a task should be responsible for cleaning up after
-        itself.
-      */
-      virtual void cleanup() = 0;
-
-      //! Pure virtual function that clones a derived class.
-      /*!
-        Pure virtual function of \ref task that makes an identical copy of
-        this and returns it. However, it resets the connection which can only
-        be made from an object that knows about the connection.
-
-        \return A \ref task that is an identical copy of this.
-      */
-      virtual std::unique_ptr<task> clone() = 0;
+      virtual bool kill();
 
     public:
       //! Equality opertor for a task.
@@ -149,6 +155,9 @@ namespace com
         const task &t);
 
     protected:
+      std::atomic_bool iterating_;
+      std::atomic_bool kill_;
+      std::vector<std::unique_ptr<task_stage>> stages_;
       std::string label_;
       uuid uuid_;
     };

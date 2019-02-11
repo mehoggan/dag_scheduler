@@ -33,6 +33,7 @@ set(SRC
   stop_watch.cxx
   task.cxx
   task_scheduler.cxx
+  task_stage.cxx
   uuid.cxx
 )
 

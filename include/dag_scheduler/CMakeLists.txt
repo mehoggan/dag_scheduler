@@ -9,6 +9,7 @@ install(FILES
   stop_watch.h
   task.h
   task_scheduler.h
+  task_stage.h
   uuid.h
   DESTINATION include/dagtasks
 )

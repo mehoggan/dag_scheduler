@@ -25,35 +25,21 @@ namespace com
           sleep_time_(sleep_time)
         {}
 
-        bool run() override
-        {
-          ran_.store(true);
-
-          const float sleep_time = sleep_time_.count() / 1000.0f;
-          logging::info(LOG_TAG, "Sleeping for", sleep_time, "seconds.");
-          std::this_thread::sleep_for(sleep_time_);
-          logging::info(LOG_TAG, "Done sleeping for", sleep_time,
-            "seconds.");
-
-          return ran_.load();
-        }
-
         bool was_ran() const
         {
           return ran_.load();
         }
 
-        std::unique_ptr<task> clone() final
-        {
-          return std::unique_ptr<task>(new LocalTestTaskImpl(*this));
-        }
+        LocalTestTaskImpl(LocalTestTaskImpl &&other) :
+          TestTaskImpl(std::move(other))
+        {}
 
-      private:
-        LocalTestTaskImpl(const LocalTestTaskImpl &other) :
-          TestTaskImpl()
+        LocalTestTaskImpl &operator=(LocalTestTaskImpl &&other)
         {
-          ran_.store(other.ran_.load());
-          sleep_time_ = other.sleep_time_;
+          TestTaskImpl::operator=(std::move(other));
+          ran_.store(false);
+          sleep_time_ = std::move(other.sleep_time_);
+          return (*this);
         }
 
       private:

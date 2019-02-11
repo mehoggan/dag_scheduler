@@ -40,33 +40,68 @@ namespace com
       EXPECT_EQ("test_label", test->label());
     }
 
-    TEST_F(TestTask, run)
+    TEST_F(TestTask, iterate_stages_succeeds_if_all_stages_ran_no_kill_task)
     {
+      const auto expected = {"A", "B", "C"};
       TestTaskImpl tt;
-      EXPECT_TRUE(tt.run());
-
-      std::unique_ptr<task> tt_ptr(new TestTaskImpl);
-      EXPECT_TRUE(tt_ptr->run());
+      auto expected_it = expected.begin();
+      ASSERT_EQ(tt.stages_.size(), expected.size());
+      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+        EXPECT_EQ(*(expected_it), next.label());
+        bool ran = next.run();
+        ++expected_it;
+        return ran;
+      });
+      EXPECT_TRUE(ran_all);
     }
 
-    TEST_F(TestTask, kill_if_is_running)
+    TEST_F(TestTask, iterate_stages_fails_if_one_stage_failed)
     {
       TestTaskImpl tt;
-      EXPECT_FALSE(tt.kill());
-
-      std::unique_ptr<task> tt_ptr(new TestTaskImpl);
-      EXPECT_FALSE(tt_ptr->kill());
-      EXPECT_TRUE(tt_ptr->run());
-      EXPECT_TRUE(tt_ptr->is_running());
-      EXPECT_TRUE(tt_ptr->kill());
+      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+        bool ran = next.run();
+        return (next.label() == "B" ? false : ran);
+      });
+      EXPECT_FALSE(ran_all);
     }
 
-    TEST_F(TestTask, clone)
+    TEST_F(TestTask, iterate_stages_fails_if_task_killed)
     {
       TestTaskImpl tt;
-      std::unique_ptr<task> tt_clone = tt.clone();
-      EXPECT_EQ(tt.get_uuid(), tt_clone->get_uuid());
-      EXPECT_EQ(tt.label(), tt_clone->label());
+      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+        next.end();
+        bool keep_running = (next.label() == "C") ? (not tt.kill()) : true;
+        return keep_running;
+      });
+      EXPECT_FALSE(ran_all);
+    }
+
+    TEST_F(TestTask, user_cannot_move_task_while_iterating_stages)
+    {
+      ASSERT_DEATH(
+        {
+          TestTaskImpl tt;
+          tt.iterate_stages([&](task_stage &next) {
+            next.end();
+            TestTaskImpl destroy(std::move(tt));
+            return true;
+          });
+        },
+        ""
+      );
+
+      ASSERT_DEATH(
+        {
+          TestTaskImpl tt;
+          tt.iterate_stages([&](task_stage &next) {
+            next.end();
+            TestTaskImpl destroy;
+            destroy = std::move(tt);
+            return true;
+          });
+        },
+        ""
+      );
     }
   }
 }

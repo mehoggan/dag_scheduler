@@ -4,16 +4,20 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
+#include <gtest/gtest_prod.h>
+
 #include <atomic>
 
 namespace com
 {
   namespace dag_scheduler
   {
-    class TestTaskImpl :
-      public logged_class<TestTaskImpl>,
-      public task
+    class TestTaskImpl : public task
     {
+    private:
+      FRIEND_TEST(TestTask,
+        iterate_stages_succeeds_if_all_stages_ran_no_kill_task);
+
     public:
       TestTaskImpl();
 
@@ -21,22 +25,9 @@ namespace com
 
       virtual ~TestTaskImpl();
 
-      virtual bool run() override;
+      TestTaskImpl(TestTaskImpl &&other);
 
-      virtual bool is_running() const override;
-
-      virtual bool kill() override;
-
-      virtual void cleanup() override;
-
-      virtual std::unique_ptr<task> clone() override;
-
-    protected:
-      TestTaskImpl(const TestTaskImpl &other);
-
-    private:
-      std::atomic_bool running_;
-      int *nasty_user_defined_pointer_;
+      TestTaskImpl &operator=(TestTaskImpl &&other);
     };
   }
 }

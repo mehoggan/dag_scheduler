@@ -6,6 +6,8 @@
 #include "dag_scheduler/logging.h"
 #include "dag_scheduler/task.h"
 
+#include <chrono>
+
 namespace com
 {
   namespace dag_scheduler
@@ -29,7 +31,9 @@ namespace com
       interruptible_task_thread &operator=(interruptible_task_thread &&rhs);
 
       bool set_task_and_run(std::unique_ptr<task> &&task,
-        const std::function<void (bool status)> &complete_callback);
+        const std::function<void (bool status)> &complete_callback,
+        const std::chrono::nanoseconds delay_between_stages =
+          std::chrono::nanoseconds(1000000));
 
       void set_interrupt();
 

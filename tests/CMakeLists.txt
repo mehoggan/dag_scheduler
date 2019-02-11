@@ -39,8 +39,10 @@ add_executable(unit_test
   test_stop_watch.cxx
   test_task.cxx
   test_task_scheduler.cxx
+  test_task_stage.cxx
   test_uuid.cxx
   utils/test_task.cxx
+  utils/test_task_stage.cxx
 )
 
 target_link_libraries(unit_test

@@ -34,7 +34,6 @@ namespace com
               if (!pause_.load()) {
                 // TODO (mhoggan): Actually put task into thread pool.
                 // For now just run the task then kill it.
-                next_task->run();
                 next_task.reset();
               }
             }

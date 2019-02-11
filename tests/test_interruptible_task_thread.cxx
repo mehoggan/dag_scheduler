@@ -18,10 +18,7 @@ namespace com
       TestInterruptibleTaskThread() :
         logged_class<TestInterruptibleTaskThread>(*this),
         ts_(LOG_TAG)
-      {
-        logging::info(LOG_TAG, "ctor for TestInterruptibleTaskThread ",
-          "called.");
-      }
+      {}
 
     protected:
       interruptible_task_thread ts_;
@@ -69,18 +66,31 @@ namespace com
         [&](bool status) {
           EXPECT_TRUE(status);
           EXPECT_FALSE(ts_.is_running());
-          EXPECT_TRUE(ts_.was_interrupted());
+          EXPECT_FALSE(ts_.was_interrupted());
           EXPECT_FALSE(ts_.has_task());
         });
       EXPECT_TRUE(started);
       EXPECT_TRUE(ts_.has_task());
       EXPECT_TRUE(ts_.is_running());
-      ts_.set_interrupt();
 
       while (ts_.is_running()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
       }
 
+      ts_.shutdown();
+    }
+
+    TEST_F(TestInterruptibleTaskThread, set_task_and_run_with_interrupt_fails)
+    {
+      std::unique_ptr<TestTaskImpl> test_task(new TestTaskImpl("test_task"));
+      ts_.set_task_and_run(std::move(test_task),
+        [&](bool status) {
+          EXPECT_FALSE(status);
+          EXPECT_FALSE(ts_.is_running());
+          EXPECT_TRUE(ts_.was_interrupted());
+          EXPECT_FALSE(ts_.has_task());
+        });
+      ts_.set_interrupt();
       ts_.shutdown();
     }
   }
