@@ -29,9 +29,10 @@ namespace com
       LOG_TAG(other.LOG_TAG),
       memo_(other.memo_),
       was_stopped_(true),
-      was_started_(false),
-      start_(std::chrono::high_resolution_clock::now())
-    {}
+      was_started_(false)
+    {
+      start();
+    }
 
     stop_watch &stop_watch::operator=(const stop_watch &rhs)
     {
@@ -39,7 +40,8 @@ namespace com
       memo_ = rhs.memo_;
       was_stopped_.store(true);
       was_started_.store(false);
-      start_ = std::chrono::high_resolution_clock::now();
+
+      start();
 
       return (*this);
     }
@@ -48,9 +50,10 @@ namespace com
       LOG_TAG(std::move(other.LOG_TAG)),
       memo_(std::move(other.memo_)),
       was_stopped_(true),
-      was_started_(false),
-      start_(std::chrono::high_resolution_clock::now())
-    {}
+      was_started_(false)
+    {
+      start();
+    }
 
     stop_watch &stop_watch::operator=(stop_watch &&rhs)
     {
@@ -58,7 +61,8 @@ namespace com
       memo_ = std::move(rhs.memo_);
       was_stopped_.store(true);
       was_started_.store(false);
-      start_ = std::chrono::high_resolution_clock::now();
+
+      start();
 
       return (*this);
     }

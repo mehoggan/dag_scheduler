@@ -145,13 +145,7 @@ namespace com
       bool ret = true;
 
       ret &= (lhs.uuid_.as_string() == rhs.uuid_.as_string());
-      if (ret == false) {
-        std::cout << "Not equal because of uuid." << std::endl;
-      }
       ret &= (lhs.current_status_ == rhs.current_status_);
-      if (ret == false) {
-        std::cout << "Not equal because of status." << std::endl;
-      }
 
       std::shared_ptr<dag_vertex> lhs_connection = lhs.connection_.lock();
       std::shared_ptr<dag_vertex> rhs_connection = rhs.connection_.lock();
@@ -159,22 +153,12 @@ namespace com
       if (lhs_connection != nullptr && rhs_connection != nullptr) {
         ret &= (lhs.connection_.lock().use_count() ==
           rhs.connection_.lock().use_count());
-        if (ret == false) {
-          std::cout << "Not equal because of connection use count."
-            << " lhs use_count == " << lhs.connection_.lock().use_count()
-            << " rhs use_count == " << rhs.connection_.lock().use_count()
-            << std::endl;
-        }
         //bool objs_are_same = (*lhs_connection) == (*rhs_connection);
         //ret &= objs_are_same;
       } else if (lhs_connection == nullptr && rhs_connection == nullptr) {
         ret &= true;
       } else {
         ret &= false;
-        if (ret == false) {
-          std::cout << "Not equal because of connection."
-            << std::endl;
-        }
       }
 
       return ret;

@@ -11,44 +11,67 @@ namespace com
 {
   namespace dag_scheduler
   {
-    //! A class that sets up stderror and stdout loggers for a derived
-    // class.
-    /*!
-     * If you inherrit from this class you will get a logger added to logging
-     * for specific instance of this class.
+    /**
+     * @brief A class that sets up stderror and stdout loggers for a derived
+     *        class.
      */
     class stop_watch
     {
     public:
-      //! ctor which starts timer.
-      /*!
+      /**
+       * @brief ctor which starts timer conditionally at construction time.
+       *
        * @param[in] tag The tag used to log the time. If the log_tag has not
        *                been added to the logger it will be as a std::cout
        *                logger.
        * @param[in] memo The note the user wants printed in the results.
+       * @param[in] start_on_construction A flag which determines if the
+       *                                  stop watch start at construction
+       *                                  time.
        */
       stop_watch(const log_tag &tag, const std::string &memo,
         bool start_on_construction = true);
 
-      //! dtor which stops timer
-      /*!
-       * The dtor will check see if the timer was forceStop 'd. If it was not
-       * it will stop the timmer and print.
+      /**
+       * @brief dtor
        */
       ~stop_watch();
 
-      //! copy ctor for stop_watch.
+      /**
+       * @brief copy ctor for stop_watch.
+       *
+       * The copy constructor behaves like a full reset of the \ref stop_watch
+       * in the since that in sets the current time to now and puts it into a
+       * running state.
+       *
+       * @param other The stop watch to copy into this.
+       */
       stop_watch(const stop_watch &other);
 
-      //! assignment operator for stop_watch.
-      /*!
-       * This is equivalent to calling reset.
+      /**
+       *
+       */
+      /**
+       * @brief assignement operator for stop_watch.
+       *
+       * The assignment operator behaves like a full reset of the
+       * \ref stop_watch in the since that in sets the current time to now and
+       * puts it into a running state.
+       *
+       * @param[in] rh The stop watch to copy into this.
+       *
+       * @return A reference to (*this).
        */
       stop_watch &operator=(const stop_watch &rhs);
 
       //! move copy ctor for stop_watch.
       /*!
        * This is equivalent to calling reset.
+       */
+      /**
+       * @brief 
+       *
+       * @param other
        */
       stop_watch(stop_watch &&other);
 

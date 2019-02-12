@@ -315,9 +315,10 @@ namespace com
         std::size_t rhs_edge_count = rhs.edge_count();
         ret &= (lhs_edge_count == rhs_edge_count);
         ret &= (lhs.incomming_edge_count() == rhs.incomming_edge_count());
-        /* We omit comparision of edges since a vertex checks its edges
-           in equality which would lead to infinite recursion.
-        */
+        /*
+         * We omit comparision of edges since a vertex checks its edges
+         * in equality which would lead to infinite recursion.
+         */
       } else if (lhs.current_status_ == dag_vertex::status::invalid &&
         rhs.current_status_ == dag_vertex::status::invalid){
         ret = true;
