@@ -67,7 +67,10 @@ namespace com
       ASSERT_DEATH(
         {
           TestTaskStageImpl tt;
-          std::thread run_stage_thread([&] { tt.run(); });
+          std::thread run_stage_thread([&] {
+            tt.run();
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+          });
           TestTaskStageImpl tt_m(std::move(tt));
           run_stage_thread.join();
         },
@@ -76,7 +79,10 @@ namespace com
       ASSERT_DEATH(
         {
           TestTaskStageImpl tt;
-          std::thread run_stage_thread([&] { tt.run(); });
+          std::thread run_stage_thread([&] {
+            tt.run();
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+          });
           TestTaskStageImpl tt_m;
           tt_m = std::move(tt);
           run_stage_thread.join();

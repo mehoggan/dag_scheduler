@@ -14,6 +14,7 @@ endif()
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
 
 include_directories(${gtest_SOURCE_DIR}/include)
+include_directories(${CMAKE_BINARY_DIR}/googletest-src/googletest/include)
 
 add_subdirectory(lib)
 

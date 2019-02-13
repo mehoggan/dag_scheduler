@@ -59,8 +59,7 @@ namespace com
     /* Tested [X] */
     bool interruptible_task_thread::set_task_and_run(
       std::unique_ptr<task> &&task,
-      const std::function<void (bool status)> &complete_callback,
-      const std::chrono::nanoseconds delay_between_stages)
+      const std::function<void (bool status)> &complete_callback)
     {
       bool thread_started = false;
       std::mutex return_mutex;
@@ -73,39 +72,40 @@ namespace com
       }
 
       thread_ = std::thread([&] {
-          thread_started = true;
-          /*
-          * We wait for task to be moved into then we return to consumers.
-          * We do this to ensure that client can query state of object and
-          * get correct state.
-          */
-          return_cond.notify_one();
-          running_.store(true);
-          bool all_ran = false;
-          if (task_ != nullptr) {
-            //*
-            all_ran = task_->iterate_stages([&](task_stage & next) {
-              bool stage_status = false;
-              {
-                std::lock_guard<std::mutex> lock(task_lock_);
-                stage_status = next.run();
-              }
-              bool this_was_interrupted = was_interrupted();
-              bool cont = stage_status && (not this_was_interrupted);
-              /*
-              * We sleep here to give cliensts time to set inturrpt. We do
-              * not want this thread to starve others.
-              */
-              std::this_thread::sleep_for(delay_between_stages);
-              return cont;
-            });
-          }
-          task_.reset(nullptr);
-          running_.store(false);
-          complete_callback(all_ran);
+        thread_started = true;
+        running_.store(true);
+        /*
+         * We wait for task to be moved into then we return to consumers.
+         * We do this to ensure that client can query state of object and
+         * get correct state.
+         */
+        return_cond.notify_one();
+        bool all_ran = false;
+        if (task_ != nullptr) {
+          all_ran = task_->iterate_stages([&](task_stage & next) {
+            bool stage_status = false;
+            {
+              std::lock_guard<std::mutex> lock(task_lock_);
+              logging::info(LOG_TAG, "Going to run stage", next);
+              stage_status = next.run();
+              std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+            const bool this_was_interrupted = was_interrupted();
+            const bool cont = stage_status && (not this_was_interrupted);
+            if (cont) {
+              logging::info(LOG_TAG, "Ran stage", next);
+            } else {
+              logging::error(LOG_TAG, "Failed to execute", next);
+            }
+            return cont;
+          });
+        }
+        task_.reset(nullptr);
+        running_.store(false);
+        complete_callback(all_ran);
 
-          return all_ran;
-        });
+        return all_ran;
+      });
 
       return_cond.wait(return_lock);
       return thread_started;

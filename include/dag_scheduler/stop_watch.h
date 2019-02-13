@@ -40,9 +40,9 @@ namespace com
       /**
        * @brief copy ctor for stop_watch.
        *
-       * The copy constructor behaves like a full reset of the \ref stop_watch
-       * in the since that in sets the current time to now and puts it into a
-       * running state.
+       * The copy constructor behaves like a full reset of the
+       * \ref stop_watch in the since that in sets the current time to now
+       * and puts it into a running state.
        *
        * @param other The stop watch to copy into this.
        */
@@ -55,55 +55,67 @@ namespace com
        * @brief assignement operator for stop_watch.
        *
        * The assignment operator behaves like a full reset of the
-       * \ref stop_watch in the since that in sets the current time to now and
-       * puts it into a running state.
+       * \ref stop_watch in the since that in sets the current time to now
+       * and puts it into a running state.
        *
-       * @param[in] rh The stop watch to copy into this.
+       * @param[in] rh The stop_watch to copy into this.
        *
        * @return A reference to (*this).
        */
       stop_watch &operator=(const stop_watch &rhs);
 
-      //! move copy ctor for stop_watch.
-      /*!
-       * This is equivalent to calling reset.
-       */
       /**
-       * @brief 
+       * @brief move copy constructor for stop_watch
        *
-       * @param other
+       * The move copy constructor behaves like a full reset of the
+       * \ref stop_watch in the since that it sets the current time to now
+       * and puts it into a running state.
+       *
+       * @param[out] other The stop_watch to move into this.
        */
       stop_watch(stop_watch &&other);
 
-      //! move assignment operator for stop_watch.
-      /*!
-       * This is equivalent to calling reset.
+      /**
+       * @brief move assignement operator for stop_watch.
+       *
+       * The move assignment operator behaves like a full reset of the
+       * \ref stop watch in the since that it sets the current time to now
+       * and it puts it into a running state.
+       *
+       * @param[out] rhs The stop_watch to move into this.
+       *
+       * @return A reference to this.
        */
       stop_watch &operator=(stop_watch &&rhs);
 
-      //! Used to start the timer.
-      /*!
-       * If the timer is not already started then start it. Otherwise ignore
-       * the request from user.
+      /**
+       * @brief Used to start the stop_watch.
+       *
+       * If the stop_watch is not already running the start it. Otherwise
+       * ignore the request from the user.
        */
       void start();
 
-      //! Used to stop the timer.
-      /*!
-       * If the timer is not already stoped it stops it else
+      /**
+       * @brief Used to stop the stop_watch.
+       *
+       * If the stop_watch is not already stoped it stops it.
+       *
+       * @return The duration from the start time.
        */
       std::chrono::nanoseconds stop();
 
-      //! Used to compute current time.
-      /*!
-       * If for whatever reason scoping cannot occur user may call this
-       * function in a thread safe manner.
+      /**
+       * @brief Used to print the duration time from when start was last
+       *        called.
+       *
+       * @return The duration from the start time.
        */
       std::chrono::nanoseconds mark();
 
-      //! Used to reset the timer's start time to current time.
-      /*!
-       * To restart timer to get offsets from the current time.
+      /**
+       * @brief Identical to calling \ref stop_watch::stop then
+       *        \ref stop_watch::start.
        */
       void reset();
 

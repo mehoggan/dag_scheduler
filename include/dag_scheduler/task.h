@@ -6,6 +6,7 @@
 #include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
 
+#include <atomic>
 #include <memory>
 #include <sstream>
 #include <ostream>

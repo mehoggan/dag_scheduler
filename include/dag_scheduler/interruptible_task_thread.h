@@ -16,19 +16,19 @@ namespace com
     {
     public:
       /**
-       * @brief 
+       * @brief
        */
       interruptible_task_thread();
 
       /**
-       * @brief 
+       * @brief
        *
        * @param[in] tag
        */
       explicit interruptible_task_thread(const log_tag &tag);
 
       /**
-       * @brief 
+       * @brief
        */
       ~interruptible_task_thread();
 
@@ -38,63 +38,61 @@ namespace com
         const interruptible_task_thread &) = delete;
 
       /**
-       * @brief 
+       * @brief
        *
        * @param[out] other
        */
       interruptible_task_thread(interruptible_task_thread &&other);
 
       /**
-       * @brief 
+       * @brief
        *
        * @param[out] rhs
        *
-       * @return 
+       * @return
        */
       interruptible_task_thread &operator=(interruptible_task_thread &&rhs);
 
       /**
-       * @brief 
+       * @brief
        *
        * @param[out] task
        * @param[in] complete_callback
        * @param[in] delay_between_stages
        *
-       * @return 
+       * @return
        */
       bool set_task_and_run(std::unique_ptr<task> &&task,
-        const std::function<void (bool status)> &complete_callback,
-        const std::chrono::nanoseconds delay_between_stages =
-          std::chrono::nanoseconds(1000000));
+        const std::function<void (bool status)> &complete_callback);
 
       /**
-       * @brief 
+       * @brief
        */
       void set_interrupt();
 
       /**
-       * @brief 
+       * @brief
        *
-       * @return 
+       * @return
        */
       bool was_interrupted() const;
 
       /**
-       * @brief 
+       * @brief
        *
-       * @return 
+       * @return
        */
       bool is_running() const;
 
       /**
-       * @brief 
+       * @brief
        *
-       * @return 
+       * @return
        */
       bool has_task() const;
 
       /**
-       * @brief 
+       * @brief
        */
       void shutdown();
 
