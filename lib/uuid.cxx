@@ -37,7 +37,6 @@ namespace com
 
     bool uuid::is_initialized() const
     {
-      // Returns 0 if is not null.
       return !uuid_is_null(uuid_);
     }
 

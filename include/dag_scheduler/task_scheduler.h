@@ -18,22 +18,61 @@ namespace com
       public boost::noncopyable
     {
     public:
+      /**
+       * @brief 
+       */
       task_scheduler();
 
+      /**
+       * @brief 
+       *
+       * @return 
+       */
       bool startup();
 
+      /**
+       * @brief 
+       *
+       * @param t
+       */
       void queue_task(std::unique_ptr<task> &&t);
 
+      /**
+       * @brief 
+       *
+       * @param t
+       *
+       * @return 
+       */
       bool kill_task(const task &t);
 
+      /**
+       * @brief 
+       */
       void pause();
 
+      /**
+       * @brief 
+       */
       void resume();
 
+      /**
+       * @brief
+       *
+       * @return 
+       */
       bool is_paused();
 
+      /**
+       * @brief 
+       */
       void shutdown();
 
+      /**
+       * @brief 
+       *
+       * @return 
+       */
       bool is_shutdown();
 
     private:
