@@ -3,11 +3,13 @@
 
 #include "declspec.h"
 
-#include "dag_scheduler/concurrent_queue.hpp"
+#include "dag_scheduler/concurrent_task_queue.h"
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
 #include <gtest/gtest_prod.h>
+
+#include <tuple>
 
 namespace com
 {
@@ -76,7 +78,7 @@ namespace com
       bool is_shutdown();
 
     private:
-      concurrent_queue<std::unique_ptr<task>> queue_;
+      concurrent_task_queue queue_;
       volatile std::atomic_bool pause_;
       volatile std::atomic_bool kill_;
     };

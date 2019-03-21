@@ -16,11 +16,22 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
 include_directories(${gtest_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR}/googletest-src/googletest/include)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.boostbeast.txt.in
+  ${CMAKE_BINARY_DIR}/boostbeast-download/CMakeLists.txt)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/boostbeast.cmake)
+
+include_directories(
+  ${UUID_INCLUDE_DIRS}
+  "${CMAKE_BINARY_DIR}/boostbeast/include"
+)
+link_directories(
+  "${CMAKE_BINARY_DIR}/boostbeast/lib"
+)
 add_subdirectory(lib)
 
 if(DAGTASKS_TESTS)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.googletest.txt.in
     ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
-  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/gtest.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/googletest.cmake)
   add_subdirectory(tests)
 endif()

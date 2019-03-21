@@ -1,0 +1,46 @@
+FROM debian
+
+RUN mkdir -p /home/dag_scheduler
+
+RUN apt-get update
+RUN apt-get install -y \
+  g++ \
+  uuid \
+  uuid-dev \
+  git \
+  wget \
+  libssl-dev \
+  build-essential
+
+RUN wget http://www.cmake.org/files/v3.12/cmake-3.12.3.tar.gz -O \
+  /opt/cmake-3.12.3.tar.gz && \
+  cd /opt && tar xf cmake-3.12.3.tar.gz && \
+  cd cmake-3.12.3 && \
+  ./configure && \
+  make && \
+  make install && \
+  ln -s /usr/local/bin/cmake /usr/bin/cmake
+
+ADD ./bindings /home/dag_scheduler/bindings
+ADD ./cmake /home/dag_scheduler/cmake
+ADD ./cmake_modules /home/dag_scheduler/cmake_modules
+ADD ./include /home/dag_scheduler/include
+ADD ./lib /home/dag_scheduler/lib
+ADD ./tests /home/dag_scheduler/tests
+ADD ./CMakeLists.boostbeast.txt.in \
+  /home/dag_scheduler/CMakeLists.boostbeast.txt.in
+ADD ./CMakeLists.googletest.txt.in \
+  /home/dag_scheduler/CMakeLists.googletest.txt.in
+ADD ./CMakeLists.txt /home/dag_scheduler/CMakeLists.txt
+ADD ./declspec.h /home/dag_scheduler/declspec.h
+ADD ./README.md /home/dag_scheduler/README.md
+ADD ./vim-dev-env.sh /home/dag_scheduler/vim-dev-env.sh
+ADD ./vimrc /root/.vimrc
+ADD ./.ycm_extra_conf.py.linux /home/dag_scheduler/.ycm_extra_conf.py
+
+RUN cd /home/dag_scheduler && \
+  mkdir -p build && \
+  cd build && \
+  cmake -DCMAKE_VERBOSE_MAKEFILE=On -DCMAKE_BUILD_TYPE=Debug ../ && \
+  make -j 5
+  

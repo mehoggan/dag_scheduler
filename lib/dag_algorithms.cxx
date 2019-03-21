@@ -1,6 +1,5 @@
 #include "dag_scheduler/dag_algorithms.h"
 
-#include "dag_scheduler/concurrent_queue.hpp"
 #include "dag_scheduler/dag_edge.h"
 #include "dag_scheduler/dag_vertex.h"
 #include "dag_scheduler/logging.h"

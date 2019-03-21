@@ -61,33 +61,5 @@ namespace com
       EXPECT_FALSE(tt_ptr->is_running());
       EXPECT_TRUE(tt_ptr->end());
     }
-
-    TEST_F(TestTaskStage, user_cannot_move_running_task)
-    {
-      ASSERT_DEATH(
-        {
-          TestTaskStageImpl tt;
-          std::thread run_stage_thread([&] {
-            tt.run();
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-          });
-          TestTaskStageImpl tt_m(std::move(tt));
-          run_stage_thread.join();
-        },
-        "");
-
-      ASSERT_DEATH(
-        {
-          TestTaskStageImpl tt;
-          std::thread run_stage_thread([&] {
-            tt.run();
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-          });
-          TestTaskStageImpl tt_m;
-          tt_m = std::move(tt);
-          run_stage_thread.join();
-        },
-        "");
-    }
   }
 }

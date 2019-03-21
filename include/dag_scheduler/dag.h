@@ -17,6 +17,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <boost/beast.hpp>
+
 namespace com
 {
   namespace dag_scheduler

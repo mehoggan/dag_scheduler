@@ -53,6 +53,7 @@ namespace com
       interrupt_.store(false);
       running_.store(false);
       task_ = std::move(rhs.task_);
+
       return (*this);
     }
 
@@ -111,7 +112,7 @@ namespace com
       return thread_started;
     }
 
-    /* Tested [X] */
+    /* Tested [✓] */
     void interruptible_task_thread::set_interrupt()
     {
       {
@@ -121,19 +122,19 @@ namespace com
       interrupt_.store(true);
     }
 
-    /* Tested [X] */
+    /* Tested [✓] */
     bool interruptible_task_thread::was_interrupted() const
     {
       return interrupt_.load();
     }
 
-    /* Tested [X] */
+    /* Tested [✓] */
     bool interruptible_task_thread::is_running() const
     {
       return running_;
     }
 
-    /* Tested [X] */
+    /* Tested [✓] */
     bool interruptible_task_thread::has_task() const
     {
       {
@@ -142,7 +143,7 @@ namespace com
       }
     }
 
-    /* Tested [X] */
+    /* Tested [✓] */
     void interruptible_task_thread::shutdown()
     {
       if (running_.load()) {

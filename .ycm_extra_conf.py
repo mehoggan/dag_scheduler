@@ -48,6 +48,7 @@ flags = [
     '-Dgmock_main_EXPORTS',
     '-Dgtest_EXPORTS',
     '-Dgtest_main_EXPORTS',
+    '-I/Users/mhoggan/Devel/build/github/dag_scheduler/boostbeast/include',
     '-I/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/uuid',
     '-I/Users/mhoggan/Devel/github/dag_scheduler/lib/..',
     '-I/Users/mhoggan/Devel/github/dag_scheduler/lib/../include',

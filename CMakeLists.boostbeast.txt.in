@@ -1,0 +1,51 @@
+cmake_minimum_required(VERSION 3.0.2)
+
+project(boostbeast-download NONE)
+include(ExternalProject)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  ExternalProject_Add(boostbeast
+    DOWNLOAD_COMMAND git clone --recursive
+      https://github.com/boostorg/boost.git
+    GIT_TAG master
+    SOURCE_DIR "${CMAKE_BINARY_DIR}/boostbeast-src"
+    BINARY_DIR "${CMAKE_BINARY_DIR}/boostbeast-build"
+    CONFIGURE_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./bootstrap.sh"
+      "--prefix=${CMAKE_BINARY_DIR}/boostbeast"
+      "--with-toolset=clang"
+    BUILD_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./b2" "-j2" "cxxstd=11"
+    INSTALL_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./b2" "install"
+    TEST_COMMAND ""
+  )
+else()
+  ExternalProject_Add(boostbeast
+    DOWNLOAD_COMMAND git clone --recursive
+      https://github.com/boostorg/boost.git
+    GIT_TAG master
+    SOURCE_DIR "${CMAKE_BINARY_DIR}/boostbeast-src"
+    BINARY_DIR "${CMAKE_BINARY_DIR}/boostbeast-build"
+    CONFIGURE_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./bootstrap.sh"
+      "--prefix=${CMAKE_BINARY_DIR}/boostbeast"
+    BUILD_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./b2" "-j2" "cxxstd=11"
+    INSTALL_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
+      "&&"
+      "./b2" "install"
+    TEST_COMMAND ""
+  )
+endif()

@@ -13,23 +13,11 @@ add_test(unit_test unit_test --report_level=no --log_level=all
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall \
   -fno-strict-aliasing")
 
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED COMPONENTS
-  date_time
-  filesystem
-  log
-  log_setup
-  system
-  thread
-  program_options
-)
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(unit_test
   main.cxx
-  test_concurrent_queue.cxx
+  test_concurrent_task_queue.cxx
   test_dag.cxx
   test_dag_algorithms.cxx
   test_dag_edge.cxx
@@ -51,7 +39,14 @@ target_link_libraries(unit_test
   gtest_main
   gmock
   gmock_main
-  ${Boost_LIBRARIES}
+  boost_date_time
+  boost_filesystem
+  boost_log
+  boost_log_setup
+  boost_system
+  boost_thread
+  boost_program_options
+  pthread
 )
 
 include_directories(../include)
@@ -84,7 +79,8 @@ add_custom_command(TARGET my_custom_target_that_always_runs
   COMMENT "Run tests as post build step."
   POST_BUILD
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMAND unit_test
+  COMMAND ${CMAKE_COMMAND} -E env
+    LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/boostbeast/lib ./unit_test
 )
 
 add_custom_target(valgrind
