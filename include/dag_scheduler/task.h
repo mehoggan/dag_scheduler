@@ -7,6 +7,7 @@
 #include "dag_scheduler/uuid.h"
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <ostream>

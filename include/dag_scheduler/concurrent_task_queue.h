@@ -4,6 +4,11 @@
 #include <dag_scheduler/task.h>
 
 #include <condition_variable>
+<<<<<<< HEAD
+=======
+#include <deque>
+#include <memory>
+>>>>>>> Added in boost.beast and dockerized in debian.
 #include <mutex>
 #include <queue>
 #include <thread>
