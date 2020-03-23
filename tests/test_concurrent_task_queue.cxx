@@ -33,7 +33,6 @@ namespace com
       EXPECT_EQ(0u, empty_queue.size());
     }
 
-
     TEST_F(TestConcurrentTaskQueue, test_size_predictable_conccurent)
     {
       concurrent_task_queue non_empty_queue;

@@ -17,7 +17,12 @@
 
 #include <gtest/gtest_prod.h>
 
+// NOTE: Pragmas added for YCM.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshadow"
 #include <boost/beast.hpp>
+#pragma clang diagnostic pop
 
 namespace com
 {
