@@ -71,7 +71,8 @@ namespace com
       return ret;
     }
 
-    bool process_dag(dag &g, processed_order_type &out)
+    bool process_dag(dag &g, processed_order_type &out,
+      task_scheduler &scheduler)
     {
       bool ret = false;
       log_tag LOG_TAG(__FUNCTION__);
@@ -80,9 +81,9 @@ namespace com
       dag g_clone = g.clone();
       dag g_check = g.clone();
 
-      std::list<dag_vertex> dummy;
-      ret = !dag_topological_sort(g_check, dummy);
-      if (ret && dummy.size() == g_clone.vertex_count()) {
+      std::list<dag_vertex> check;
+      ret = !dag_topological_sort(g_check, check);
+      if (ret && check.size() == g_clone.vertex_count()) {
         out.clear();
         std::vector<std::shared_ptr<dag_vertex>>
           curr_dag_vertices_with_no_incomming_edges =
@@ -100,11 +101,14 @@ namespace com
             }
           );
 
-          // TODO (mhoggan): Add vertices_to_process to scheduler.
           out.push_back({});
           for (dag_vertex &v : vertices_to_process) {
             out.back().push_back(v.clone());
           }
+          std::for_each(vertices_to_process.begin(), vertices_to_process.end(),
+            [&](dag_vertex &vertex) {
+              scheduler.queue_task(std::move(vertex.get_task()));
+            });
           vertices_to_process.clear();
 
           curr_dag_vertices_with_no_incomming_edges.clear();

@@ -102,5 +102,42 @@ namespace com
       queue.clear();
       EXPECT_TRUE(queue.empty());
     }
+
+    TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue)
+    {
+      concurrent_task_queue queue;
+      std::unique_ptr<task> task_ptr(new task);
+      const uuid &ref = task_ptr->get_uuid();
+      queue.push(std::move(task_ptr));
+      std::unique_ptr<task> removed;
+      queue.remove_task_from_queue(ref, removed);
+      ASSERT_TRUE(removed != nullptr);
+      EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string());
+      EXPECT_TRUE(queue.empty());
+    }
+
+    TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok)
+    {
+      concurrent_task_queue queue;
+
+      std::unique_ptr<task> task_ptr(new task);
+      const uuid &ref = task_ptr->get_uuid();
+      queue.push(std::move(task_ptr));
+
+      std::unique_ptr<task> task_ptr_remains(new task);
+      const uuid &ref_remains = task_ptr_remains->get_uuid();
+      queue.push(std::move(task_ptr_remains));
+
+      std::unique_ptr<task> removed;
+      queue.remove_task_from_queue(ref, removed);
+      ASSERT_TRUE(removed != nullptr);
+      EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string()); 
+      EXPECT_FALSE(queue.empty());
+
+      std::unique_ptr<task> remains_check;
+      queue.try_pop(remains_check);
+      EXPECT_EQ(ref_remains.as_string(),
+        remains_check->get_uuid().as_string());
+    }
   }
 }

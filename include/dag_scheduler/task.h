@@ -52,6 +52,23 @@ namespace com
         const std::string &label);
 
       /**
+       * @brief ctor that gives a task a descriptive name and stages.
+       *
+       * A constructor for a \ref task that assigns a set of
+       * \ref task_stage (s) to a \ref task and a descriptive label to the
+       * \ref task.
+       *
+       * @param[in] stages A collection of \ref task_stage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional function to call at the end
+       * of a task.
+       */
+      task(std::vector<std::unique_ptr<task_stage>> &stages,
+        const std::string &label,
+        std::function<void (bool)> complete_callback);
+
+      /**
        * @brief dtor
        */
       virtual ~task();
@@ -131,6 +148,16 @@ namespace com
        */
       virtual bool kill();
 
+      /**
+       * @brief Function used by user of class of a \ref task to signal
+       * it completion. The complete_callback will be called if set
+       * by the user calling the correct constructor.
+       *
+       * @param[in] status The status to send to the call back specified by
+       *                   the user..
+       */
+      virtual void complete(bool status);
+
     public:
       /**
        * @brief Equality operator.
@@ -178,6 +205,7 @@ namespace com
       std::atomic_bool kill_;
       std::vector<std::unique_ptr<task_stage>> stages_;
       std::string label_;
+      std::function<void (bool)> complete_callback_;
       uuid uuid_;
     };
   }

@@ -2,6 +2,7 @@
 
 #include "dag_scheduler/logging.h"
 
+#include <string>
 #include <vector>
 
 namespace com
@@ -12,7 +13,12 @@ namespace com
       logged_class<task_scheduler>(*this),
       pause_(true),
       kill_(true)
-    {}
+    {
+      for (std::uint8_t id = 0; id < thread_pool_.size(); ++id) {
+        thread_pool_[id].reset(
+            new interruptible_task_thread(log_tag(std::to_string(id))));
+      }
+    }
 
     bool task_scheduler::startup()
     {
@@ -25,16 +31,33 @@ namespace com
         if (should_get_next) {
           std::unique_ptr<task> next_task = nullptr;
           queue_.wait_for_and_pop(next_task, refresh_time);
-          if (next_task != nullptr) {
+          if (next_task) {
             logging::info(LOG_TAG, "next task =", (*next_task));
             while (true) {
               if (kill_.load()) {
+                if (next_task) {
+                  next_task->kill();
+                }
                 break;
               }
               if (!pause_.load()) {
-                // TODO (mhoggan): Actually put task into thread pool.
-                // For now just run the task then kill it.
-                next_task.reset();
+                std::size_t unused_index = first_unused_thread();
+                if (unused_index != static_cast<std::size_t>(-1)) {
+                  if (kill_.load()) {
+                    if (next_task) {
+                      next_task->kill();
+                    }
+                    next_task.reset(nullptr);
+                    break;
+                  }
+                  {
+                    std::lock_guard<std::mutex> lock(thread_pool_lock_); 
+                    if (next_task) {
+                      thread_pool_[unused_index]->set_task_and_run(
+                        std::move(next_task));
+                    }
+                  }
+                }
               }
             }
           }
@@ -51,11 +74,14 @@ namespace com
 
     bool task_scheduler::kill_task(const task &t)
     {
-      // TODO (mhoggan): Please implement.
-      // There are two cases to consider here:
-      //    1. The task is still in the queue.
-      //    2. The task is actually running in the thread pool.
-      return true;
+      return kill_task(t.get_uuid());
+    }
+
+    bool task_scheduler::kill_task(const uuid &u)
+    {
+      std::unique_ptr<task> to_kill;
+      queue_.remove_task_from_queue(u, to_kill);
+      return true;;
     }
 
     void task_scheduler::pause()
@@ -82,6 +108,19 @@ namespace com
     bool task_scheduler::is_shutdown()
     {
       return kill_.load();
+    }
+
+    std::size_t task_scheduler::first_unused_thread()
+    {
+      std::lock_guard<std::mutex> lock(thread_pool_lock_);
+      std::size_t first_unused_index = static_cast<std::size_t>(-1);
+      for (std::size_t i = 0; i < thread_pool_.size(); ++i) {
+        if (not thread_pool_[i]->is_running()) {
+          first_unused_index = i;
+          break;
+        }
+      }
+      return first_unused_index;
     }
   }
 }

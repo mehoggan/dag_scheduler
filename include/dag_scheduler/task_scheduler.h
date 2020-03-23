@@ -4,11 +4,13 @@
 #include "declspec.h"
 
 #include "dag_scheduler/concurrent_task_queue.h"
+#include "dag_scheduler/interruptible_task_thread.h"
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
 #include <gtest/gtest_prod.h>
 
+#include <mutex>
 #include <tuple>
 
 namespace com
@@ -50,6 +52,15 @@ namespace com
 
       /**
        * @brief 
+       *
+       * @param u
+       *
+       * @return 
+       */
+      bool kill_task(const uuid &u);
+
+      /**
+       * @brief 
        */
       void pause();
 
@@ -78,9 +89,14 @@ namespace com
       bool is_shutdown();
 
     private:
+      std::size_t first_unused_thread();
+
+    private:
       concurrent_task_queue queue_;
       volatile std::atomic_bool pause_;
       volatile std::atomic_bool kill_;
+      std::array<std::unique_ptr<interruptible_task_thread>, 10> thread_pool_;
+      std::mutex thread_pool_lock_;
     };
   }
 }

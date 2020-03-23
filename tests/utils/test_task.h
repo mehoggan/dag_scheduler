@@ -7,6 +7,7 @@
 #include <gtest/gtest_prod.h>
 
 #include <atomic>
+#include <functional>
 
 namespace com
 {
@@ -22,6 +23,9 @@ namespace com
       TestTaskImpl();
 
       TestTaskImpl(const std::string &label);
+
+      TestTaskImpl(const std::string &label,
+          std::function<void (bool)> complete_callback);
 
       virtual ~TestTaskImpl();
 

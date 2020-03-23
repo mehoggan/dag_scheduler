@@ -158,6 +158,24 @@ namespace com
         return true;
       }
 
+      /**
+       * @brief A function to remove an item from the queue.
+       *
+       * A member function of \ref concurrent_task_queue<task> that attempts
+       * to remove a defined item from anywhere in the queue. If the user calls
+       * this that task will be removed permenantly from the queue and not
+       * returned
+       *
+       * @param[in] to_remove A reference to a task to be removed from the
+       *                      queue.
+       * @param[out] ret A \ref std::unique_ptr to the contents removed from
+       *                 the queue.
+       *
+       * @return "true" if item was found and removed, false otherwise.
+       */
+      void remove_task_from_queue(const uuid &to_remove,
+        std::unique_ptr<task> &ret_ptr);
+
     private:
        std::deque<std::unique_ptr<task>> queue_;
        mutable std::mutex mutex_;

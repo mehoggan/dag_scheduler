@@ -4,6 +4,7 @@
 #include "declspec.h"
 
 #include "dag_scheduler/dag.h"
+#include "dag_scheduler/task_scheduler.h"
 
 #include <list>
 
@@ -65,7 +66,8 @@ namespace com
      * @return False if \ref g could not have all \ref dag_vertex (s)
      *         visited. 
      */
-    DLLSPEC_DAGTASKS bool process_dag(dag &g, processed_order_type &out);
+    DLLSPEC_DAGTASKS bool process_dag(dag &g, processed_order_type &out,
+      task_scheduler &scheduler);
   }
 }
 

@@ -27,6 +27,16 @@ namespace com
       label_(label)
     {}
 
+    task::task(std::vector<std::unique_ptr<task_stage>> &stages,
+      const std::string &label,
+      std::function<void (bool)> complete_callback) :
+      iterating_(false),
+      kill_(false),
+      stages_(std::move(stages)),
+      label_(label),
+      complete_callback_(complete_callback)
+    {}
+
     task::~task()
     {}
 
@@ -93,6 +103,13 @@ namespace com
       return kill_.load();
     }
 
+    void task::complete(bool status)
+    {
+      if (complete_callback_) {
+        complete_callback_(status);
+      }
+    }
+
     bool operator==(const task &lhs, const task &rhs)
     {
       return lhs.uuid_ == rhs.uuid_;
@@ -105,7 +122,7 @@ namespace com
 
     std::ostream &operator<<(std::ostream &out, const task &t)
     {
-      out << "label =" << t.label_;
+      out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }
@@ -119,7 +136,7 @@ namespace com
 
     std::stringstream &operator<<(std::stringstream &out, const task &t)
     {
-      out << "label =" << t.label_;
+      out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }

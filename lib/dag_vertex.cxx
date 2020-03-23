@@ -56,6 +56,7 @@ namespace com
       current_status_ = other.current_status_;
       edges_ = std::move(other.edges_);
       incomming_edge_count_ = other.incomming_edge_count_.load();
+      task_ = std::move(other.task_);
 
       other.label_.clear();
       other.current_status_ = status::invalid;
@@ -69,6 +70,7 @@ namespace com
       current_status_ = rhs.current_status_;
       edges_ = std::move(rhs.edges_);
       incomming_edge_count_ = rhs.incomming_edge_count_.load();
+      task_ = std::move(rhs.task_);
 
       rhs.label_.clear();
       rhs.current_status_ = status::invalid;
@@ -220,6 +222,11 @@ namespace com
     const std::string &dag_vertex::label() const
     {
       return label_;
+    }
+
+    std::unique_ptr<task> &dag_vertex::get_task()
+    {
+      return task_;
     }
 
     bool dag_vertex::has_incomming_edges() const

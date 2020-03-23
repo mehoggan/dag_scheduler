@@ -199,7 +199,8 @@ namespace com
 
         processed_order_type ordered_batches;
 
-        EXPECT_TRUE(process_dag(get_dag(), ordered_batches));
+        task_scheduler ts;
+        EXPECT_TRUE(process_dag(get_dag(), ordered_batches, ts));
 
         ASSERT_EQ(5u, ordered_batches.size());
         ASSERT_EQ(1u, ordered_batches[0].size());
@@ -246,7 +247,8 @@ namespace com
 
         processed_order_type ordered_batches;
 
-        EXPECT_FALSE(process_dag(get_dag(), ordered_batches));
+        task_scheduler ts;
+        EXPECT_FALSE(process_dag(get_dag(), ordered_batches, ts));
         get_dag().reset();
       }
     }

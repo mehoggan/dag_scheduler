@@ -1,0 +1,5 @@
+---
+address: "localhost"
+port: 8888
+doc-root: "/Users/matthew.hoggan/Desktop"
+threads: 2

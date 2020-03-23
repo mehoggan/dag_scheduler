@@ -60,7 +60,7 @@ namespace com
 
     std::ostream &operator<<(std::ostream &out, const task_stage &t)
     {
-      out << "label =" << t.label_;
+      out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }
@@ -70,7 +70,7 @@ namespace com
 
     std::stringstream &operator<<(std::stringstream &out, const task_stage &t)
     {
-      out << "label =" << t.label_;
+      out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }

@@ -1,6 +1,8 @@
 #include <dag_scheduler/concurrent_task_queue.h>
+#include <dag_scheduler/logging.h>
 
 #include <cassert>
+#include <utility>
 
 namespace com
 {
@@ -67,6 +69,28 @@ namespace com
       std::unique_ptr<task> popped_value = std::move(queue_.front());
       queue_.pop_front();
       return std::move(popped_value);
+    }
+
+
+    void concurrent_task_queue::remove_task_from_queue(const uuid &to_remove,
+      std::unique_ptr<task> &ret_ptr)
+    {
+      log_tag lt(__FUNCTION__);
+      logging::add_std_cout_logger(lt);
+
+      std::unique_lock<std::mutex> lock(mutex_);
+      if (not queue_.empty()) {
+        auto iterator = std::remove_if(queue_.begin(), queue_.end(),
+          [&] (std::unique_ptr<task> &task) {
+            auto ret = task.get()->get_uuid().as_string() ==
+              to_remove.as_string();
+            if (ret) {
+              ret_ptr = std::move(task);
+            }
+            return  ret;
+          });
+        queue_.resize(std::size_t(iterator - queue_.begin()));
+      }
     }
   }
 }

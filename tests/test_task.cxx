@@ -40,6 +40,19 @@ namespace com
       EXPECT_EQ("test_label", test->label());
     }
 
+    TEST_F(TestTask, call_back_ctor_sets_appropiate_callback)
+    {
+      std::function<void (bool)> complete_callback = [](bool status) {
+        EXPECT_TRUE(status);
+      };
+      std::unique_ptr<task> test(
+          new TestTaskImpl("test_label", complete_callback));
+      EXPECT_NE(nullptr, test);
+      EXPECT_NE(test->get_uuid().as_string(), test->label());
+      EXPECT_EQ("test_label", test->label());
+      test->complete(true);
+    }
+
     TEST_F(TestTask, iterate_stages_succeeds_if_all_stages_ran_no_kill_task)
     {
       const auto expected = {"A", "B", "C"};

@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.0.2)
 
-find_program(valgrind REQUIRED)
-set(CTEST_MEMORYCHECK_COMMAND "/usr/bin/valgrind") 
-set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes
-  --leak-check=full")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_MACOSX_RPATH 1)
+else()
+  find_program(valgrind REQUIRED)
+  set(CTEST_MEMORYCHECK_COMMAND "/usr/bin/valgrind") 
+  set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes
+    --leak-check=full")
+endif()
+
 include(CTest)
 enable_testing()
 

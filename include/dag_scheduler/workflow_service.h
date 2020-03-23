@@ -1,0 +1,161 @@
+#ifndef WORKFLOW_ORCHESTRATOR_H_INCLUDED
+#define WORKFLOW_ORCHESTRATOR_H_INCLUDED
+
+#include <dag_scheduler/logged_class.hpp>
+
+#include <yaml-cpp/yaml.h>
+
+#include <boost/asio/connect.hpp>
+#include <boost/asio/ssl/stream.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/ssl.hpp>
+
+#include <memory>
+
+#include "declspec.h"
+
+/*
+ * Code in this module borrowed from:
+ * https://www.boost.org/doc/libs/develop/libs/beast/example/http/server/
+ * async-ssl/http_server_async_ssl.cpp
+ */
+
+namespace com
+{
+  namespace dag_scheduler
+  {
+    class DLLSPEC_DAGTASKS workflow_service :
+      public logged_class<workflow_service>
+    {
+    public:
+      struct connection_info
+      {
+        std::string address_;
+        std::uint32_t port_;
+        std::string doc_root_;
+        std::uint16_t threads_;
+      };
+
+    public:
+      /**
+       * @brief default ctor
+       */
+      explicit workflow_service(const connection_info& ci);
+
+    private:
+      boost::asio::io_context ioc_;
+      boost::asio::ssl::context ctx_;
+    };
+
+    class DLLSPEC_DAGTASKS https_listener :
+      public logged_class<https_listener>,
+      public std::enable_shared_from_this<https_listener>
+    {
+    public:
+      https_listener(
+        boost::asio::io_context& ioc,
+        boost::asio::ssl::context& ctx,
+        boost::asio::ip::tcp::endpoint endpoint,
+        std::shared_ptr<const std::string>& doc_root);
+
+      ~https_listener();
+
+      void run();
+
+    private:
+      void do_accept();
+
+      void on_accept(boost::beast::error_code ec,
+        boost::asio::ip::tcp::socket socket);
+
+    private:
+      boost::asio::io_context& ioc_;
+      boost::asio::ssl::context& ctx_;
+      boost::asio::ip::tcp::acceptor acceptor_;
+      std::shared_ptr<const std::string> doc_root_;
+    };
+
+    class https_session :
+      public logged_class<https_session>,
+      public std::enable_shared_from_this<https_session>
+    {
+    private:
+      struct send_it
+      {
+        https_session& self_;
+
+        explicit send_it(https_session& self);
+
+        template<bool isRequest, class Body, class Fields>
+        void operator()(
+          boost::beast::http::message<isRequest, Body, Fields>&& msg) const
+        {
+          auto sp = std::make_shared<
+            boost::beast::http::message<
+              isRequest, Body, Fields>>(std::move(msg));
+
+          self_.res_ = sp;
+
+          boost::beast::http::async_write(
+            self_.stream_,
+            *sp,
+            boost::beast::bind_front_handler(
+              &https_session::on_write,
+              self_.shared_from_this(),
+              sp->need_eof()));
+        }
+      };
+
+    public:
+      explicit https_session(
+        boost::asio::ip::tcp::socket&& socket,
+        boost::asio::ssl::context& ctx,
+        const std::shared_ptr<const std::string>& doc_root);
+
+      void run();
+
+    private:
+      void on_run();
+      void on_handshake(boost::beast::error_code ec);
+      void do_read();
+      void on_read(boost::beast::error_code ec, std::size_t bytes_transferred);
+      void do_close();
+      void on_shutdown(boost::beast::error_code ec);
+      void on_write(bool close, boost::beast::error_code ec, std::size_t);
+
+    private:
+      boost::beast::ssl_stream<boost::beast::tcp_stream> stream_;
+      boost::beast::flat_buffer buffer_;
+      std::shared_ptr<std::string const> doc_root_;
+      boost::beast::http::request<boost::beast::http::string_body> req_;
+      std::shared_ptr<void> res_;
+      send_it labmda_;
+    };
+  }
+}
+
+namespace YAML
+{
+  template<>
+  struct convert<com::dag_scheduler::workflow_service::connection_info>
+  {
+    static bool decode(const Node& node,
+      com::dag_scheduler::workflow_service::connection_info &rhs)
+    {
+      if (node.size() != 4) {
+        return false;
+      }
+      rhs.address_ = node["address"].as<std::string>();
+      if (rhs.address_ == "localhost") {
+        rhs.address_ = "127.0.0.1";
+      }
+      rhs.port_ = node["port"].as<std::uint32_t>();
+      rhs.doc_root_ = node["doc-root"].as<std::string>();
+      rhs.threads_ = node["threads"].as<std::uint16_t>();
+      return true;
+    }
+  };
+}
+
+#endif

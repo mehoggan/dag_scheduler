@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 #include "dag_scheduler/task_scheduler.h"
 
@@ -20,7 +19,9 @@ namespace com
       {
       public:
         explicit LocalTestTaskImpl(
-          const std::chrono::milliseconds &sleep_time) :
+          const std::chrono::milliseconds &sleep_time,
+          std::function<void (bool)> complete_callback_) :
+          TestTaskImpl(__FUNCTION__ , complete_callback_),
           ran_(false),
           sleep_time_(sleep_time)
         {}
@@ -99,7 +100,7 @@ namespace com
       task_scheduler ts;
 
       std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
-        std::chrono::milliseconds(3)));
+        std::chrono::milliseconds(3), std::function<void (bool)>()));
       ts.queue_task(std::move(ltti));
       ASSERT_EQ(nullptr, ltti.get());
     }
@@ -107,25 +108,28 @@ namespace com
     TEST(TestTaskScheduler, kill_task)
     {
       std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
-        std::chrono::milliseconds(3)));
+        std::chrono::milliseconds(3), std::function<void (bool)>()));
       task_scheduler ts;
       EXPECT_TRUE(ts.kill_task(*(ltti)));
     }
 
     TEST(TestTaskScheduler, queue_task_and_let_it_run)
     {
+      std::function<void (bool)> complete_callback = [&](bool status) {
+        EXPECT_TRUE(status);
+      };
+
       task_scheduler ts;
       std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
       // Give time for thread to start up before we fire and kill.
       std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
-        std::chrono::milliseconds(1000)));
+        std::chrono::milliseconds(1000), complete_callback));
 
       ts.queue_task(std::move(ltti));
 
       // From a unit test perspective we need to give the task time to
       // be scheduled and then run. One second should be sufficient.
-      auto wait_time_sec = std::chrono::seconds(1);
-      std::this_thread::sleep_for(wait_time_sec);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
 
       ts.shutdown();
       ts_thread.join();

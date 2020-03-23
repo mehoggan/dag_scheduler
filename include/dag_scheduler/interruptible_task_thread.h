@@ -62,13 +62,16 @@ namespace com
        *
        * @return
        */
-      bool set_task_and_run(std::unique_ptr<task> &&task,
-        const std::function<void (bool status)> &complete_callback);
+      bool set_task_and_run(std::unique_ptr<task> &&task);
 
       /**
        * @brief
+       *
+       * @param[in] should_interrupt
+       *
+       * @return
        */
-      void set_interrupt();
+      void set_interrupt(bool should_interrupt = true);
 
       /**
        * @brief

@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.0.2)
-include_directories(../)
-include_directories(../include/)
 message(STATUS "gtest_SOURCE_DIR = ${gtest_SOURCE_DIR}")
-include_directories(${gtest_SOURCE_DIR}/include)
+include_directories(
+  "${CMAKE_BINARY_DIR}/yaml-cpp-build/include"
+  "${CMAKE_BINARY_DIR}/yaml-cpp-src/include"
+  "${gtest_SOURCE_DIR}/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+)
 
 find_package(UUID REQUIRED)
 
@@ -23,6 +27,7 @@ set(SRC
   ./task_scheduler.cxx
   ./task_stage.cxx
   ./uuid.cxx
+  ./workflow_service.cxx
 )
 
 if (BUILD_SHARED_LIBS)
@@ -44,13 +49,18 @@ endif()
 # We explicitly list boost libraries because of boost beast.
 target_link_libraries(dagtasks
   ${UUID_LIBRARIES}
+  boost_chrono
   boost_date_time
   boost_filesystem
   boost_log
   boost_log_setup
+  boost_program_options
+  boost_system
   boost_system
   boost_thread
-  boost_program_options
+  boost_thread
+  ssl
+  crypto
   pthread
 )
 add_dependencies(dagtasks gtest)

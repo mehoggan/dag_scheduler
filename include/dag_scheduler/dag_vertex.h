@@ -3,6 +3,7 @@
 
 #include "declspec.h"
 
+#include "dag_scheduler/task.h"
 #include "dag_scheduler/uuid.h"
 
 #include <atomic>
@@ -285,7 +286,7 @@ namespace com
       std::string current_status_as_string() const;
 
       /**
-       * @brief  A getter for the label used to visualize a \ref dag_vertex.
+       * @brief A getter for the label used to visualize a \ref dag_vertex.
        *
        * A member getter function for \ref dag_vertex for the label that
        * helps identify a instance of \ref dag_vertex. Note that it is not
@@ -294,6 +295,13 @@ namespace com
        * @return A string representation of that label. 
        */
       const std::string &label() const;
+
+      /**
+       * @brief A getter for the task assigned to this \ref dag_vertex.
+       *
+       * @return The task held by this vertex.
+       */
+      std::unique_ptr<task> &get_task();
 
     public:
       /**
@@ -361,6 +369,7 @@ namespace com
       std::string label_;
       std::vector<std::unique_ptr<dag_edge>> edges_;
       std::atomic<std::size_t> incomming_edge_count_;
+      std::unique_ptr<task> task_;
 
     private:
       FRIEND_TEST(TestDagVertex, connect_and_contains_connection);
