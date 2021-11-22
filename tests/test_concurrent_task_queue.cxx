@@ -78,6 +78,7 @@ namespace com
         for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
           std::vector<std::unique_ptr<task_stage>> stages;
           std::unique_ptr<task> task_ptr(new task(stages, std::to_string(i)));
+          ASSERT_TRUE(task_ptr.get() != nullptr);
           auto uuid_str = task_ptr->get_uuid().as_string();
           uuids.push_back(uuid_str);
           queue.push(std::move(task_ptr));
@@ -86,6 +87,7 @@ namespace com
 
       std::unique_ptr<task> j;
       bool found = queue.wait_for_and_pop(j, std::chrono::seconds(8));
+      ASSERT_TRUE(j.get() != nullptr);
       ASSERT_TRUE(found);
       EXPECT_EQ(uuids[0], j->get_uuid().as_string());
 

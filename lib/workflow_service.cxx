@@ -6,7 +6,9 @@
 #include "boost/beast/http/empty_body.hpp"
 #include "boost/beast/http/file_body.hpp"
 #include "boost/system/detail/errc.hpp"
+#include "boost/system/detail/error_code.hpp"
 #include "dag_scheduler/logging.h"
+#include <atomic>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/asio/strand.hpp>
@@ -15,68 +17,69 @@
 #include <boost/beast/version.hpp>
 
 #include <memory>
+#include <thread>
 #include <vector>
 
 namespace detail
 {
   boost::beast::string_view mime_type(boost::beast::string_view path)
   {
-      const auto ext = [&path] {
-        const auto pos = path.rfind(".");
-        boost::beast::string_view ret;
-        if (pos != boost::beast::string_view::npos) {
-          ret = path.substr(pos);
-        }
-        return ret;
-      }();
+    const auto ext = [&path] {
+      const auto pos = path.rfind(".");
       boost::beast::string_view ret;
-      if (boost::beast::iequals(ext, ".htm")) {
-        ret = "text/html";
-      } else if (boost::beast::iequals(ext, ".html")) {
-        ret = "text/html";
-      } else if (boost::beast::iequals(ext, ".php")) {
-        ret = "text/html";
-      } else if (boost::beast::iequals(ext, ".css")) {
-        ret = "text/css";
-      } else if (boost::beast::iequals(ext, ".txt")) {
-        ret = "text/plain";
-      } else if (boost::beast::iequals(ext, ".js")) {
-        ret = "application/javascript";
-      } else if (boost::beast::iequals(ext, ".json")) {
-        ret = "application/json";
-      } else if (boost::beast::iequals(ext, ".xml")) {
-        ret = "application/xml";
-      } else if (boost::beast::iequals(ext, ".swf")) {
-        ret = "application/x-shockwave-flash";
-      } else if (boost::beast::iequals(ext, ".flv")) {
-        ret = "video/x-flv";
-      } else if (boost::beast::iequals(ext, ".png")) {
-        ret = "image/png";
-      } else if (boost::beast::iequals(ext, ".jpe")) {
-        ret = "image/jpeg";
-      } else if (boost::beast::iequals(ext, ".jpeg")) {
-        ret = "image/jpeg";
-      } else if (boost::beast::iequals(ext, ".jpg")) {
-        ret = "image/jpeg";
-      } else if (boost::beast::iequals(ext, ".gif")) {
-        ret = "image/gif";
-      } else if (boost::beast::iequals(ext, ".bmp")) {
-        ret = "image/bmp";
-      } else if (boost::beast::iequals(ext, ".ico")) {
-        ret = "image/vnd.microsoft.icon";
-      } else if (boost::beast::iequals(ext, ".tiff")) {
-        ret = "image/tiff";
-      } else if (boost::beast::iequals(ext, ".tif")) {
-        ret = "image/tiff";
-      } else if (boost::beast::iequals(ext, ".svg")) {
-        ret = "image/svg+xml";
-      } else if (boost::beast::iequals(ext, ".sggz")) {
-        ret = "image/svg+xml";
-      } else {
-        ret = "application/text";
+      if (pos != boost::beast::string_view::npos) {
+        ret = path.substr(pos);
       }
       return ret;
-    };
+    }();
+    boost::beast::string_view ret;
+    if (boost::beast::iequals(ext, ".htm")) {
+      ret = "text/html";
+    } else if (boost::beast::iequals(ext, ".html")) {
+      ret = "text/html";
+    } else if (boost::beast::iequals(ext, ".php")) {
+      ret = "text/html";
+    } else if (boost::beast::iequals(ext, ".css")) {
+      ret = "text/css";
+    } else if (boost::beast::iequals(ext, ".txt")) {
+      ret = "text/plain";
+    } else if (boost::beast::iequals(ext, ".js")) {
+      ret = "application/javascript";
+    } else if (boost::beast::iequals(ext, ".json")) {
+      ret = "application/json";
+    } else if (boost::beast::iequals(ext, ".xml")) {
+      ret = "application/xml";
+    } else if (boost::beast::iequals(ext, ".swf")) {
+      ret = "application/x-shockwave-flash";
+    } else if (boost::beast::iequals(ext, ".flv")) {
+      ret = "video/x-flv";
+    } else if (boost::beast::iequals(ext, ".png")) {
+      ret = "image/png";
+    } else if (boost::beast::iequals(ext, ".jpe")) {
+      ret = "image/jpeg";
+    } else if (boost::beast::iequals(ext, ".jpeg")) {
+      ret = "image/jpeg";
+    } else if (boost::beast::iequals(ext, ".jpg")) {
+      ret = "image/jpeg";
+    } else if (boost::beast::iequals(ext, ".gif")) {
+      ret = "image/gif";
+    } else if (boost::beast::iequals(ext, ".bmp")) {
+      ret = "image/bmp";
+    } else if (boost::beast::iequals(ext, ".ico")) {
+      ret = "image/vnd.microsoft.icon";
+    } else if (boost::beast::iequals(ext, ".tiff")) {
+      ret = "image/tiff";
+    } else if (boost::beast::iequals(ext, ".tif")) {
+      ret = "image/tiff";
+    } else if (boost::beast::iequals(ext, ".svg")) {
+      ret = "image/svg+xml";
+    } else if (boost::beast::iequals(ext, ".sggz")) {
+      ret = "image/svg+xml";
+    } else {
+      ret = "application/text";
+    }
+    return ret;
+  };
 
   std::string path_cat(
     boost::beast::string_view base,
@@ -205,14 +208,16 @@ namespace detail
           body.file().read(&body_str[0], body.size(), read_ec);
           if (not read_ec) {
             com::dag_scheduler::logging::info(LOG_TAG, "Returning", body_str);
+            boost::beast::http::response<boost::beast::http::string_body> res(
+              std::piecewise_construct,
+              std::make_tuple(std::move(body_str)),
+              std::make_tuple(boost::beast::http::status::ok, req.version()));
+            return send(std::move(res));
           } else {
             com::dag_scheduler::logging::warn(LOG_TAG, "Could not read body!");
+            response = server_error_handler<Body, Allocator>(ec.message(), req,
+              LOG_TAG);
           }
-          body.file().seek(0, read_ec);
-          boost::beast::http::response<boost::beast::http::file_body> res(
-            std::piecewise_construct,
-            std::make_tuple(std::move(body)),
-              std::make_tuple(boost::beast::http::status::ok, req.version())); 
         } else {
           response = bad_request_handler<Body, Allocator>(
             "Illegal request-target", req, LOG_TAG);
@@ -319,6 +324,28 @@ namespace detail
     ctx.use_tmp_dh(
       boost::asio::buffer(dh.data(), dh.size()));
   }
+
+  std::shared_ptr<com::dag_scheduler::https_listener> make_https_listener(
+    boost::asio::io_context& ioc,
+    boost::asio::ssl::context& ctx,
+    std::shared_ptr<const std::string> doc_root,
+    const boost::asio::ip::address& address,
+    const uint16_t port)
+  {
+    return std::make_shared<com::dag_scheduler::https_listener>(
+      ioc, ctx, boost::asio::ip::tcp::endpoint(address, port), doc_root);
+  }
+
+  com::dag_scheduler::https_listener* https_listener_dumb_ptr(
+    boost::asio::io_context& ioc,
+    boost::asio::ssl::context& ctx,
+    std::shared_ptr<const std::string> doc_root,
+    const boost::asio::ip::address& address,
+    const uint16_t port)
+  {
+    return new com::dag_scheduler::https_listener(ioc, ctx,
+      boost::asio::ip::tcp::endpoint(address, port), doc_root);
+  }
 }
 
 namespace com
@@ -337,20 +364,31 @@ namespace com
       auto doc_root = std::make_shared<const std::string>(ci.doc_root_);
       auto const address = boost::asio::ip::make_address(ci.address_);
       auto const port = static_cast<uint16_t>(ci.port_);
-      auto listener = std::make_shared<https_listener>(
-        ioc_,
-        ctx_,
-        boost::asio::ip::tcp::endpoint(address, port),
-        doc_root);
-      listener->run();
 
-      // Run the I/O service on the requested number of threads
+      auto sig_handler = [&](
+        const boost::system::error_code& ec, int signum) {
+          logging::info(LOG_TAG, "Exiting with", ec.message(), "and signal",
+            signum);
+          exit(signum);
+        };
+      boost::asio::signal_set signals(ioc_, SIGINT);
+      signals.async_wait(sig_handler);
+
+      std::shared_ptr<https_listener> listener = detail::make_https_listener(
+        ioc_, ctx_, doc_root, address, port);
       std::vector<std::thread> v;
       v.reserve(ci.threads_ - 1);
       for (auto i = v.size(); i > 0; --i) {
-        v.emplace_back([this] { ioc_.run(); });
+        v.emplace_back([&]() { ioc_.run(); });
       }
+
+      listener->run();
       ioc_.run();
+      for (auto &t : v) {
+        if (t.joinable()) {
+          t.join();
+        }
+      }
    }
 
     https_listener::https_listener(
@@ -362,33 +400,10 @@ namespace com
       ioc_(ioc),
       ctx_(ctx),
       acceptor_(ioc),
+      endpoint_(endpoint),
       doc_root_(doc_root)
     {
-      logging::info(LOG_TAG, "Setting up connection acceptor...");
-      boost::beast::error_code ec;
-      acceptor_.open(endpoint.protocol(), ec);
-      if (ec) {
-        logging::error(LOG_TAG, "Failed to accept incomming connections!");
-        throw boost::beast::system_error(ec);
-      }
-
-      acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
-      if (ec) {
-        logging::error(LOG_TAG, "Failed to set options on acceptor!");
-        throw boost::beast::system_error(ec);
-      }
-
-      acceptor_.bind(endpoint, ec);
-      if (ec) {
-        logging::error(LOG_TAG, "Failed to bind to endpoint!");
-        throw boost::beast::system_error(ec);
-      }
-
-      acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
-      if (ec) {
-        logging::error(LOG_TAG, "Failed to listen to incoming connection!");
-        throw boost::beast::system_error(ec);
-      }
+      create_acceptor();
     }
 
     https_listener::~https_listener()
@@ -401,14 +416,21 @@ namespace com
       do_accept();
     }
 
+    void https_listener::reset()
+    {
+      acceptor_.close();
+      create_acceptor();
+      run();
+    }
+
     void https_listener::do_accept()
     {
-      logging::info(LOG_TAG, "Acceptor now accepting connections...");
       acceptor_.async_accept(
         boost::asio::make_strand(ioc_),
         boost::beast::bind_front_handler(
           &https_listener::on_accept,
           shared_from_this()));
+      logging::info(LOG_TAG, "Acceptor now accepting connections...");
     }
 
     void https_listener::on_accept(
@@ -417,13 +439,50 @@ namespace com
     {
       if (ec) {
         logging::error(LOG_TAG, "Failed to service request,", ec.message());
-        return;
       } else {
         logging::info(LOG_TAG, "Starting up session...");
-        std::make_shared<https_session>(
-          std::move(socket),
-          ctx_,
-          doc_root_)->run();
+        socket.set_option(boost::asio::socket_base::keep_alive(true), ec);
+        if (not ec) {
+          std::make_shared<https_session>(
+            std::move(socket), ctx_, doc_root_, *this)->run();
+        } else {
+          logging::error(LOG_TAG, "Failed to keep socket alive.");
+        }
+      }
+    }
+
+    void https_listener::create_acceptor()
+    {
+      logging::info(LOG_TAG, "Setting up connection acceptor...");
+      boost::beast::error_code ec;
+      acceptor_.open(endpoint_.protocol(), ec);
+      if (ec) {
+        logging::error(LOG_TAG, "Failed to accept incomming connections!");
+        throw boost::beast::system_error(ec);
+      }
+
+      acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
+      if (ec) {
+        logging::error(LOG_TAG, "Failed to set options on acceptor!");
+        throw boost::beast::system_error(ec);
+      }
+
+      acceptor_.set_option(boost::asio::socket_base::keep_alive(true), ec);
+      if (ec) {
+        logging::error(LOG_TAG, "Failet to set options on acceptor!");
+        throw boost::beast::system_error(ec);
+      }
+
+      acceptor_.bind(endpoint_, ec);
+      if (ec) {
+        logging::error(LOG_TAG, "Failed to bind to endpoint!");
+        throw boost::beast::system_error(ec);
+      }
+
+      acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
+      if (ec) {
+        logging::error(LOG_TAG, "Failed to listen to incoming connection!");
+        throw boost::beast::system_error(ec);
       }
     }
 
@@ -434,15 +493,18 @@ namespace com
     https_session::https_session(
       boost::asio::ip::tcp::socket&& socket,
       boost::asio::ssl::context& ctx,
-      const std::shared_ptr<const std::string>& doc_root) :
+      const std::shared_ptr<const std::string>& doc_root,
+      https_listener& owner) :
       logged_class<https_session>(*this),
       stream_(std::move(socket), ctx),
       doc_root_(doc_root),
-      labmda_(*this)
+      lambda_(*this),
+      owner_(owner)
     {}
 
     void https_session::run()
     {
+      logging::info(LOG_TAG, "HTTP session startup...");
       boost::asio::dispatch(
         stream_.get_executor(),
         boost::beast::bind_front_handler(
@@ -451,7 +513,7 @@ namespace com
 
     void https_session::on_run()
     {
-      logging::info(LOG_TAG, "HTTP session running...");
+      logging::info(LOG_TAG, "HTTP session executing...");
       boost::beast::get_lowest_layer(stream_).expires_after(
           std::chrono::seconds(30));
       stream_.async_handshake(
@@ -467,6 +529,7 @@ namespace com
         logging::error(LOG_TAG, "Failed to handshake with", ec.message());
       } else {
         do_read();
+        logging::info(LOG_TAG, "SSL handshake successful.");
       }
     }
 
@@ -476,8 +539,6 @@ namespace com
 
       boost::beast::get_lowest_layer(stream_).expires_after(
         std::chrono::seconds(30));
-
-      logging::info(LOG_TAG, "SSL handshake successful.");
       logging::info(LOG_TAG, "Going to read in request...");
       boost::beast::http::async_read(stream_, buffer_, req_,
         boost::beast::bind_front_handler(
@@ -498,7 +559,7 @@ namespace com
           ec.message());
       } else {
         logging::info(LOG_TAG, "Going to handle request...");
-        detail::handle_request(*doc_root_, std::move(req_), labmda_, LOG_TAG);
+        detail::handle_request(*doc_root_, std::move(req_), lambda_, LOG_TAG);
       }
     }
 
@@ -517,6 +578,7 @@ namespace com
       if (ec) {
         logging::error(LOG_TAG, "Failed to shutdown with", ec.message());
       }
+      owner_.reset();
     }
 
     void https_session::on_write(

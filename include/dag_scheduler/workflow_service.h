@@ -63,16 +63,21 @@ namespace com
 
       void run();
 
+      void reset();
+
     private:
       void do_accept();
 
       void on_accept(boost::beast::error_code ec,
         boost::asio::ip::tcp::socket socket);
 
+      void create_acceptor();
+
     private:
       boost::asio::io_context& ioc_;
       boost::asio::ssl::context& ctx_;
       boost::asio::ip::tcp::acceptor acceptor_;
+      boost::asio::ip::tcp::endpoint endpoint_;
       std::shared_ptr<const std::string> doc_root_;
     };
 
@@ -111,7 +116,8 @@ namespace com
       explicit https_session(
         boost::asio::ip::tcp::socket&& socket,
         boost::asio::ssl::context& ctx,
-        const std::shared_ptr<const std::string>& doc_root);
+        const std::shared_ptr<const std::string>& doc_root,
+        https_listener& owner);
 
       void run();
 
@@ -130,7 +136,8 @@ namespace com
       std::shared_ptr<std::string const> doc_root_;
       boost::beast::http::request<boost::beast::http::string_body> req_;
       std::shared_ptr<void> res_;
-      send_it labmda_;
+      send_it lambda_;
+      https_listener&  owner_;
     };
   }
 }
