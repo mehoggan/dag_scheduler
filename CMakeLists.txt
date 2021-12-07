@@ -24,10 +24,21 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   include_directories("/usr/local/opt/openssl@3/include")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 endif()
+set(Boost_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/boostbeast/include"
+  CACHE INTERNAL "Boost_INCLUDE_DIR")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.yaml-cpp.txt.in
         ${CMAKE_BINARY_DIR}/yaml-cpp-download/CMakeLists.txt)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/yaml-cpp.cmake)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.cpprestsdk.txt.in
+        ${CMAKE_BINARY_DIR}/cpprestsdk-download/CMakeLists.txt)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/cpprestsdk.cmake)
+# TODO (matthew.hoggan): Make Release CMAKE_BUILD_TYPE
+link_directories(
+  "${CMAKE_CURRENT_BINARY_DIR}/cpprestsdk-build/Release/Binaries")
+include_directories(
+  "${CMAKE_CURRENT_BINARY_DIR}/cpprestsdk-src/Release/include")
 
 include_directories(
   ${UUID_INCLUDE_DIRS}

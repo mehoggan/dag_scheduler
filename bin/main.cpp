@@ -38,17 +38,17 @@ int main(int argc, char* argv[])
   } else {
     try {
       std::cout << "Loading YAML file..." << std::endl;
-      auto yaml_node = YAML::LoadFile(vm["server_yaml"].as<std::string>());
+      const auto service_yaml_file = vm["server_yaml"].as<std::string>();
+      YAML::Node yaml_node = YAML::LoadFile(service_yaml_file);
       std::cout << "Loaded YAML file." << std::endl;
       auto ci = yaml_node.as<
         com::dag_scheduler::workflow_service::connection_info>();
       std::cout << "Deserialized YAML file." << std::endl;
       com::dag_scheduler::workflow_service ws(ci);
-      ret = EXIT_SUCCESS;
     } catch (const std::exception &e) {
       std::cerr << "Error: " << e.what() << std::endl;
       ret = EXIT_FAILURE;
     }
   }
-  return EXIT_SUCCESS;
+  return ret;
 }

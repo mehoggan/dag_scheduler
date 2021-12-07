@@ -49,6 +49,7 @@ endif()
 # We explicitly list boost libraries because of boost beast.
 target_link_libraries(dagtasks
   ${UUID_LIBRARIES}
+  cpprest
   boost_chrono
   boost_date_time
   boost_filesystem

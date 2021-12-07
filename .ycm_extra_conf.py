@@ -58,6 +58,7 @@ flags = [
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/googletest-src/googletest/include',
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/yaml-cpp-src/include',
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/yaml-cpp-build/include',
+    '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/cpprestsdk-src/Release/include',
     '-I/usr/local/opt/openssl@3/include',
     '-W',
     '-Wall',

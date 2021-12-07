@@ -2,7 +2,7 @@
 execute_process(COMMAND ${CMAKE_COMMAND}
   -G "${CMAKE_GENERATOR}" .
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/yaml-cpp-download)
-execute_process(COMMAND ${CMAKE_COMMAND} --build -YAML_BUILD_SHARED_LIBS=ON .
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/yaml-cpp-download)
 
 # Add yaml-cpp directly to our build. This adds

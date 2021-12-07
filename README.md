@@ -1,5 +1,20 @@
 # Change Notes
 
+## Wednesday December 1, 2021
+* The following file: nboostbeast/include/boost/core/noinit_adaptor.hpp needs
+to have its contents changed to
+
+```
+template<class U>
+void destroy(U* p) {
+    using UClass = typename U::U;
+    p->~UClass();
+    (void)p;
+} 
+```
+
+in order for it to compile on OSX Big Sur.
+
 ## Tuesday August 17, 2021
 * Added in ycm changes to support development in Mac OSX.
 * Work done on adding tasks to scheduler.
