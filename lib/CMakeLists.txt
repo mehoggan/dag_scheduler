@@ -20,15 +20,17 @@ set(SRC
   ./dag_algorithms.cxx
   ./dag_edge.cxx
   ./dag_vertex.cxx
+  ./https_session.cxx
   ./interruptible_task_thread.cxx
   ./logging.cxx
+  ./service_helpers.cxx
   ./stop_watch.cxx
   ./task.cxx
   ./task_scheduler.cxx
   ./task_stage.cxx
   ./uuid.cxx
   ./workflow_service.cxx
-)
+        ../include/dag_scheduler/service_helpers.hpp)
 
 if (BUILD_SHARED_LIBS)
   add_library(dagtasks SHARED ${SRC})
