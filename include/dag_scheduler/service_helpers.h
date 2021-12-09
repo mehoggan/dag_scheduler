@@ -1,0 +1,48 @@
+#ifndef SERVICE_HELPERS_H_INCLUDED
+#define SERVICE_HELPERS_H_INCLUDED
+
+#include "dag_scheduler/logging.h"
+
+#include <boost/asio/ssl.hpp>
+#include <boost/beast.hpp>
+
+namespace std
+{
+  template <>
+  struct hash<boost::beast::string_view>
+  {
+    std::size_t operator()(const boost::beast::string_view& sv) const
+    {
+      return std::hash<string>()(sv.to_string());
+    }
+  };
+}
+
+namespace detail
+{
+  boost::beast::string_view mime_type(boost::beast::string_view path);
+
+  std::string path_cat(
+    boost::beast::string_view base,
+    boost::beast::string_view path);
+
+  void load_server_cert(
+    boost::asio::ssl::context& ctx,
+    com::dag_scheduler::log_tag& LOG_TAG);
+
+  boost::beast::http::response<boost::beast::http::string_body>
+  bad_request_handler(
+    boost::beast::string_view why,
+    boost::beast::http::request<boost::beast::http::string_body>& req);
+
+  boost::beast::http::response<boost::beast::http::string_body>
+  not_found_handler(
+    boost::beast::string_view target,
+    boost::beast::http::request<boost::beast::http::string_body>& req);
+
+  boost::beast::http::response<boost::beast::http::string_body>
+  server_error_handler(
+    boost::beast::string_view what,
+    boost::beast::http::request<boost::beast::http::string_body>& req);
+}
+#endif

@@ -1,6 +1,6 @@
 #include "dag_scheduler/https_session.h"
 
-#include "dag_scheduler/service_helpers.hpp"
+#include "dag_scheduler/service_helpers.h"
 
 #include <boost/asio/placeholders.hpp>
 #include <boost/beast/core/error.hpp>
@@ -13,20 +13,50 @@ namespace com
 {
   namespace dag_scheduler
   {
-    https_session::send_it::send_it(https_session &self) :
-    self_(self)
+    https_session::session_responder::session_responder(https_session &self) :
+      self_(self)
     {}
+
+    void https_session::session_responder::send(
+      responder::StringMessageType&& msg)
+    {
+      auto sp = std::make_shared<responder::StringMessageType>(std::move(msg));
+      self_.res_ = sp;
+      boost::beast::http::async_write(
+        self_.stream_,
+        *sp,
+        boost::beast::bind_front_handler(
+          &https_session::on_write,
+          self_.shared_from_this(),
+          sp->need_eof()));
+    }
+
+    void https_session::session_responder::send(
+      responder::EmptyMessageType&& msg)
+    {
+      auto sp = std::make_shared<responder::EmptyMessageType>(std::move(msg));
+      self_.res_ = sp;
+      boost::beast::http::async_write(
+        self_.stream_,
+        *sp,
+        boost::beast::bind_front_handler(
+          &https_session::on_write,
+          self_.shared_from_this(),
+          sp->need_eof()));
+    }
 
     https_session::https_session(
       boost::asio::ip::tcp::socket&& socket,
       boost::asio::ssl::context& ctx,
       const std::shared_ptr<const std::string>& doc_root,
-      https_listener& owner) :
+      workflow_service::https_listener& owner,
+      workflow_service::router& router) :
       logged_class<https_session>(*this),
       stream_(std::move(socket), ctx),
       doc_root_(doc_root),
-      lambda_(*this),
-      owner_(owner)
+      responder_(new session_responder(*this)),
+      owner_(owner),
+      router_(router)
    {}
 
    void https_session::run()
@@ -81,11 +111,27 @@ namespace com
         logging::info(LOG_TAG, "End of stream detected.");
         do_close();
       } else if (ec) {
-        logging::error(LOG_TAG, "Failed to read in session with",
-                       ec.message());
+        logging::error(LOG_TAG, "Failed to read in session with", ec.message());
       } else {
         logging::info(LOG_TAG, "Going to handle request...");
-        detail::handle_request(*doc_root_, std::move(req_), lambda_, LOG_TAG);
+        try {
+          auto& handler_ptr =router_[req_.target()];
+          if (not handler_ptr) {
+            throw std::runtime_error("Failed to handle " +
+              req_.target().to_string());
+          } else {
+            endpoint_handler& handler = *(router_[req_.target()]);
+            bool status = handler(std::move(req_), std::move(responder_));
+            if (not status) {
+              throw std::runtime_error("Failed to handle " +
+                req_.target().to_string());
+            }
+          }
+        } catch (std::runtime_error& rte) {
+          logging::error(LOG_TAG, "Failed to handle", req_.target().to_string(),
+            "with", rte.what());
+          do_close();
+        }
       }
     }
 

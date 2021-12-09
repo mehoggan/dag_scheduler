@@ -2,7 +2,7 @@
 
 #include "dag_scheduler/https_session.h"
 #include "dag_scheduler/logging.h"
-#include "dag_scheduler/service_helpers.hpp"
+#include "dag_scheduler/service_helpers.h"
 
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/strand.hpp>
@@ -19,15 +19,45 @@ namespace com
   {
     namespace
     {
-      std::shared_ptr<com::dag_scheduler::https_listener> make_https_listener(
+      std::shared_ptr<com::dag_scheduler::workflow_service::https_listener>
+      make_https_listener(
         boost::asio::io_context& ioc,
         boost::asio::ssl::context& ctx,
         std::shared_ptr<const std::string> doc_root,
         const boost::asio::ip::address& address,
-        const uint16_t port)
+        const uint16_t port,
+        workflow_service::router& router)
       {
-        return std::make_shared<com::dag_scheduler::https_listener>(
-          ioc, ctx, boost::asio::ip::tcp::endpoint(address, port), doc_root);
+        return std::make_shared<
+          com::dag_scheduler::workflow_service::https_listener>(
+            ioc, ctx, boost::asio::ip::tcp::endpoint(address, port), doc_root,
+            router);
+      }
+    }
+
+    bool workflow_service::router::register_endpoint(
+      const boost::beast::string_view &endpoint,
+      std::unique_ptr<endpoint_handler> handler)
+    {
+      bool ret = true;
+      if (router_.find(endpoint) != router_.end()) {
+        ret = false;
+      } else {
+        router_[endpoint] = std::move(handler);
+      }
+      return ret;
+    }
+
+    std::unique_ptr<endpoint_handler>& workflow_service::router::operator[](
+      const boost::beast::string_view &endpoint)
+    {
+      std::unique_ptr<endpoint_handler> ret(nullptr);
+      if (router_.find(endpoint) == router_.end()) {
+        std::string err_msg = "No handler for " + endpoint.to_string() +
+          " was found.";
+        throw std::runtime_error(err_msg);
+      } else {
+        return router_[endpoint];
       }
     }
 
@@ -44,6 +74,10 @@ namespace com
       auto const address = boost::asio::ip::make_address(ci.address_);
       auto const port = static_cast<uint16_t>(ci.port_);
 
+      std::unique_ptr<endpoint_handler> doc_root_handler(
+        new doc_root_endpoint(ci.doc_root_));
+      router_.register_endpoint("/index.html", std::move(doc_root_handler));
+
       auto sig_handler = [&](
         const boost::system::error_code& ec, int signum) {
           logging::info(LOG_TAG, "Exiting with", ec.message(), "and signal",
@@ -54,7 +88,7 @@ namespace com
       signals.async_wait(sig_handler);
 
       std::shared_ptr<https_listener> listener = make_https_listener(
-        ioc_, ctx_, doc_root, address, port);
+        ioc_, ctx_, doc_root, address, port, router_);
       std::vector<std::thread> v;
       v.reserve(ci.threads_ - 1);
       for (auto i = v.size(); i > 0; --i) {
@@ -70,39 +104,41 @@ namespace com
       }
    }
 
-    https_listener::https_listener(
+   workflow_service::https_listener::https_listener(
       boost::asio::io_context& ioc,
       boost::asio::ssl::context& ctx,
       boost::asio::ip::tcp::endpoint endpoint,
-      std::shared_ptr<const std::string>& doc_root) :
+      std::shared_ptr<const std::string>& doc_root,
+      router& router) :
       logged_class<https_listener>(*this),
       ioc_(ioc),
       ctx_(ctx),
       acceptor_(ioc),
       endpoint_(endpoint),
-      doc_root_(doc_root)
+      doc_root_(doc_root),
+      router_(router)
     {
       create_acceptor();
     }
 
-    https_listener::~https_listener()
+    workflow_service::https_listener::~https_listener()
     {
       logging::info(LOG_TAG, "Shutting down https_listener...");
     }
 
-    void https_listener::run()
+    void workflow_service::https_listener::run()
     {
       do_accept();
     }
 
-    void https_listener::reset()
+    void workflow_service::https_listener::reset()
     {
       acceptor_.close();
       create_acceptor();
       run();
     }
 
-    void https_listener::do_accept()
+    void workflow_service::https_listener::do_accept()
     {
       acceptor_.async_accept(
         boost::asio::make_strand(ioc_),
@@ -112,7 +148,7 @@ namespace com
       logging::info(LOG_TAG, "Acceptor now accepting connections...");
     }
 
-    void https_listener::on_accept(
+    void workflow_service::https_listener::on_accept(
       boost::beast::error_code ec,
       boost::asio::ip::tcp::socket socket)
     {
@@ -123,14 +159,14 @@ namespace com
         socket.set_option(boost::asio::socket_base::keep_alive(true), ec);
         if (not ec) {
           std::make_shared<https_session>(
-            std::move(socket), ctx_, doc_root_, *this)->run();
+            std::move(socket), ctx_, doc_root_, *this, router_)->run();
         } else {
           logging::error(LOG_TAG, "Failed to keep socket alive.");
         }
       }
     }
 
-    void https_listener::create_acceptor()
+    void workflow_service::https_listener::create_acceptor()
     {
       logging::info(LOG_TAG, "Setting up connection acceptor...");
       boost::beast::error_code ec;

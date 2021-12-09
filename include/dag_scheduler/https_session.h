@@ -18,38 +18,29 @@ namespace com
       public std::enable_shared_from_this<https_session>
       {
       private:
-        struct send_it
-          {
+        friend class https_listener;
+
+      private:
+        class session_responder :
+          public responder
+        {
+        public:
+          explicit session_responder(https_session& self);
+
+          virtual void send(StringMessageType &&) override;
+          virtual void send(EmptyMessageType &&) override;
+
+        private:
           https_session& self_;
-
-          explicit send_it(https_session& self);
-
-          template<bool isRequest, class Body, class Fields>
-          void operator()(
-            boost::beast::http::message<isRequest, Body, Fields>&& msg) const
-            {
-            auto sp = std::make_shared<
-              boost::beast::http::message<
-              isRequest, Body, Fields>>(std::move(msg));
-
-            self_.res_ = sp;
-
-            boost::beast::http::async_write(
-              self_.stream_,
-              *sp,
-              boost::beast::bind_front_handler(
-                &https_session::on_write,
-                self_.shared_from_this(),
-                sp->need_eof()));
-            }
-          };
+        };
 
       public:
         https_session(
           boost::asio::ip::tcp::socket&& socket,
           boost::asio::ssl::context& ctx,
           const std::shared_ptr<const std::string>& doc_root,
-          https_listener& owner);
+          workflow_service::https_listener& owner,
+          workflow_service::router& router_);
 
         void run();
 
@@ -67,10 +58,11 @@ namespace com
         boost::beast::ssl_stream<boost::beast::tcp_stream> stream_;
         boost::beast::flat_buffer buffer_;
         std::shared_ptr<std::string const> doc_root_;
-        boost::beast::http::request<boost::beast::http::string_body> req_;
+        endpoint_handler::StringRequestType req_;
         std::shared_ptr<void> res_;
-        send_it lambda_;
-        https_listener&  owner_;
+        std::unique_ptr<responder> responder_;
+        workflow_service::https_listener&  owner_;
+        workflow_service::router& router_;
     };
   }
 }

@@ -1,4 +1,4 @@
-#include "dag_scheduler/service_helpers.hpp"
+#include "dag_scheduler/service_helpers.h"
 
 namespace detail
 {
@@ -175,4 +175,48 @@ namespace detail
     ctx.use_tmp_dh(
       boost::asio::buffer(dh.data(), dh.size()));
   }
+
+  boost::beast::http::response<boost::beast::http::string_body>
+  bad_request_handler(
+    boost::beast::string_view why,
+    boost::beast::http::request<boost::beast::http::string_body>& req)
+  {
+    boost::beast::http::response<boost::beast::http::string_body> res(
+      boost::beast::http::status::bad_request, req.version());
+    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(boost::beast::http::field::content_script_type, "text/html");
+    res.keep_alive(req.keep_alive());
+    res.body() = std::string(why);
+    res.prepare_payload();
+    return res;
+  }
+
+   boost::beast::http::response<boost::beast::http::string_body>
+   not_found_handler(
+     boost::beast::string_view target,
+     boost::beast::http::request<boost::beast::http::string_body>& req)
+   {
+     boost::beast::http::response<boost::beast::http::string_body> res(
+       boost::beast::http::status::not_found, req.version());
+     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+     res.set(boost::beast::http::field::content_type, "text/html");
+     res.keep_alive(req.keep_alive());
+     res.body() = "The resource '" + std::string(target) + "'was not found.\n";
+     res.prepare_payload();
+     return res;
+   }
+
+   boost::beast::http::response<boost::beast::http::string_body>
+   server_error_handler(
+     boost::beast::string_view what,
+     boost::beast::http::request<boost::beast::http::string_body>& req)
+   {
+     boost::beast::http::response<boost::beast::http::string_body> res(
+       boost::beast::http::status::internal_server_error, req.version());
+     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+     res.set(boost::beast::http::field::content_type, "text/html");
+     res.keep_alive(req.keep_alive());
+     res.body() = "An error occurred: '" + std::string(what) + "'\n";
+     return res;
+   }
 }
