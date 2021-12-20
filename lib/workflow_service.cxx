@@ -6,7 +6,6 @@
 
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/strand.hpp>
-#include <boost/beast/version.hpp>
 
 #include <atomic>
 #include <memory>
@@ -28,10 +27,10 @@ namespace com
         const uint16_t port,
         workflow_service::router& router)
       {
+        auto endpoint = boost::asio::ip::tcp::endpoint(address, port);
         return std::make_shared<
           com::dag_scheduler::workflow_service::https_listener>(
-            ioc, ctx, boost::asio::ip::tcp::endpoint(address, port), doc_root,
-            router);
+            ioc, ctx, endpoint, doc_root, router);
       }
     }
 
@@ -107,7 +106,7 @@ namespace com
    workflow_service::https_listener::https_listener(
       boost::asio::io_context& ioc,
       boost::asio::ssl::context& ctx,
-      boost::asio::ip::tcp::endpoint endpoint,
+      boost::asio::ip::tcp::endpoint& endpoint,
       std::shared_ptr<const std::string>& doc_root,
       router& router) :
       logged_class<https_listener>(*this),

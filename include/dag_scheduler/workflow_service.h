@@ -61,7 +61,7 @@ namespace com
         https_listener(
           boost::asio::io_context& ioc,
           boost::asio::ssl::context& ctx,
-          boost::asio::ip::tcp::endpoint endpoint,
+          boost::asio::ip::tcp::endpoint& endpoint,
           std::shared_ptr<const std::string>& doc_root,
           router& router_);
 

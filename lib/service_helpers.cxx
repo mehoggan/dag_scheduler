@@ -201,7 +201,7 @@ namespace detail
      res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
      res.set(boost::beast::http::field::content_type, "text/html");
      res.keep_alive(req.keep_alive());
-     res.body() = "The resource '" + std::string(target) + "'was not found.\n";
+     res.body() = "The resource '" + std::string(target) + "' was not found.\n";
      res.prepare_payload();
      return res;
    }

@@ -87,7 +87,7 @@ namespace com
 
       std::unique_ptr<task> j;
       bool found = queue.wait_for_and_pop(j, std::chrono::seconds(8));
-      ASSERT_TRUE(j.get() != nullptr);
+      ASSERT_TRUE(j != nullptr);
       ASSERT_TRUE(found);
       EXPECT_EQ(uuids[0], j->get_uuid().as_string());
 

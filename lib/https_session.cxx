@@ -84,6 +84,7 @@ namespace com
     {
       if (ec) {
         logging::error(LOG_TAG, "Failed to handshake with", ec.message());
+        do_close();
       } else {
         do_read();
         logging::info(LOG_TAG, "SSL handshake successful.");
@@ -123,14 +124,17 @@ namespace com
             endpoint_handler& handler = *(router_[req_.target()]);
             bool status = handler(std::move(req_), std::move(responder_));
             if (not status) {
-              throw std::runtime_error("Failed to handle " +
-                req_.target().to_string());
+              responder_->send(detail::server_error_handler(
+                "Internal Server error",
+                req_));
             }
           }
         } catch (std::runtime_error& rte) {
           logging::error(LOG_TAG, "Failed to handle", req_.target().to_string(),
             "with", rte.what());
-          do_close();
+          responder_->send(detail::not_found_handler(
+            req_.target(),
+            req_));
         }
       }
     }

@@ -14,8 +14,6 @@ namespace com
     public:
       typedef boost::beast::http::empty_body EmptyBodyType;
       typedef boost::beast::http::string_body StringBodyType;
-      typedef boost::beast::http::response<EmptyBodyType> EmptyResponseType;
-      typedef boost::beast::http::response<StringBodyType> StringResponseType;
       typedef boost::beast::http::basic_fields<std::allocator<char>> FieldsType;
       typedef boost::beast::http::message<false, StringBodyType, FieldsType>
         StringMessageType;
@@ -60,14 +58,32 @@ namespace com
 
       virtual ~doc_root_endpoint();
 
-      virtual bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder);
+      bool operator()(StringRequestType&& req,
+        std::unique_ptr<responder>&& responder) final;
 
-      virtual bool operator()(StringRequestType&& req,
+      bool operator()(StringRequestType&& req,
+        std::unique_ptr<responder>&& responder) const final;
+
+    private:
+      bool handle_request(StringRequestType&& req,
         std::unique_ptr<responder>&& responder) const;
 
     private:
       boost::beast::string_view doc_root_;
+    };
+
+    struct register_dag_endpoint :
+      public endpoint_handler,
+      logged_class<register_dag_endpoint>
+    {
+    public:
+      ~register_dag_endpoint() final;
+
+      bool operator()(StringRequestType&& req,
+        std::unique_ptr<responder>&& responder) final;
+
+      bool operator()(StringRequestType&& req,
+        std::unique_ptr<responder>&& responder) const final;
     };
   }
 }
