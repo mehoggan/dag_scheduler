@@ -1,45 +1,13 @@
-diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
-index 11c1b04..0975faf 100644
---- a/test/CMakeLists.txt
-+++ b/test/CMakeLists.txt
-@@ -1,20 +1,20 @@
--find_package(GTestSrc)
--
--IF(GTESTSRC_FOUND)
--    enable_testing()
--
--    if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
--        set(gtest_disable_pthreads ON)
--        set(gtest_force_shared_crt ON)
--    endif()
--
--    add_subdirectory(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/googletest)
--    include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
--
--    set(TEST_LIBRARIES gtest gtest_main)
--
--    add_custom_target(tests ALL)
--    add_subdirectory(perftest)
--    add_subdirectory(unittest)
--
--ENDIF(GTESTSRC_FOUND)
-+# find_package(GTestSrc)
-+# 
-+# IF(GTESTSRC_FOUND)
-+#     enable_testing()
-+# 
-+#     if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
-+#         set(gtest_disable_pthreads ON)
-+#         set(gtest_force_shared_crt ON)
-+#     endif()
-+# 
-+#     add_subdirectory(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/googletest)
-+#     include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
-+# 
-+#     set(TEST_LIBRARIES gtest gtest_main)
-+# 
-+#     add_custom_target(tests ALL)
-+#     add_subdirectory(perftest)
-+#     add_subdirectory(unittest)
-+# 
-+# ENDIF(GTESTSRC_FOUND)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bdfdd677..05675874 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -176,7 +176,7 @@ if(RAPIDJSON_BUILD_TESTS)
+         # required for VS2012 due to missing support for variadic templates
+         add_definitions(-D_VARIADIC_MAX=10)
+     endif(MSVC11)
+-    add_subdirectory(test)
++    # add_subdirectory(test)
+     include(CTest)
+ endif()
+ 
