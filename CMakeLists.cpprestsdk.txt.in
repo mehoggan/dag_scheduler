@@ -4,7 +4,7 @@ project(cpprestsdk-download NONE)
 include(ExternalProject)
 
 ExternalProject_Add(cpprestsdk
-	GIT_REPOSITORY https://github.com/microsoft/cpprestsdk.git
+	GIT_REPOSITORY ${CPPRESTSDK_REPO}
 	GIT_TAG master
 	SOURCE_DIR "${CMAKE_BINARY_DIR}/cpprestsdk-src"
 	BINARY_DIR "${CMAKE_BINARY_DIR}/cpprestsdk-build"

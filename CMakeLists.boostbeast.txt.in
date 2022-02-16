@@ -3,10 +3,9 @@ cmake_minimum_required(VERSION 3.0.2)
 project(boostbeast-download NONE)
 include(ExternalProject)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   ExternalProject_Add(boostbeast
-    DOWNLOAD_COMMAND git clone --recursive
-      https://github.com/boostorg/boost.git
+    DOWNLOAD_COMMAND git clone --recursive ${BOOSTBEAST_REPO} 
     GIT_TAG master
     SOURCE_DIR "${CMAKE_BINARY_DIR}/boostbeast-src"
     BINARY_DIR "${CMAKE_BINARY_DIR}/boostbeast-build"
@@ -28,8 +27,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   )
 else()
   ExternalProject_Add(boostbeast
-    DOWNLOAD_COMMAND git clone --recursive
-      https://github.com/boostorg/boost.git
+    DOWNLOAD_COMMAND git clone --recursive ${BOOSTBEAST_REPO} 
     GIT_TAG master
     SOURCE_DIR "${CMAKE_BINARY_DIR}/boostbeast-src"
     BINARY_DIR "${CMAKE_BINARY_DIR}/boostbeast-build"

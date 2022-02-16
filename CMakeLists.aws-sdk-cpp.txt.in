@@ -4,7 +4,7 @@ project(aws-sdk-cpp-download NONE)
 include(ExternalProject)
 
 ExternalProject_Add(aws-sdk-cpp
-	GIT_REPOSITORY git@github.com:aws/aws-sdk-cpp.git
+	GIT_REPOSITORY ${AWS_SDK_CPP_REPO}
 	GIT_TAG master
 	SOURCE_DIR "${CMAKE_BINARY_DIR}/aws-sdk-cpp-src"
 	BINARY_DIR "${CMAKE_BINARY_DIR}/aws-sdk-cpp-build"
