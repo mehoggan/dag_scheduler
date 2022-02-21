@@ -1,8 +1,6 @@
 #include "dag_scheduler/endpoints.h"
 #include "dag_scheduler/service_helpers.h"
 
-#include <aws/s3/s3_client.h>
-#include <cpprest/base_uri.h>
 #include <rapidjson/rapidjson.h>
 
 namespace com
