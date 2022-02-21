@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0.2)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
 else()
-  find_program(valgrind REQUIRED)
+  find_program(MEMORYCHECK_COMMAND valgrind)
   set(CTEST_MEMORYCHECK_COMMAND "/usr/bin/valgrind") 
   set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes
     --leak-check=full")
