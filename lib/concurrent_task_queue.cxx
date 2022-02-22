@@ -61,14 +61,14 @@ namespace com
       return ret;
     }
 
-    std::unique_ptr<task>&& concurrent_task_queue::wait_and_pop()
+    std::unique_ptr<task> concurrent_task_queue::wait_and_pop()
     {
       std::unique_lock<std::mutex> lock(mutex_);
       condition_variable_.wait(lock, queue_not_empty(queue_));
       assert(!queue_.empty());
       std::unique_ptr<task> popped_value = std::move(queue_.front());
       queue_.pop_front();
-      return std::move(popped_value);
+      return popped_value;
     }
 
 

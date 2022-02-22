@@ -118,7 +118,7 @@ namespace com
        * @return popped_value The \ref task to assign to if queue is
        *                      NOT empty.
        */
-      std::unique_ptr<task>&& wait_and_pop();
+      std::unique_ptr<task> wait_and_pop();
 
       /**
        * @brief A function that removes \ref task from queue if it is not

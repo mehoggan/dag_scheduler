@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.0.2)
+
+project(openssl-download NONE)
+include(ExternalProject)
+
+ExternalProject_Add(openssl
+  DOWNLOAD_COMMAND git clone --recursive ${OPENSSL_REPO}
+    ${CMAKE_BINARY_DIR}/openssl-src
+  GIT_TAG master
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/openssl-src"
+  BINARY_DIR "${CMAKE_BINARY_DIR}/openssl-build"
+  CONFIGURE_COMMAND "cd"
+    "${CMAKE_BINARY_DIR}/openssl-src"
+    "&&"
+    ./Configure
+    --prefix=${CMAKE_BINARY_DIR}/openssl
+    --openssldir=${CMAKE_BINARY_DIR}/openssl
+  BUILD_COMMAND "cd"
+    "${CMAKE_BINARY_DIR}/openssl-src"
+    "&&"
+    make -j5
+  INSTALL_COMMAND "cd"
+    "${CMAKE_BINARY_DIR}/openssl-src"
+    "&&"
+    make install
+  TEST_COMMAND "")
