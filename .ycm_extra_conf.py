@@ -61,7 +61,7 @@ flags = [
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/yaml-cpp-build/include',
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/libpqxx-src/include',
     '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/rapidjson-src/include',
-    '-I/usr/local/opt/openssl@3/include',
+    '-I/Users/matthew.hoggan/Devel/build/github/mehoggan/dag_scheduler/openssl-src/include',
     '-W',
     '-Wall',
     '-Wcast-align',

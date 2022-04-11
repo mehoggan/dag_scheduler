@@ -1,5 +1,12 @@
 # Change Notes
 
+## Wednesday March 30, 2021
+On OSx Big Sur one needs to:
+```
+sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+```
+after installing xcode from the App Store.
+
 ## Wednesday December 1, 2021
 * The following file: nboostbeast/include/boost/core/noinit_adaptor.hpp needs
 to have its contents changed to
