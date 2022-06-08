@@ -10,12 +10,6 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
-  set(ENV{C_INCLUDE_PATH}
-    "${C_INCLUDE_PATH}:"
-    "/Library/Frameworks/Python.framework/Versions/3.8/include")
-  set(ENV{CPLUS_INCLUDE_PATH}
-    "${CPLUS_INCLUDE_PATH}:"
-    "/Library/Frameworks/Python.framework/Versions/3.8/include")
 endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
