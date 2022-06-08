@@ -10,6 +10,10 @@ cd ${BUILD_DIR}/boostbeast-src && \
   export LIBTOOL="/usr/bin/libtool" && \
   export MAKE="/usr/bin/make" && \
   export CFLAGS="-Wno-unknown-warning-option" && \
+  export OPENSSL_ROOT="${BUILD_DIR}/openssl" && \
+  export OPENSSL_ROOTDIR="${BUILD_DIR}/openssl" && \
+  export OPENSSL_INCLUDE_DIR="${BUILD_DIR}/openssl/include" && \
+  export OPENSSL_LIBRARIES="${BUILD_DIR}/openssl/lib" && \
   ./bootstrap.sh \
-    --prefix=${CMAKE_BINARY_DIR}/boostbeast \
+    --prefix=${BUILD_DIR}/boostbeast \
     --with-toolset=clang

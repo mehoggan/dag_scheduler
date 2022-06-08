@@ -10,6 +10,12 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_MACOSX_RPATH 1)
+  set(ENV{C_INCLUDE_PATH}
+    "${C_INCLUDE_PATH}:"
+    "/Library/Frameworks/Python.framework/Versions/3.8/include")
+  set(ENV{CPLUS_INCLUDE_PATH}
+    "${CPLUS_INCLUDE_PATH}:"
+    "/Library/Frameworks/Python.framework/Versions/3.8/include")
 endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
@@ -35,14 +41,14 @@ set(OPENSSL_REPO "https://github.com/openssl/openssl.git" CACHE STRING
 if(CLONE_EXTERNALS_GIT)
   # Note openssl/openssl did not provide a git link.
   set(OPENSSL_REPO "https://github.com/openssl/openssl.git" CACHE STRING
-    "Varible use to determine where to clone from base od CLONE_EXTERNALS_GIT"
+    "Varible used to determine where to clone from base od CLONE_EXTERNALS_GIT"
     FORCE)
 endif()
 set(OPENSSL_ROOT "${CMAKE_BINARY_DIR}/openssl" CACHE STRING
   "Root directory for where openssl build system installs itself." FORCE)
-if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
-  file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/openssl") 
-endif()
+# if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
+#   file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/openssl") 
+# endif()
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/openssl")
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
   message(FATAL_ERROR "Failed to create the install directory="
@@ -54,7 +60,7 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.openssl.txt.in
   ${CMAKE_BINARY_DIR}/openssl-download/CMakeLists.txt)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl.cmake)
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/lib")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/include")
 set(ENV{OPENSSL_ROOT_DIR} "${CMAKE_CURRENT_BINARY_DIR}/openssl")
 message(STATUS "OPENSSL_ROOT_DIR = $ENV{OPENSSL_ROOT_DIR} before configure.")
@@ -79,6 +85,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.boostbeast.txt.in
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/boostbeast.cmake)
 set(Boost_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/boostbeast/include"
   CACHE INTERNAL "Boost_INCLUDE_DIR")
+if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/boostbeast/include)
+  message(FATAL_ERROR "Exiting cmake generation because boostbeast did not "
+    "install correctly.")
+endif()
 
 # External Library (yaml)
 set(YAML_CPP_REPO "https://github.com/jbeder/yaml-cpp.git" CACHE STRING

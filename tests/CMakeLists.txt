@@ -51,6 +51,7 @@ target_link_libraries(unit_test
   boost_system
   boost_thread
   boost_program_options
+  ssl.3
   pthread
 )
 
