@@ -20,7 +20,7 @@ target_link_libraries(main
     boost_system
     boost_thread
     boost_chrono
-    ssl.3
+    ${OPENSSL_LIB}
     crypto
 )
 

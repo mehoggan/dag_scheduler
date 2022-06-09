@@ -17,7 +17,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/c++11.cmake)
 include_directories(${gtest_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR}/googletest-src/googletest/include)
 
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nonportable-include-path")
@@ -40,9 +39,6 @@ if(CLONE_EXTERNALS_GIT)
 endif()
 set(OPENSSL_ROOT "${CMAKE_BINARY_DIR}/openssl" CACHE STRING
   "Root directory for where openssl build system installs itself." FORCE)
-# if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
-#   file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/openssl") 
-# endif()
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/openssl")
 if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
   message(FATAL_ERROR "Failed to create the install directory="
@@ -54,7 +50,15 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.openssl.txt.in
   ${CMAKE_BINARY_DIR}/openssl-download/CMakeLists.txt)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl.cmake)
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/lib")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/lib")
+  set(OPENSSL_LIB "ssl.3" CACHE STRING
+    "The name of the library to use for openssl linking." FORCE)
+else()
+  link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/lib64")
+  set(OPENSSL_LIB "ssl" CACHE STRING
+    "The name of the library to use for openssl linking." FORCE)
+endif()
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/include")
 set(ENV{OPENSSL_ROOT_DIR} "${CMAKE_CURRENT_BINARY_DIR}/openssl")
 message(STATUS "OPENSSL_ROOT_DIR = $ENV{OPENSSL_ROOT_DIR} before configure.")
