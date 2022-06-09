@@ -2,7 +2,7 @@ BUILD_DIR=${1}
 
 echo "Going to install boostbeast..."
 
-cd ${BUILD_DIR}/openssl-src &&
+cd ${BUILD_DIR}/boostbeast-src &&
   export CC="/usr/bin/clang" && \
   export AR="/usr/bin/ar" && \
   export RANLIB="/usr/bin/ranlib" && \

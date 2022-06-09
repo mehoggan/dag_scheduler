@@ -61,7 +61,7 @@ target_link_libraries(dagtasks
   boost_system
   boost_thread
   boost_thread
-  ssl
+  ssl.3
   crypto
   pthread
 )

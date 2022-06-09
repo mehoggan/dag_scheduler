@@ -13,7 +13,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     DOWNLOAD_COMMAND /bin/sh
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clone.boostbeast.sh
       ${CMAKE_BINARY_DIR}
-      ${OPENSSL_REPO}
+      ${BOOSTBEAST_REPO}
     SOURCE_DIR "${CMAKE_BINARY_DIR}/boostbeast-src"
     BINARY_DIR "${CMAKE_BINARY_DIR}/boostbeast-build"
     CONFIGURE_COMMAND /bin/sh
