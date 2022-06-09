@@ -1,15 +1,15 @@
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-conversion")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    link_directories("/usr/local/opt/openssl@3/lib")
-    include_directories("/usr/local/opt/openssl@3/include")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+  link_directories("${CMAKE_BINARY_DIR}/openssl")
+  include_directories("${CMAKE_BINARY_DIR}/openssl/include")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 endif()
 
 include_directories("${CMAKE_BINARY_DIR}/yaml-cpp-build/include"
-    "${CMAKE_BINARY_DIR}/yaml-cpp-src/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/.."
+  "${CMAKE_BINARY_DIR}/yaml-cpp-src/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/.."
 )
 
 add_executable(main "./main.cpp")

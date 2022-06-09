@@ -30,8 +30,7 @@ set(SRC
   ./task_scheduler.cxx
   ./task_stage.cxx
   ./uuid.cxx
-  ./workflow_service.cxx
-        ../include/dag_scheduler/service_helpers.h)
+  ./workflow_service.cxx)
 
 if (BUILD_SHARED_LIBS)
   add_library(dagtasks SHARED ${SRC})

@@ -3,24 +3,49 @@ cmake_minimum_required(VERSION 3.0.2)
 project(openssl-download NONE)
 include(ExternalProject)
 
-ExternalProject_Add(openssl
-  DOWNLOAD_COMMAND git clone --recursive ${OPENSSL_REPO}
-    ${CMAKE_BINARY_DIR}/openssl-src
-  GIT_TAG master
-  SOURCE_DIR "${CMAKE_BINARY_DIR}/openssl-src"
-  BINARY_DIR "${CMAKE_BINARY_DIR}/openssl-build"
-  CONFIGURE_COMMAND "cd"
-    "${CMAKE_BINARY_DIR}/openssl-src"
-    "&&"
-    ./Configure
-    --prefix=${CMAKE_BINARY_DIR}/openssl
-    --openssldir=${CMAKE_BINARY_DIR}/openssl
-  BUILD_COMMAND "cd"
-    "${CMAKE_BINARY_DIR}/openssl-src"
-    "&&"
-    make -j5
-  INSTALL_COMMAND "cd"
-    "${CMAKE_BINARY_DIR}/openssl-src"
-    "&&"
-    make install
-  TEST_COMMAND "")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  ExternalProject_Add(openssl
+    LOG_MERGED_STDOUTERR ON
+    LOG_DOWNLOAD ON
+    LOG_CONFIGURE ON
+    LOG_BUILD ON
+    LOG_INSTALL ON
+    DOWNLOAD_COMMAND /bin/sh
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clone.openssl.sh
+      ${CMAKE_BINARY_DIR}
+      ${OPENSSL_REPO}
+    SOURCE_DIR "${CMAKE_BINARY_DIR}/openssl-src"
+    BINARY_DIR "${CMAKE_BINARY_DIR}/openssl-build"
+    CONFIGURE_COMMAND /bin/sh
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/configure.openssl.sh
+      ${CMAKE_BINARY_DIR}
+    BUILD_COMMAND /bin/sh
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build.openssl.sh
+      ${CMAKE_BINARY_DIR}
+    INSTALL_COMMAND /bin/sh
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/install.openssl.sh
+      ${CMAKE_BINARY_DIR}
+    TEST_COMMAND "")
+else()
+  ExternalProject_Add(openssl
+    DOWNLOAD_COMMAND git clone --recursive ${OPENSSL_REPO}
+      ${CMAKE_BINARY_DIR}/openssl-src
+    GIT_TAG master
+    SOURCE_DIR "${CMAKE_BINARY_DIR}/openssl-src"
+    BINARY_DIR "${CMAKE_BINARY_DIR}/openssl-build"
+    CONFIGURE_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/openssl-src"
+      "&&"
+      ./Configure
+      --prefix=${CMAKE_BINARY_DIR}/openssl
+      --openssldir=${CMAKE_BINARY_DIR}/openssl
+    BUILD_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/openssl-src"
+      "&&"
+      make -j5
+    INSTALL_COMMAND "cd"
+      "${CMAKE_BINARY_DIR}/openssl-src"
+      "&&"
+      make install
+    TEST_COMMAND "")
+endif()

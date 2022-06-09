@@ -40,15 +40,29 @@ if(CLONE_EXTERNALS_GIT)
 endif()
 set(OPENSSL_ROOT "${CMAKE_BINARY_DIR}/openssl" CACHE STRING
   "Root directory for where openssl build system installs itself." FORCE)
-message(STATUS "Cloning openssl using ${OPENSSL_REPO} and installing into "
-  "${OPENSSL_ROOT}")
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
+  file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/openssl") 
+endif()
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/openssl")
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/openssl")
+  message(FATAL_ERROR "Failed to create the install directory="
+    "${CMAKE_BINARY_DIR}/openssl for openssl")
+else()
+  message(STATUS "Created the install directory="
+    "${CMAKE_BINARY_DIR}/openssl for openssl")
+endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.openssl.txt.in
   ${CMAKE_BINARY_DIR}/openssl-download/CMakeLists.txt)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/openssl.cmake)
-link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/lib64")
+link_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/include")
 set(ENV{OPENSSL_ROOT_DIR} "${CMAKE_CURRENT_BINARY_DIR}/openssl")
 message(STATUS "OPENSSL_ROOT_DIR = $ENV{OPENSSL_ROOT_DIR} before configure.")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/openssl/include")
+if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/openssl/include)
+  message(FATAL_ERROR "Exiting cmake generation because openssl did not "
+    "install correctly.")
+endif()
 
 # External Library (boost)
 set(BOOSTBEAST_REPO "https://github.com/boostorg/boost.git" CACHE STRING
