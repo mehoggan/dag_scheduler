@@ -39,6 +39,5 @@ ENV GIT_SSL_NO_VERIFY=1
 RUN cd /home/dag_scheduler && \
   mkdir -p build && \
   cd build && \
-  cmake -DCMAKE_VERBOSE_MAKEFILE=On -DCMAKE_BUILD_TYPE=Debug ../ && \
+  cmake -DCMAKE_VERBOSE_MAKEFILE=On -DCMAKE_BUILD_TYPE=Debug ../ # && \
   make -j 5
-  
