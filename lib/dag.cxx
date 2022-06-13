@@ -13,50 +13,50 @@ namespace com
 {
   namespace dag_scheduler
   {
-    dag::dag_exception::dag_exception(const char *message) :
+    DAG::DAGException::DAGException(const char *message) :
       std::runtime_error(message),
       what_(message)
     {}
 
-    const char *dag::dag_exception::what() const throw()
+    const char *DAG::DAGException::what() const throw()
     {
       return what_.c_str();
     }
 
-    dag::dag() :
-      dag("")
+    DAG::DAG() :
+      DAG("")
     {}
 
-    dag::dag(const std::string &title) :
-      logged_class(*this),
+    DAG::DAG(const std::string &title) :
+      LoggedClass(*this),
       title_(title)
     {}
 
-    dag::~dag()
+    DAG::~DAG()
     {}
 
-    dag::dag(dag &&other) :
-      logged_class(*this),
+    DAG::DAG(DAG &&other) :
+      LoggedClass(*this),
       graph_(std::move(other.graph_))
     {}
 
-    dag &dag::operator=(dag &&other)
+    DAG &DAG::operator=(DAG &&other)
     {
       graph_ = std::move(other.graph_);
       return (*this);
     }
 
-    dag dag::clone()
+    DAG DAG::clone()
     {
       return (*this);
     }
 
-    bool dag::add_vertex(dag_vertex &&v)
+    bool DAG::add_vertex(DAGVertex &&v)
     {
       bool ret = false;
 
       if (!contains_vertex(v)) {
-        auto graph_vertex = std::make_shared<dag_vertex>(std::move(v));
+        auto graph_vertex = std::make_shared<DAGVertex>(std::move(v));
         graph_.push_back(graph_vertex);
         ret = true;
       }
@@ -64,19 +64,19 @@ namespace com
       return ret;
     }
 
-    std::weak_ptr<dag_vertex> dag::find_vertex(const dag_vertex &v)
+    std::weak_ptr<DAGVertex> DAG::find_vertex(const DAGVertex &v)
     {
-      std::weak_ptr<dag_vertex> ret = find_vertex_by_uuid(v.get_uuid());
+      std::weak_ptr<DAGVertex> ret = find_vertex_by_uuid(v.get_uuid());
       return ret;
     }
 
-    std::weak_ptr<dag_vertex> dag::find_vertex_by_uuid(const uuid &u)
+    std::weak_ptr<DAGVertex> DAG::find_vertex_by_uuid(const UUID &u)
     {
-      std::weak_ptr<dag_vertex> ret;
+      std::weak_ptr<DAGVertex> ret;
 
       auto it = std::find_if(graph_.begin(), graph_.end(),
-        [&](std::shared_ptr<dag_vertex> vi) {
-          const dag_vertex &rhs = (*(vi.get()));
+        [&](std::shared_ptr<DAGVertex> vi) {
+          const DAGVertex &rhs = (*(vi.get()));
 
           std::string u_str = u.as_string();
           std::string rhs_str = rhs.get_uuid().as_string();
@@ -94,14 +94,14 @@ namespace com
       return ret;
     }
 
-    std::vector<std::weak_ptr<dag_vertex>>
-    dag::find_all_verticies_with_label(const std::string &l)
+    std::vector<std::weak_ptr<DAGVertex>>
+    DAG::find_all_verticies_with_label(const std::string &l)
     {
-      std::vector<std::weak_ptr<dag_vertex>> ret;
+      std::vector<std::weak_ptr<DAGVertex>> ret;
 
       for (auto it = graph_.begin(); it != graph_.end(); ++it) {
         if ((*it)->label() == l) {
-          std::weak_ptr<dag_vertex> tmp = (*it);
+          std::weak_ptr<DAGVertex> tmp = (*it);
           ret.push_back(tmp);
         }
       }
@@ -109,7 +109,7 @@ namespace com
       return ret;
     }
 
-    bool dag::contains_vertex(const dag_vertex &v)
+    bool DAG::contains_vertex(const DAGVertex &v)
     {
       bool ret = false;
 
@@ -120,7 +120,7 @@ namespace com
       return ret;
     }
 
-    bool dag::contains_vertex_by_uuid(const uuid &u)
+    bool DAG::contains_vertex_by_uuid(const UUID &u)
     {
       bool ret = false;
 
@@ -131,7 +131,7 @@ namespace com
       return ret;
     }
 
-    bool dag::contains_vertex_by_label(const std::string &l)
+    bool DAG::contains_vertex_by_label(const std::string &l)
     {
       bool ret = false;
 
@@ -142,21 +142,21 @@ namespace com
       return ret;
     }
 
-    bool dag::connection_would_make_cyclic(const dag_vertex &v1,
-      const dag_vertex &v2)
+    bool DAG::connection_would_make_cyclic(const DAGVertex &v1,
+      const DAGVertex &v2)
     {
       bool ret = false;
 
-      std::list<dag_vertex> sorted_vertices;
-      dag graph_clone = clone();
+      std::list<DAGVertex> sorted_vertices;
+      DAG graph_clone = clone();
 
-      dag_vertex v1_clone = *const_cast<dag_vertex *>(&v1);
-      dag_vertex v2_clone = *const_cast<dag_vertex *>(&v2);
+      DAGVertex v1_clone = *const_cast<DAGVertex *>(&v1);
+      DAGVertex v2_clone = *const_cast<DAGVertex *>(&v2);
       graph_clone.add_vertex(std::move(v1_clone));
       graph_clone.add_vertex(std::move(v2_clone));
-      std::weak_ptr<dag_vertex> v1_found = graph_clone.find_vertex(v1_clone);
-      std::weak_ptr<dag_vertex> v2_found = graph_clone.find_vertex(v2_clone);
-      // Bypass dag interface to prevent infinite recursion.
+      std::weak_ptr<DAGVertex> v1_found = graph_clone.find_vertex(v1_clone);
+      std::weak_ptr<DAGVertex> v2_found = graph_clone.find_vertex(v2_clone);
+      // Bypass DAG interface to prevent infinite recursion.
       v1_found.lock()->connect(v2_found.lock());
 
       assert((!v1_found.expired() && !v2_found.expired()) &&
@@ -167,27 +167,27 @@ namespace com
       return ret;
     }
 
-    bool dag::connection_would_make_cyclic_by_uuid(const uuid &u1,
-      const uuid &u2)
+    bool DAG::connection_would_make_cyclic_by_uuid(const UUID &u1,
+      const UUID &u2)
     {
       bool ret = false;
 
-      std::weak_ptr<dag_vertex> v1_tmp = find_vertex_by_uuid(u1);
-      std::weak_ptr<dag_vertex> v2_tmp = find_vertex_by_uuid(u2);
+      std::weak_ptr<DAGVertex> v1_tmp = find_vertex_by_uuid(u1);
+      std::weak_ptr<DAGVertex> v2_tmp = find_vertex_by_uuid(u2);
 
       ret = connection_would_make_cyclic(*(v1_tmp.lock()), *(v2_tmp.lock()));
 
       return ret;
     }
 
-    bool dag::connection_would_make_cyclic_by_label(const std::string &l1,
+    bool DAG::connection_would_make_cyclic_by_label(const std::string &l1,
       const std::string &l2)
     {
       bool ret = true;
 
-      std::vector<std::weak_ptr<dag_vertex>> v1;
+      std::vector<std::weak_ptr<DAGVertex>> v1;
       v1 = find_all_verticies_with_label(l1);
-      std::vector<std::weak_ptr<dag_vertex>> v2;
+      std::vector<std::weak_ptr<DAGVertex>> v2;
       v2 = find_all_verticies_with_label(l2);
 
       for (auto v : v1) {
@@ -207,12 +207,12 @@ namespace com
       return ret;
     }
 
-    bool dag::connect(const dag_vertex &v1, const dag_vertex &v2)
+    bool DAG::connect(const DAGVertex &v1, const DAGVertex &v2)
     {
       bool ret = false;
 
-      std::weak_ptr<dag_vertex> v1_tmp = find_vertex(v1);
-      std::weak_ptr<dag_vertex> v2_tmp = find_vertex(v2);
+      std::weak_ptr<DAGVertex> v1_tmp = find_vertex(v1);
+      std::weak_ptr<DAGVertex> v2_tmp = find_vertex(v2);
 
       if (!v1_tmp.expired() && !v2_tmp.expired()) {
         auto v1_it = std::find(graph_.begin(), graph_.end(), v1_tmp.lock());
@@ -228,7 +228,7 @@ namespace com
             error_str << "Connecting " << std::endl << (*(v1_tmp.lock()))
               << std::endl << "to " << std::endl << (*(v2_tmp.lock()))
               << std::endl << "would cause a cycle.";
-            throw dag_exception(error_str.str().c_str());
+            throw DAGException(error_str.str().c_str());
           }
         }
       }
@@ -236,26 +236,26 @@ namespace com
       return ret;
     }
 
-    bool dag::connect_by_uuid(const uuid &u1, const uuid &u2)
+    bool DAG::connect_by_uuid(const UUID &u1, const UUID &u2)
     {
       bool ret = false;
 
-      std::weak_ptr<dag_vertex> v1_tmp = find_vertex_by_uuid(u1);
-      std::weak_ptr<dag_vertex> v2_tmp = find_vertex_by_uuid(u2);
+      std::weak_ptr<DAGVertex> v1_tmp = find_vertex_by_uuid(u1);
+      std::weak_ptr<DAGVertex> v2_tmp = find_vertex_by_uuid(u2);
 
       ret = connect(*(v1_tmp.lock()), *(v2_tmp.lock()));
 
       return ret;
     }
 
-    bool dag::connect_all_by_label(const std::string l1,
+    bool DAG::connect_all_by_label(const std::string l1,
       const std::string l2)
     {
       bool ret = true;
 
-      std::vector<std::weak_ptr<dag_vertex>> v1;
+      std::vector<std::weak_ptr<DAGVertex>> v1;
       v1 = find_all_verticies_with_label(l1);
-      std::vector<std::weak_ptr<dag_vertex>> v2;
+      std::vector<std::weak_ptr<DAGVertex>> v2;
       v2 = find_all_verticies_with_label(l2);
 
       for (auto v : v1) {
@@ -267,36 +267,36 @@ namespace com
       return ret;
     }
 
-    bool dag::add_and_connect(dag_vertex &&v1, dag_vertex &&v2)
+    bool DAG::add_and_connect(DAGVertex &&v1, DAGVertex &&v2)
     {
       bool ret = false;
 
-      dag_vertex v1_clone = v1.clone();
-      dag_vertex v2_clone = v2.clone();
+      DAGVertex v1_clone = v1.clone();
+      DAGVertex v2_clone = v2.clone();
 
       add_vertex(std::move(v1));
       add_vertex(std::move(v2));
 
-      std::weak_ptr<dag_vertex> v1_ptr = find_vertex(v1_clone);
-      std::weak_ptr<dag_vertex> v2_ptr = find_vertex(v2_clone);
+      std::weak_ptr<DAGVertex> v1_ptr = find_vertex(v1_clone);
+      std::weak_ptr<DAGVertex> v2_ptr = find_vertex(v2_clone);
 
       ret = connect(*(v1_ptr.lock().get()), *(v2_ptr.lock().get()));
 
       return ret;
     }
 
-    bool dag::are_connected(const dag_vertex &v1, const dag_vertex &v2)
+    bool DAG::are_connected(const DAGVertex &v1, const DAGVertex &v2)
     {
       bool ret = false;
 
-      std::weak_ptr<dag_vertex> v1_tmp = find_vertex(v1);
-      std::weak_ptr<dag_vertex> v2_tmp = find_vertex(v2);
+      std::weak_ptr<DAGVertex> v1_tmp = find_vertex(v1);
+      std::weak_ptr<DAGVertex> v2_tmp = find_vertex(v2);
 
-      dag_vertex &v2_ref = *(v2_tmp.lock().get());
+      DAGVertex &v2_ref = *(v2_tmp.lock().get());
       std::uintptr_t v2_addr = reinterpret_cast<std::uintptr_t>(&v2_ref);
-      v1_tmp.lock()->visit_all_edges([&](const dag_edge &e) {
-          dag_edge &e_tmp = *const_cast<dag_edge *>(&e);
-          dag_vertex &c_ref = *(e_tmp.get_connection().lock().get());
+      v1_tmp.lock()->visit_all_edges([&](const DAGEdge &e) {
+          DAGEdge &e_tmp = *const_cast<DAGEdge *>(&e);
+          DAGVertex &c_ref = *(e_tmp.get_connection().lock().get());
           std::uintptr_t c_addr = reinterpret_cast<std::uintptr_t>(&c_ref);
           if (c_addr == v2_addr) {
             ret = true;
@@ -307,26 +307,26 @@ namespace com
       return ret;
     }
 
-    bool dag::are_connected_by_uuid(const uuid &u1, const uuid &u2)
+    bool DAG::are_connected_by_uuid(const UUID &u1, const UUID &u2)
     {
       bool ret = false;
 
-      std::weak_ptr<dag_vertex> v1_tmp = find_vertex_by_uuid(u1);
-      std::weak_ptr<dag_vertex> v2_tmp = find_vertex_by_uuid(u2);
+      std::weak_ptr<DAGVertex> v1_tmp = find_vertex_by_uuid(u1);
+      std::weak_ptr<DAGVertex> v2_tmp = find_vertex_by_uuid(u2);
 
       ret = are_connected(*(v1_tmp.lock().get()), *(v2_tmp.lock().get()));
 
       return ret;
     }
 
-    bool dag::all_are_connected_by_label(const std::string l1,
+    bool DAG::all_are_connected_by_label(const std::string l1,
       const std::string l2)
     {
       bool ret = true;
 
-      std::vector<std::weak_ptr<dag_vertex>> v1;
+      std::vector<std::weak_ptr<DAGVertex>> v1;
       v1 = find_all_verticies_with_label(l1);
-      std::vector<std::weak_ptr<dag_vertex>> v2;
+      std::vector<std::weak_ptr<DAGVertex>> v2;
       v2 = find_all_verticies_with_label(l2);
 
       ret &= (!v1.empty() && !v2.empty());
@@ -340,23 +340,23 @@ namespace com
       return ret;
     }
 
-    void dag::linear_traversal(
-      std::function<void (std::shared_ptr<dag_vertex>)> cb)
+    void DAG::linear_traversal(
+      std::function<void (std::shared_ptr<DAGVertex>)> cb)
     {
       std::for_each(graph_.begin(), graph_.end(), cb);
     }
 
-    std::size_t dag::vertex_count() const
+    std::size_t DAG::vertex_count() const
     {
       return graph_.size();
     }
 
-    std::size_t dag::edge_count() const
+    std::size_t DAG::edge_count() const
     {
       std::size_t ret = 0;
 
-      (const_cast<dag *>(this))->linear_traversal(
-        [&] (std::shared_ptr<dag_vertex> v) {
+      (const_cast<DAG *>(this))->linear_traversal(
+        [&] (std::shared_ptr<DAGVertex> v) {
           ret += v->edge_count();
         }
       );
@@ -364,20 +364,20 @@ namespace com
       return ret;
     }
 
-    const std::string &dag::title() const
+    const std::string &DAG::title() const
     {
       return title_;
     }
 
-    bool dag::remove_vertex(const dag_vertex &v)
+    bool DAG::remove_vertex(const DAGVertex &v)
     {
       bool ret = false;
 
       graph_.erase(std::remove_if(graph_.begin(), graph_.end(),
-        [&](std::shared_ptr<dag_vertex> o) {
+        [&](std::shared_ptr<DAGVertex> o) {
           bool found = ((o.get() != nullptr) && (*(o.get()) == v));
           if (found) {
-            o->visit_all_edges([&](const dag_edge &e){
+            o->visit_all_edges([&](const DAGEdge &e){
                 if (e.connection_.lock() != nullptr) {
                   e.connection_.lock()->sub_incomming_edge();
                 }
@@ -391,16 +391,16 @@ namespace com
       return ret;
     }
 
-    bool dag::remove_vertex_by_uuid(const uuid &id)
+    bool DAG::remove_vertex_by_uuid(const UUID &id)
     {
       bool ret = false;
 
-      std::vector<std::shared_ptr<dag_vertex>>::iterator remove_it =
+      std::vector<std::shared_ptr<DAGVertex>>::iterator remove_it =
         std::remove_if(graph_.begin(), graph_.end(),
-          [&](std::shared_ptr<dag_vertex> o) {
+          [&](std::shared_ptr<DAGVertex> o) {
             bool found = ((o.get() != nullptr) && (o->get_uuid() == id));
             if (found) {
-              o->visit_all_edges([&](const dag_edge &e){
+              o->visit_all_edges([&](const DAGEdge &e){
                   if (e.connection_.lock() != nullptr) {
                     e.connection_.lock()->sub_incomming_edge();
                   }
@@ -415,15 +415,15 @@ namespace com
       return ret;
     }
 
-    bool dag::remove_all_vertex_with_label(const std::string &label)
+    bool DAG::remove_all_vertex_with_label(const std::string &label)
     {
       bool ret = false;
 
-      std::vector<std::shared_ptr<dag_vertex>> found_with_label;
+      std::vector<std::shared_ptr<DAGVertex>> found_with_label;
 
       std::copy_if(graph_.begin(), graph_.end(),
         std::back_inserter(found_with_label),
-        [&](std::shared_ptr<dag_vertex> v) {
+        [&](std::shared_ptr<DAGVertex> v) {
           return (v.get() && (v->label() == label));
         });
 
@@ -431,7 +431,7 @@ namespace com
 
       if (ret) {
         std::for_each(found_with_label.begin(), found_with_label.end(),
-          [&](std::shared_ptr<dag_vertex> v) {
+          [&](std::shared_ptr<DAGVertex> v) {
             if (v != nullptr) {
               remove_vertex(*v);
             }
@@ -441,39 +441,39 @@ namespace com
       return ret;
     }
 
-    void dag::reset()
+    void DAG::reset()
     {
       graph_.clear();
     }
 
-    std::shared_ptr<dag_vertex> dag::get_vertex_at(std::size_t i)
+    std::shared_ptr<DAGVertex> DAG::get_vertex_at(std::size_t i)
     {
       assert(i < graph_.size() && "Index out of bounds.");
       return graph_[i];
     }
 
-    void dag::clone_connections(dag_vertex &from, dag_vertex &to)
+    void DAG::clone_connections(DAGVertex &from, DAGVertex &to)
     {
       assert(from.get_uuid() == to.get_uuid() &&
         "Cloning connections on dag_vertices that are not the same is not "
         "permitted.");
 
-      std::vector<dag_vertex::dag_vertex_connection> from_connections =
+      std::vector<DAGVertex::DAGVertex_connection> from_connections =
         from.clone_all_connections();
 
       for (auto &connection : from_connections) {
-        std::weak_ptr<dag_vertex> find = find_vertex(connection.vertex());
+        std::weak_ptr<DAGVertex> find = find_vertex(connection.vertex());
         assert(!find.expired() && "This should never happen.");
         to.connect(find.lock());
       }
     }
 
-    dag::dag(const dag &other) :
-      logged_class(*this)
+    DAG::DAG(const DAG &other) :
+      LoggedClass(*this)
     {
-      dag *o = (const_cast<dag *>(&other));
-      o->linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          dag_vertex tmp = v->clone();
+      DAG *o = (const_cast<DAG *>(&other));
+      o->linear_traversal([&](std::shared_ptr<DAGVertex> v) {
+          DAGVertex tmp = v->clone();
           add_vertex(std::move(tmp));
         }
       );
@@ -483,11 +483,11 @@ namespace com
       }
     }
 
-    dag &dag::operator=(const dag &rhs)
+    DAG &DAG::operator=(const DAG &rhs)
     {
-      dag &o = *(const_cast<dag *>(&rhs));
-      o.linear_traversal([&](std::shared_ptr<dag_vertex> v) {
-          dag_vertex tmp = v->clone();
+      DAG &o = *(const_cast<DAG *>(&rhs));
+      o.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
+          DAGVertex tmp = v->clone();
           add_vertex(std::move(tmp));
         }
       );
@@ -499,32 +499,32 @@ namespace com
       return (*this);
     }
 
-    std::ostream &operator<<(std::ostream &out, const dag &g)
+    std::ostream &operator<<(std::ostream &out, const DAG &g)
     {
       out << "Title: --" << g.title_ << "--" << std::endl;
-      for (std::shared_ptr<dag_vertex> v : g.graph_) {
+      for (std::shared_ptr<DAGVertex> v : g.graph_) {
         out << (*v) << std::endl;
       }
 
       return out;
     }
 
-    bool operator==(const dag &lhs, const dag &rhs)
+    bool operator==(const DAG &lhs, const DAG &rhs)
     {
       bool ret = true;
 
       ret &= (lhs.graph_.size() == rhs.graph_.size());
 
-      dag lhs_clone = (*const_cast<dag *>(&lhs)).clone();
-      dag rhs_clone = (*const_cast<dag *>(&rhs)).clone();
+      DAG lhs_clone = (*const_cast<DAG *>(&lhs)).clone();
+      DAG rhs_clone = (*const_cast<DAG *>(&rhs)).clone();
 
       std::sort(lhs_clone.graph_.begin(), lhs_clone.graph_.end(),
-        [](std::shared_ptr<dag_vertex> a, std::shared_ptr<dag_vertex> b) {
+        [](std::shared_ptr<DAGVertex> a, std::shared_ptr<DAGVertex> b) {
           return a->label() < b->label();
         }
       );
       std::sort(rhs_clone.graph_.begin(), rhs_clone.graph_.end(),
-        [](std::shared_ptr<dag_vertex> a, std::shared_ptr<dag_vertex> b) {
+        [](std::shared_ptr<DAGVertex> a, std::shared_ptr<DAGVertex> b) {
           return a->label() < b->label();
         }
       );
@@ -547,7 +547,7 @@ namespace com
       return ret;
     }
 
-    bool operator!=(const dag &lhs, const dag &rhs)
+    bool operator!=(const DAG &lhs, const DAG &rhs)
     {
       return !(lhs == rhs);
     }

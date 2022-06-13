@@ -14,16 +14,16 @@ namespace com
   {
     class TestInterruptibleTaskThread :
       public ::testing::Test,
-      public logged_class<TestInterruptibleTaskThread>
+      public LoggedClass<TestInterruptibleTaskThread>
     {
     public:
       TestInterruptibleTaskThread() :
-        logged_class<TestInterruptibleTaskThread>(*this),
+        LoggedClass<TestInterruptibleTaskThread>(*this),
         ts_(LOG_TAG)
       {}
 
     protected:
-      interruptible_task_thread ts_;
+      InterruptibleTaskThread ts_;
 
     protected:
       virtual void SetUp() {}
@@ -40,7 +40,7 @@ namespace com
 
     TEST_F(TestInterruptibleTaskThread, move_ctor_not_running)
     {
-      interruptible_task_thread ts(std::move(ts_));
+      InterruptibleTaskThread ts(std::move(ts_));
       EXPECT_FALSE(ts.is_running());
       EXPECT_FALSE(ts.was_interrupted());
       EXPECT_FALSE(ts.has_task());
@@ -52,7 +52,7 @@ namespace com
     TEST_F(TestInterruptibleTaskThread, move_assignement_not_running)
     {
 
-      interruptible_task_thread ts;
+      InterruptibleTaskThread ts;
       ts = std::move(ts_);
       EXPECT_FALSE(ts.is_running());
       EXPECT_FALSE(ts.was_interrupted());

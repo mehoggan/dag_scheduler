@@ -6,41 +6,41 @@ namespace com
 {
   namespace dag_scheduler
   {
-    uuid::uuid()
+    UUID::UUID()
     {
       uuid_generate(uuid_);
     }
 
-    uuid::~uuid()
+    UUID::~UUID()
     {
       uuid_clear(uuid_);
     }
 
-    uuid uuid::clone()
+    UUID UUID::clone()
     {
       return (*this);
     }
 
-    uuid::uuid(uuid &&other)
+    UUID::UUID(UUID &&other)
     {
       uuid_copy(uuid_, other.uuid_);
-      other.~uuid();
+      other.~UUID();
     }
 
-    uuid &uuid::operator=(uuid &&rhs)
+    UUID &UUID::operator=(UUID &&rhs)
     {
       uuid_copy(uuid_, rhs.uuid_);
-      rhs.~uuid();
+      rhs.~UUID();
 
       return (*this);
     }
 
-    bool uuid::is_initialized() const
+    bool UUID::is_initialized() const
     {
       return !uuid_is_null(uuid_);
     }
 
-    std::string uuid::as_string() const
+    std::string UUID::as_string() const
     {
       std::string ret;
       if (is_initialized()) {
@@ -52,12 +52,12 @@ namespace com
       return ret;
     }
 
-    uuid::uuid(const uuid &other)
+    UUID::UUID(const UUID &other)
     {
       uuid_copy(uuid_, other.uuid_);
     }
 
-    uuid &uuid::operator=(const uuid &rhs)
+    UUID &UUID::operator=(const UUID &rhs)
     {
       uuid_copy(uuid_, rhs.uuid_);
 

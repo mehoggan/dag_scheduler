@@ -7,65 +7,65 @@ namespace com
 {
   namespace dag_scheduler
   {
-    responder::~responder()
+    Responder::~Responder()
     {}
 
-    endpoint_handler::endpoint_handler()
+    EndpointHandler::EndpointHandler()
     {}
 
-    endpoint_handler::~endpoint_handler()
+    EndpointHandler::~EndpointHandler()
     {}
 
-    endpoint_handler::endpoint_handler(
+    EndpointHandler::EndpointHandler(
       const boost::beast::string_view& endpoint) :
       endpoint_(endpoint)
     {}
 
-    bool endpoint_handler::operator()(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder)
+    bool EndpointHandler::operator()(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder)
     {
       (void) req;
-      (void) responder;
+      (void) Responder;
       return false;
     }
 
-    bool endpoint_handler::operator()(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder) const
+    bool EndpointHandler::operator()(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder) const
     {
       (void) req;
-      (void) responder;
+      (void) Responder;
       return false;
     }
 
-    doc_root_endpoint::doc_root_endpoint(
+    DocRootEndpoint::DocRootEndpoint(
       const boost::beast::string_view& doc_root) :
-      endpoint_handler(),
-      logged_class<doc_root_endpoint>(*this),
+      EndpointHandler(),
+      LoggedClass<DocRootEndpoint>(*this),
       doc_root_(doc_root)
     {}
 
-    doc_root_endpoint::~doc_root_endpoint()
+    DocRootEndpoint::~DocRootEndpoint()
     {}
 
-    bool doc_root_endpoint::operator()(
-      endpoint_handler::StringRequestType&& req,
-      std::unique_ptr<responder>&& responder)
+    bool DocRootEndpoint::operator()(
+      EndpointHandler::StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder)
     {
-      return handle_request(std::move(req), std::move(responder));
+      return handle_request(std::move(req), std::move(Responder));
     }
 
-    bool doc_root_endpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder) const
+    bool DocRootEndpoint::operator()(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder) const
     {
-      return handle_request(std::move(req), std::move(responder));
+      return handle_request(std::move(req), std::move(Responder));
     }
 
-    bool doc_root_endpoint::handle_request(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder) const
+    bool DocRootEndpoint::handle_request(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder) const
     {
-      com::dag_scheduler::logging::info(LOG_TAG, "Handling request for",
+      com::dag_scheduler::Logging::info(LOG_TAG, "Handling request for",
         doc_root_.to_string());
-      responder::StringMessageType response;
+      Responder::StringMessageType response;
       if (req.method() != boost::beast::http::verb::get &&
       req.method() != boost::beast::http::verb::head) {
         response = detail::bad_request_handler("Unknown HTTP-method\n", req);
@@ -93,7 +93,7 @@ namespace com
               detail::mime_type(path));
             res.content_length(body_size);
             res.keep_alive(req.keep_alive());
-            responder->send(std::move(res));
+            Responder->send(std::move(res));
             return true;
           } else if (req.method() == boost::beast::http::verb::get) {
             std::string body_str;
@@ -101,7 +101,7 @@ namespace com
             boost::beast::error_code read_ec;
             body.file().read(&body_str[0], body.size(), read_ec);
             if (not read_ec) {
-              com::dag_scheduler::logging::info(LOG_TAG, "Returning",
+              com::dag_scheduler::Logging::info(LOG_TAG, "Returning",
                 body_str);
               response = boost::beast::http::response<
                 boost::beast::http::string_body>(
@@ -110,34 +110,34 @@ namespace com
                   std::make_tuple(boost::beast::http::status::ok,
                     req.version()));
             } else {
-              com::dag_scheduler::logging::warn(LOG_TAG,
+              com::dag_scheduler::Logging::warn(LOG_TAG,
                 "Could not read body!");
               response = detail::server_error_handler(ec.message(), req);
             }
           }
         }
       }
-      responder->send(std::move(response));
+      Responder->send(std::move(response));
       return true;
     }
 
-    register_dag_endpoint::~register_dag_endpoint()
+    RegisterDAGEndpoint::~RegisterDAGEndpoint()
     {
     }
 
-    bool register_dag_endpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder)
+    bool RegisterDAGEndpoint::operator()(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder)
     {
       (void) req;
-      (void) responder;
+      (void) Responder;
       return true;
     }
 
-    bool register_dag_endpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<responder>&& responder) const
+    bool RegisterDAGEndpoint::operator()(StringRequestType&& req,
+      std::unique_ptr<Responder>&& Responder) const
     {
       (void) req;
-      (void) responder;
+      (void) Responder;
       return true;
     }
   }

@@ -14,7 +14,7 @@ namespace com
 
     TestTaskStageImpl::TestTaskStageImpl(const std::string &label,
       const std::chrono::nanoseconds &run_sleep_time) :
-      task_stage(label),
+      TaskStage(label),
       running_(false),
       nasty_user_defined_pointer_(new int(10)),
       run_sleep_time_(run_sleep_time)
@@ -26,23 +26,23 @@ namespace com
     }
 
     TestTaskStageImpl::TestTaskStageImpl(TestTaskStageImpl &&other) :
-      task_stage(std::move(other)),
+      TaskStage(std::move(other)),
       running_(false),
       nasty_user_defined_pointer_(
         std::move(other.nasty_user_defined_pointer_)),
       run_sleep_time_(std::move(other.run_sleep_time_))
     {
       assert(not other.is_running() &&
-        "You cannot move a running task_stage");
+        "You cannot move a running TaskStage");
 
       other.nasty_user_defined_pointer_ = nullptr;
     }
 
     TestTaskStageImpl &TestTaskStageImpl::operator=(TestTaskStageImpl &&other)
     {
-      task_stage::operator=(std::move(other));
+      TaskStage::operator=(std::move(other));
       assert(not other.is_running() &&
-        "You cannot move a running task_stage");
+        "You cannot move a running TaskStage");
       running_.store(false);
       nasty_user_defined_pointer_ = std::move(
         other.nasty_user_defined_pointer_);

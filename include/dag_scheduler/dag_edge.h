@@ -25,20 +25,20 @@ namespace com
      *
      * A class that represents a directed edge in a acyclic graph (dag) and
      * operations that can be performed on it. Users can check for connected
-     * \ref dag_vertex and get access to the connected \ref dag_vertex.
+     * \ref DAGVertex and get access to the connected \ref DAGVertex.
      */
-    class DLLSPEC_DAGTASKS dag_edge
+    class DLLSPEC_DAGTASKS DAGEdge
     {
     private:
-      friend class dag;
-      friend class dag_vertex;
-      friend struct dag_vertex::dag_vertex_connection;
-      friend bool dag_topological_sort(dag &g,
-        std::list<dag_vertex> &sorted_vertices); 
+      friend class DAG;
+      friend class DAGVertex;
+      friend struct DAGVertex::DAGVertex_connection;
+      friend bool dag_topological_sort(DAG &g,
+        std::list<DAGVertex> &sorted_vertices); 
 
     public:
-      // TODO: Use dag class to manage status.
-      enum class status
+      // TODO: Use DAG class to manage status.
+      enum class Status
       {
         initialized,
         traversed,
@@ -47,87 +47,87 @@ namespace com
 
     public:
       /**
-       * @brief A constructor for a \ref dag_edge
+       * @brief A constructor for a \ref DAGEdge
        *
-       * A constructor for a \ref dag_edge.
+       * A constructor for a \ref DAGEdge.
        */
-      dag_edge();
+      DAGEdge();
 
       /**
-       * @brief A destructor for a \ref dag_edge
+       * @brief A destructor for a \ref DAGEdge
        *
-       * A destructor for a \ref dag_edge
+       * A destructor for a \ref DAGEdge
        */
-      virtual ~dag_edge();
+      virtual ~DAGEdge();
 
       /**
-       * @brief A move constructor for a \ref dag_edge
+       * @brief A move constructor for a \ref DAGEdge
        *
-       * A move constructor for a \ref dag_edge
+       * A move constructor for a \ref DAGEdge
        *
-       * @param[out] other The \ref dag_edge to move into (*this).
+       * @param[out] other The \ref DAGEdge to move into (*this).
        */
-      dag_edge(dag_edge &&other);
+      DAGEdge(DAGEdge &&other);
 
       //! 
       /*!
       */
       /**
-       * @brief A assignment move operator for a \ref dag_edge
+       * @brief A assignment move operator for a \ref DAGEdge
        *
-       * A assignment move operator for a \ref dag_edge
+       * A assignment move operator for a \ref DAGEdge
        *
-       * @param[out] rhs The \ref dag_edge to move into (*this).
+       * @param[out] rhs The \ref DAGEdge to move into (*this).
        *
        * @return A reference to (*this).
        */
-      dag_edge &operator=(dag_edge &&rhs);
+      DAGEdge &operator=(DAGEdge &&rhs);
 
       /**
-       * @brief Clones this object into an identical dag_edge.
+       * @brief Clones this object into an identical DAGEdge.
        *
-       * A member function of \ref dag_edge that makes an identical copy of
+       * A member function of \ref DAGEdge that makes an identical copy of
        * this and returns it. However, it resets the connection which can only
        * be made from an object that knows about the connection.
        *
-       * @return A \ref dag_edge that is an identical copy of this. 
+       * @return A \ref DAGEdge that is an identical copy of this. 
        */
-      dag_edge clone();
+      DAGEdge clone();
 
       /**
-       * @brief Get a weak reference to the \ref dag_vertex pointed to by
+       * @brief Get a weak reference to the \ref DAGVertex pointed to by
        *        this.
        *
-       * A member function of \ref dag_edge that returns a weak reference to
-       * the \ref dag_vertex that this edge points to.
+       * A member function of \ref DAGEdge that returns a weak reference to
+       * the \ref DAGVertex that this edge points to.
        *
-       * @return A \ref std::weak_ptr<\ref dag_vertex> that points to the
-       *         \ref dag_vertex that this points to. 
+       * @return A \ref std::weak_ptr<\ref DAGVertex> that points to the
+       *         \ref DAGVertex that this points to. 
        */
-      std::weak_ptr<dag_vertex> get_connection();
+      std::weak_ptr<DAGVertex> get_connection();
 
       /**
-       * @brief Checks to see if this \ref dag_edge points to \ref v
+       * @brief Checks to see if this \ref DAGEdge points to \ref v
        *
-       * @param[in] v A \ref dag_vertex for which we are checking for a
+       * @param[in] v A \ref DAGVertex for which we are checking for a
        *              connection to.
        *
        * @return true if \ref this points to \ref v. False other wise. 
        */
-      bool is_a_connection_to(const dag_vertex &v) const;
+      bool is_a_connection_to(const DAGVertex &v) const;
 
       /**
        * @brief A getter for the \ref uuid of \ref this.
        *
-       * A member function of \ref dag_edge that return the \ref uuid that
+       * A member function of \ref DAGEdge that return the \ref uuid that
        * uniqly identifies any clone of \ref this.
        *
        * @return A \ref uuid that uniqly identifies any clone of \ref this. 
        */
-      const uuid &get_uuid() const;
+      const UUID &get_uuid() const;
 
       //! TODO (mhoggan): Add doc string once implemented.
-      const status &current_status() const;
+      const Status &current_status() const;
 
       //! TODO (mhoggan): Add doc string once implemented.
       std::string current_status_as_string() const;
@@ -137,53 +137,53 @@ namespace com
        * @brief A stream operator for writting a \ref dag_egde to a stream.
        *
        * @param[out] out The stream to write \p e to.
-       * @param[in] e The \ref dag_edge to write to \p out.
+       * @param[in] e The \ref DAGEdge to write to \p out.
        *
        * @return A reference to \p out after it was streamed to.
        */
-      friend std::ostream &operator<<(std::ostream &out, const dag_edge &e);
+      friend std::ostream &operator<<(std::ostream &out, const DAGEdge &e);
 
       /**
        * @brief Comparison operator to compare equivalnce of two
-       *        \ref dag_edge (s).
+       *        \ref DAGEdge (s).
        *
-       * Two \ref dag_edge (s) are considered equivalent if:
+       * Two \ref DAGEdge (s) are considered equivalent if:
        *   * First they have the same uuid.
        *   * Second if they have the same status.
        *   * Third if they have the same connection (TODO not well defined.)
        *
-       * @param[in] lhs The \ref dag_edge on the left hand side of the '=='.
-       * @param[in] rhs The \ref dag_edge on the right hand side of the '=='.
+       * @param[in] lhs The \ref DAGEdge on the left hand side of the '=='.
+       * @param[in] rhs The \ref DAGEdge on the right hand side of the '=='.
        *
        * @return true if \p lhs == \p rhs.
        */
-      friend bool operator==(const dag_edge &lhs, const dag_edge &rhs);
+      friend bool operator==(const DAGEdge &lhs, const DAGEdge &rhs);
 
       /**
        * @brief Comparison operator to compare non equivalnce of two
-       *        \ref dag_edge (s).
+       *        \ref DAGEdge (s).
        *
-       * Two \ref dag_edge (s) are considered equivalent if:
+       * Two \ref DAGEdge (s) are considered equivalent if:
        *     * First they have the same uuid.
        *     * Second if they have the same status.
        *     * Third if they have the same connection (TODO not well defined.)
        *
-       * @param[in] lhs The \ref dag_edge on the left hand side of the '!='.
-       * @param[in] rhs The \ref dag_edge on the right hand side of the '!='.
+       * @param[in] lhs The \ref DAGEdge on the left hand side of the '!='.
+       * @param[in] rhs The \ref DAGEdge on the right hand side of the '!='.
        *
        * @return true if \p lhs != \p rhs.
        */
-      friend bool operator!=(const dag_edge &lhs, const dag_edge &rhs);
+      friend bool operator!=(const DAGEdge &lhs, const DAGEdge &rhs);
 
     protected:
-      bool connect_to(std::shared_ptr<dag_vertex> v);
-      dag_edge(const dag_edge &other);
-      dag_edge &operator=(const dag_edge &rhs);
+      bool connect_to(std::shared_ptr<DAGVertex> v);
+      DAGEdge(const DAGEdge &other);
+      DAGEdge &operator=(const DAGEdge &rhs);
 
     private:
-      class uuid uuid_;
-      status current_status_;
-      std::weak_ptr<dag_vertex> connection_;
+      class UUID uuid_;
+      Status current_status_;
+      std::weak_ptr<DAGVertex> connection_;
 
     private:
       FRIEND_TEST(TestDagEdge, copy_ctor);

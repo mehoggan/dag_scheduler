@@ -81,7 +81,7 @@ namespace detail
 
   void load_server_cert(
     boost::asio::ssl::context& ctx,
-    com::dag_scheduler::log_tag& LOG_TAG)
+    com::dag_scheduler::LogTag& LOG_TAG)
   {
     /*
      * The certificate was generated from CMD.EXE on Windows 10 using:
@@ -90,7 +90,7 @@ namespace detail
      *  -days 10000 -out cert.pem -subj "//C=US\ST=CA\L=Los Angeles\O=Beast\\
      *  CN=www.example.com"
     */
-    com::dag_scheduler::logging::info(LOG_TAG, "Loading SSL cert...");
+    com::dag_scheduler::Logging::info(LOG_TAG, "Loading SSL cert...");
 
     std::string const cert =
       "-----BEGIN CERTIFICATE-----\n"

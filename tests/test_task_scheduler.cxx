@@ -51,14 +51,14 @@ namespace com
 
     TEST(TestTaskScheduler, default_ctor)
     {
-      task_scheduler ts;
+      TaskScheduler ts;
       EXPECT_TRUE(ts.is_paused());
       EXPECT_TRUE(ts.is_shutdown()) << "User must call startup";
     }
 
     TEST(TestTaskScheduler, startup)
     {
-      task_scheduler ts;
+      TaskScheduler ts;
 
       std::thread ts_thread([&]() {
         ASSERT_TRUE(ts.startup());
@@ -80,7 +80,7 @@ namespace com
 
     TEST(TestTaskScheduler, pause_resume)
     {
-      task_scheduler ts;
+      TaskScheduler ts;
       std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
       std::chrono::milliseconds give_ts_thread_time(500);
       std::this_thread::sleep_for(give_ts_thread_time);
@@ -97,9 +97,9 @@ namespace com
 
     TEST(TestTaskScheduler, queue_task)
     {
-      task_scheduler ts;
+      TaskScheduler ts;
 
-      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+      std::unique_ptr<Task> ltti(new detail::LocalTestTaskImpl(
         std::chrono::milliseconds(3), std::function<void (bool)>()));
       ts.queue_task(std::move(ltti));
       ASSERT_EQ(nullptr, ltti.get());
@@ -107,9 +107,9 @@ namespace com
 
     TEST(TestTaskScheduler, kill_task)
     {
-      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+      std::unique_ptr<Task> ltti(new detail::LocalTestTaskImpl(
         std::chrono::milliseconds(3), std::function<void (bool)>()));
-      task_scheduler ts;
+      TaskScheduler ts;
       EXPECT_TRUE(ts.kill_task(*(ltti)));
     }
 
@@ -119,10 +119,10 @@ namespace com
         EXPECT_TRUE(status);
       };
 
-      task_scheduler ts;
+      TaskScheduler ts;
       std::thread ts_thread([&]() {ASSERT_TRUE(ts.startup());});
       // Give time for thread to start up before we fire and kill.
-      std::unique_ptr<task> ltti(new detail::LocalTestTaskImpl(
+      std::unique_ptr<Task> ltti(new detail::LocalTestTaskImpl(
         std::chrono::milliseconds(1000), complete_callback));
 
       ts.queue_task(std::move(ltti));

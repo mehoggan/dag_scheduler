@@ -3,7 +3,7 @@
 
 #include "declspec.h"
 
-#include "dag_scheduler/task.h"
+#include "dag_scheduler/Task.h"
 #include "dag_scheduler/uuid.h"
 
 #include <atomic>
@@ -19,8 +19,8 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class dag_edge;
-    class dag;
+    class DAGEdge;
+    class DAG;
 
     /**
      * @brief A class that represents a vertex or node in a acyclic graph
@@ -28,71 +28,71 @@ namespace com
      *
      * A class that represents a vertex or node in a acyclic graph (dag) and
      * operations that can be performed on it. Users can check for connected
-     * \ref dag_vertex and get access to the connected \ref dag_vertex. In
-     * addition users can connect instance of \ref dag_vertex, find out
-     * how many \ref dag_edges come from an instance, and check to see how
-     * many \ref dag_edges point at a given instance.
+     * \ref DAGVertex and get access to the connected \ref DAGVertex. In
+     * addition users can connect instance of \ref DAGVertex, find out
+     * how many \ref DAGEdges come from an instance, and check to see how
+     * many \ref DAGEdges point at a given instance.
      */
-    class DLLSPEC_DAGTASKS dag_vertex
+    class DLLSPEC_DAGTASKS DAGVertex
     {
     private:
-      friend class dag_edge;
-      friend class dag;
-      friend struct dag_vertex_connection;
+      friend class DAGEdge;
+      friend class DAG;
+      friend struct DAGVertex_connection;
 
     public:
       /**
-       * @brief A utility struct used to reconnect a \ref dag_vertex
+       * @brief A utility struct used to reconnect a \ref DAGVertex
        *
-       * This is a utility class used to reconnect two \ref dag_vertex
-       * and their associated \ref dag_edge.
+       * This is a utility class used to reconnect two \ref DAGVertex
+       * and their associated \ref DAGEdge.
        */
-      struct dag_vertex_connection
+      struct DAGVertex_connection
       {
       public:
         /**
-         * @brief A constructor for a \ref dag_vertex_connection
+         * @brief A constructor for a \ref DAGVertex_connection
          *
-         * A constructor for a \ref dag_vertex_connection
+         * A constructor for a \ref DAGVertex_connection
          */
-        dag_vertex_connection();
+        DAGVertex_connection();
 
         /**
-         * @brief A constructor for a \ref dag_vertex_connection
+         * @brief A constructor for a \ref DAGVertex_connection
          * 
-         * A constructor for a \ref dag_vertex_connection
+         * A constructor for a \ref DAGVertex_connection
          *
-         * @param edge The \ref dag_edge that points to \ref vertex.
-         * @param vertex The \ref dag_vertex pointed to by \ref edge.
+         * @param edge The \ref DAGEdge that points to \ref vertex.
+         * @param vertex The \ref DAGVertex pointed to by \ref edge.
          */
-        dag_vertex_connection(dag_edge &edge, dag_vertex &vertex);
+        DAGVertex_connection(DAGEdge &edge, DAGVertex &vertex);
 
         /**
-         * @brief A getter for the \ref dag_edge that points to \ref vertex_
+         * @brief A getter for the \ref DAGEdge that points to \ref vertex_
          *
-         * A getter for the \ref dag_edge that points to \ref vertex_
+         * A getter for the \ref DAGEdge that points to \ref vertex_
          *
          * @return A const reference to the member variable edge_ 
          */
-        const dag_edge &edge() const;
+        const DAGEdge &edge() const;
 
         /**
-         * @brief A getter for the \ref dag_vertex that is pointed to by
+         * @brief A getter for the \ref DAGVertex that is pointed to by
          *        \ref edge_.
          *
-         * A getter for the \ref dag_vertex that is pointed to by \ref edge_.
+         * A getter for the \ref DAGVertex that is pointed to by \ref edge_.
          *
          * @return A const reference to the member variable vertex_. 
          */
-        const dag_vertex &vertex() const;
+        const DAGVertex &vertex() const;
 
       private:
-        std::unique_ptr<dag_edge> edge_;
-        std::unique_ptr<dag_vertex> vertex_;
+        std::unique_ptr<DAGEdge> edge_;
+        std::unique_ptr<DAGVertex> vertex_;
       };
 
       // TODO: Use dag class to manage status.
-      enum class status
+      enum class Status
       {
         initialized,
         scheduled,
@@ -104,87 +104,87 @@ namespace com
 
     public:
       /**
-       * @brief A constructor for a \ref dag_vertex
+       * @brief A constructor for a \ref DAGVertex
        *
-       * A constructor for a \ref dag_vertex
+       * A constructor for a \ref DAGVertex
        */
-      dag_vertex();
+      DAGVertex();
 
       /**
-       * @brief A constructor for a \ref dag_vertex
+       * @brief A constructor for a \ref DAGVertex
        *
-       * A constructor for a \ref dag_vertex
+       * A constructor for a \ref DAGVertex
        *
        * @param[in] label A string by which to identify one or more
-       *                  \ref dag_vertex.
+       *                  \ref DAGVertex.
        */
-      explicit dag_vertex(const std::string &label);
+      explicit DAGVertex(const std::string &label);
 
       /**
-       * @brief A destructor for a \ref dag_vertex 
+       * @brief A destructor for a \ref DAGVertex 
        *
-       * A destructor for a \ref dag_vertex
+       * A destructor for a \ref DAGVertex
        */
-      virtual ~dag_vertex();
+      virtual ~DAGVertex();
 
       /**
-       * @brief A move constructor for a \ref dag_vertex.
+       * @brief A move constructor for a \ref DAGVertex.
        *
-       * A move constructor for a \ref dag_vertex
+       * A move constructor for a \ref DAGVertex
        *
-       * @param[out] other The \ref dag_vertex to move into (*this).
+       * @param[out] other The \ref DAGVertex to move into (*this).
        */
-      dag_vertex(dag_vertex &&other);
+      DAGVertex(DAGVertex &&other);
 
       /**
-       * @brief A assignment move operator for a \ref dag_vertex.
+       * @brief A assignment move operator for a \ref DAGVertex.
        *
-       * A assignment move operator for a \ref dag_vertex
+       * A assignment move operator for a \ref DAGVertex
        *
-       * @param[out] rhs The \ref dag_vertex to move into (*this).
+       * @param[out] rhs The \ref DAGVertex to move into (*this).
        *
        * @return A reference to (*this).
        */
-      dag_vertex &operator=(dag_vertex &&rhs);
+      DAGVertex &operator=(DAGVertex &&rhs);
 
       /**
-       * @brief Clones this object into an identical dag_vertex.
+       * @brief Clones this object into an identical DAGVertex.
        *
-       * A member function of \ref dag_vertex that makes an identical copy of
-       * this and returns it. However, does not preseve \ref dag_edges.
+       * A member function of \ref DAGVertex that makes an identical copy of
+       * this and returns it. However, does not preseve \ref DAGEdges.
        *
-       * @return A \ref dag_vertex that is an identical copy of this. 
+       * @return A \ref DAGVertex that is an identical copy of this. 
        */
-      dag_vertex clone();
+      DAGVertex clone();
 
       /**
-       * @brief Connects a ref counted instance of a \ref dag_vertex to this.
+       * @brief Connects a ref counted instance of a \ref DAGVertex to this.
        *
-       * @param[in] other The \ref dag_vertex for which an \ref dag_edge is
+       * @param[in] other The \ref DAGVertex for which an \ref DAGEdge is
        *                  drawn to.
        *
        * @return true if connection is made false otherwise. 
        */
-      bool connect(std::shared_ptr<dag_vertex> other);
+      bool connect(std::shared_ptr<DAGVertex> other);
 
       /**
-       * @brief Checks for the existance of a \ref dag_edge to \ref other.
+       * @brief Checks for the existance of a \ref DAGEdge to \ref other.
        *
-       * A member fucntion of \ref dag_vertex that checks if \ref this
-       * contains a \ref dag_edge to \ref other.
+       * A member fucntion of \ref DAGVertex that checks if \ref this
+       * contains a \ref DAGEdge to \ref other.
        *
-       * @param[in] other The \ref dag_vertex which we are checking for a
-       *                  \ref dag_edge that is drawn to it.
+       * @param[in] other The \ref DAGVertex which we are checking for a
+       *                  \ref DAGEdge that is drawn to it.
        *
-       * @return true if (*this) is connected via a \ref dag_edge to \p other.
+       * @return true if (*this) is connected via a \ref DAGEdge to \p other.
        */
-      bool contains_connection_to(const dag_vertex &other);
+      bool contains_connection_to(const DAGVertex &other);
 
       /**
        * @brief A utility function used by \ref dag to reconnect after a
        *        clone.
        *
-       * A member function of \ref dag_vertex that is to be used after
+       * A member function of \ref DAGVertex that is to be used after
        * \ref clone. Because a clone does not preserve connections users who
        * choose to use this class outside of a \ref dag will need a way to
        * reconnect the \ref dag_eged (s) that existed from \ref this before
@@ -192,104 +192,104 @@ namespace com
        * \ref the member function \ref clone_all_connections before calling
        * this member function.
        *
-       * @param[in] connections A collection of \ref dag_vertex_connection
+       * @param[in] connections A collection of \ref DAGVertex_connection
        *                        that contains the results of calling
        *                        \ref clone_all_connections.
        *
-       * @return A \ref std::vector<\ref std::shared_ptr<\ref dag_vertex>>
+       * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>>
        *         which contains ref counted instances of the connections
        *         restablished by calling this function. 
        */
-      std::vector<std::shared_ptr<dag_vertex>> restablish_connections(
-        std::vector<dag_vertex_connection> &connections);
+      std::vector<std::shared_ptr<DAGVertex>> restablish_connections(
+        std::vector<DAGVertex_connection> &connections);
 
       /**
-       * @brief Used to get the number of \ref dag_vertex (s) this points to.
+       * @brief Used to get the number of \ref DAGVertex (s) this points to.
        *
-       * A member function of \ref dag_vertex that returns the number of
-       * current connections from \ref this to other \ref dag_vertex via
-       * a \ref dag_edge.
+       * A member function of \ref DAGVertex that returns the number of
+       * current connections from \ref this to other \ref DAGVertex via
+       * a \ref DAGEdge.
        *
-       * @return A positive integer with the number of \ref dag_edge (s) that
-       *         extend from \ref this to other \ref dag_vertex (s). 
+       * @return A positive integer with the number of \ref DAGEdge (s) that
+       *         extend from \ref this to other \ref DAGVertex (s). 
        */
       std::size_t edge_count() const;
 
       /**
-       * @brief A utility function that visits all \ref dag_edge (s) of this.
+       * @brief A utility function that visits all \ref DAGEdge (s) of this.
        *
-       * A utility member function of \ref dag_vertex that visits each
-       * \ref dag_edge in the order they were added to the collection of
-       * \ref dag_edge (s) \ref this contains.
+       * A utility member function of \ref DAGVertex that visits each
+       * \ref DAGEdge in the order they were added to the collection of
+       * \ref DAGEdge (s) \ref this contains.
        *
        * @param[in] cb A user defined function that is called once per
-       *               \ref dag_edge that \ref this contains in the order
-       *               that the \ref dag_edge (s) were added.
+       *               \ref DAGEdge that \ref this contains in the order
+       *               that the \ref DAGEdge (s) were added.
        */
-      void visit_all_edges(std::function<void (const dag_edge &)> cb) const;
+      void visit_all_edges(std::function<void (const DAGEdge &)> cb) const;
 
       /**
        * @brief A utility function used with \ref clone to preserve
        *        connections.
        *
-       * A utility member function of \ref dag_vertex that is to be used with
-       * the member function of \ref dag_vertex, \ref clone to make it
+       * A utility member function of \ref DAGVertex that is to be used with
+       * the member function of \ref DAGVertex, \ref clone to make it
        * possible for user's code to preserve connections after a \ref clone.
        * To restablish the connections the user would call the member function
        * \ref restablish_connections with the return value.
        *
-       * @return A \ref std::vector<\ref dag_vertex_connections> of the
-       *         \ref dag_edge (s) and their associate \ref dag_vertex. 
+       * @return A \ref std::vector<\ref DAGVertex_connections> of the
+       *         \ref DAGEdge (s) and their associate \ref DAGVertex. 
        */
-      std::vector<dag_vertex_connection> clone_all_connections();
+      std::vector<DAGVertex_connection> clone_all_connections();
 
       /**
-       * @brief A utility function to see if any \ref dag_edges point to this.
+       * @brief A utility function to see if any \ref DAGEdges point to this.
        *
-       * A utility member function of \ref dag_vertex that returns a boolean
-       * value of \ref true if any \ref dag_edge (s) point at \ref this.
+       * A utility member function of \ref DAGVertex that returns a boolean
+       * value of \ref true if any \ref DAGEdge (s) point at \ref this.
        *
-       * @return true if \ref dag_edge::connect_to was called with \ref this
+       * @return true if \ref DAGEdge::connect_to was called with \ref this
        *         provided as the ref counted object proveded as an argument to
-       *         the aforementioned function of \ref dag_edge. If the
+       *         the aforementioned function of \ref DAGEdge. If the
        *         contrary, then \ref false is returned. 
        */
       bool has_incomming_edges() const;
 
       /**
-       * @brief A utility function used to get the number of \ref dag_edge (s)
+       * @brief A utility function used to get the number of \ref DAGEdge (s)
        *        that point at this.
        *
-       * A utility function of \ref dag_vertex that returns a positive integer
-       * for the number of \ref dag_edge (s) that point at \ref this.
+       * A utility function of \ref DAGVertex that returns a positive integer
+       * for the number of \ref DAGEdge (s) that point at \ref this.
        *
        * @return A positive integer that represents the number of
-       *         \ref dag_edge (s) that point at this. 
+       *         \ref DAGEdge (s) that point at this. 
        */
       std::size_t incomming_edge_count() const;
 
       /**
        * @brief A getter for the unique id owned by a instance of
-       *        \ref dag_edge.
+       *        \ref DAGEdge.
        *
-       * A member getter function for \ref dag_vertex for the unique id owned
-       * by a instance or any clone of that instance of a \ref dag_edge.
+       * A member getter function for \ref DAGVertex for the unique id owned
+       * by a instance or any clone of that instance of a \ref DAGEdge.
        *
        * @return A \ref uuid owned by the instance of \ref this. 
        */
-      const uuid &get_uuid() const;
+      const UUID &get_uuid() const;
 
       //*! TODO (mhoggan): Add doc string.
-      const status &current_status() const;
+      const Status &current_status() const;
 
       //*! TODO (mhoggan): Add doc string.
       std::string current_status_as_string() const;
 
       /**
-       * @brief A getter for the label used to visualize a \ref dag_vertex.
+       * @brief A getter for the label used to visualize a \ref DAGVertex.
        *
-       * A member getter function for \ref dag_vertex for the label that
-       * helps identify a instance of \ref dag_vertex. Note that it is not
+       * A member getter function for \ref DAGVertex for the label that
+       * helps identify a instance of \ref DAGVertex. Note that it is not
        * guaranteed to be unique.
        *
        * @return A string representation of that label. 
@@ -297,79 +297,79 @@ namespace com
       const std::string &label() const;
 
       /**
-       * @brief A getter for the task assigned to this \ref dag_vertex.
+       * @brief A getter for the Task assigned to this \ref DAGVertex.
        *
-       * @return The task held by this vertex.
+       * @return The Task held by this vertex.
        */
-      std::unique_ptr<task> &get_task();
+      std::unique_ptr<Task> &get_task();
 
     public:
       /**
-       * @brief A stream operator for writting a \ref dag_vertex to a stream.
+       * @brief A stream operator for writting a \ref DAGVertex to a stream.
        *
        * @param[out] out The stream to write \p v to.
-       * @param[in] v The \ref dag_vertex to write it \p out.
+       * @param[in] v The \ref DAGVertex to write it \p out.
        *
        * @return A reference to \p out after it was streamed to.
        */
       friend std::ostream &operator<<(std::ostream &out,
-        const dag_vertex &v);
+        const DAGVertex &v);
 
       /**
        * @brief Comparison operator to compare equivalence of two
-       *        \ref dag_vertex(s).
+       *        \ref DAGVertex(s).
        *
-       * Two \ref dag_vertexe (s) are considered equivalent if:
+       * Two \ref DAGVertexe (s) are considered equivalent if:
        *   * First their uuid (s) are equivalent.
        *   * Second ther label (s) are equivalent.
        *   * Third their edge counts are equivalnet.
        *   * Fourth their incomming edge counts are equivalent.
        *   * Fith their status' are the same.
        *
-       * @param[in] lhs The \ref dag_vertex on the left hand side of the '=='.
-       * @param[in] rhs The \ref dag_vertex on the right hand side of the
+       * @param[in] lhs The \ref DAGVertex on the left hand side of the '=='.
+       * @param[in] rhs The \ref DAGVertex on the right hand side of the
        *                '=='.
        *
        * @return true if \p lhs == \p rhs.
        */
-      friend bool operator==(const dag_vertex &lhs, const dag_vertex &rhs);
+      friend bool operator==(const DAGVertex &lhs, const DAGVertex &rhs);
 
       /**
        * @brief Comparison operator to compare non equivalence of two
-       *        \ref dag_vertex(s).
+       *        \ref DAGVertex(s).
        *
-       * Two \ref dag_vertexe (s) are considered equivalent if:
+       * Two \ref DAGVertexe (s) are considered equivalent if:
        *   * First their uuid (s) are equivalent.
        *   * Second ther label (s) are equivalent.
        *   * Third their edge counts are equivalnet.
        *   * Fourth their incomming edge counts are equivalent.
        *   * Fith their status' are the same.
        *
-       * @param[in] lhs The \ref dag_vertex on the left hand side of the '!='.
-       * @param[in] rhs The \ref dag_vertex on the right hand side of the
+       * @param[in] lhs The \ref DAGVertex on the left hand side of the '!='.
+       * @param[in] rhs The \ref DAGVertex on the right hand side of the
        *                '!='.
        *
        * @return true if \p lhs != \p rhs.
        */
-      friend bool operator!=(const dag_vertex &lhs, const dag_vertex &rhs);
+      friend bool operator!=(const DAGVertex &lhs, const DAGVertex &rhs);
 
     protected:
       void add_incomming_edge();
       void sub_incomming_edge();
       void clear_edges();
       void reset_incomming_edge_count();
-      const dag_edge &get_edge_at(std::size_t i) const;
+      const DAGEdge &get_edge_at(std::size_t i) const;
 
-      dag_vertex(const dag_vertex &other);
-      dag_vertex &operator=(const dag_vertex &rhs);
+      DAGVertex(const DAGVertex &other);
+      DAGVertex &operator=(const DAGVertex &rhs);
 
     private:
-      class uuid uuid_;
-      status current_status_;
+      class UUID uuid_;
+      Status current_status_;
       std::string label_;
-      std::vector<std::unique_ptr<dag_edge>> edges_;
+      std::vector<std::unique_ptr<DAGEdge>> edges_;
       std::atomic<std::size_t> incomming_edge_count_;
-      std::unique_ptr<task> task_;
+      std::unique_ptr<Task> task_;
 
     private:
       FRIEND_TEST(TestDagVertex, connect_and_contains_connection);

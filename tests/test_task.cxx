@@ -13,11 +13,11 @@ namespace com
   {
     class TestTask :
       public ::testing::Test,
-      public logged_class<TestTask>
+      public LoggedClass<TestTask>
     {
     public:
       TestTask() :
-        logged_class<TestTask>(*this)
+        LoggedClass<TestTask>(*this)
       {}
 
     protected:
@@ -27,14 +27,14 @@ namespace com
 
     TEST_F(TestTask, default_ctor)
     {
-      std::unique_ptr<task> test(new TestTaskImpl);
+      std::unique_ptr<Task> test(new TestTaskImpl);
       EXPECT_NE(nullptr, test);
       EXPECT_EQ(test->get_uuid().as_string(), test->label());
     }
 
     TEST_F(TestTask, label_ctor)
     {
-      std::unique_ptr<task> test(new TestTaskImpl("test_label"));
+      std::unique_ptr<Task> test(new TestTaskImpl("test_label"));
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
@@ -45,7 +45,7 @@ namespace com
       std::function<void (bool)> complete_callback = [](bool status) {
         EXPECT_TRUE(status);
       };
-      std::unique_ptr<task> test(
+      std::unique_ptr<Task> test(
           new TestTaskImpl("test_label", complete_callback));
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
@@ -59,7 +59,7 @@ namespace com
       TestTaskImpl tt;
       auto expected_it = expected.begin();
       ASSERT_EQ(tt.stages_.size(), expected.size());
-      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+      bool ran_all = tt.iterate_stages([&](TaskStage &next) {
         EXPECT_EQ(*(expected_it), next.label());
         bool ran = next.run();
         ++expected_it;
@@ -71,7 +71,7 @@ namespace com
     TEST_F(TestTask, iterate_stages_fails_if_one_stage_failed)
     {
       TestTaskImpl tt;
-      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+      bool ran_all = tt.iterate_stages([&](TaskStage &next) {
         bool ran = next.run();
         return (next.label() == "B" ? false : ran);
       });
@@ -81,7 +81,7 @@ namespace com
     TEST_F(TestTask, iterate_stages_fails_if_task_killed)
     {
       TestTaskImpl tt;
-      bool ran_all = tt.iterate_stages([&](task_stage &next) {
+      bool ran_all = tt.iterate_stages([&](TaskStage &next) {
         next.end();
         bool keep_running = (next.label() == "C") ? (not tt.kill()) : true;
         return keep_running;
@@ -95,7 +95,7 @@ namespace com
       // ASSERT_DEATH(
       //   {
       //     TestTaskImpl tt;
-      //     tt.iterate_stages([&](task_stage &next) {
+      //     tt.iterate_stages([&](TaskStage &next) {
       //       next.end();
       //       TestTaskImpl destroy(std::move(tt));
       //       return true;
@@ -107,7 +107,7 @@ namespace com
       // ASSERT_DEATH(
       //   {
       //     TestTaskImpl tt;
-      //     tt.iterate_stages([&](task_stage &next) {
+      //     tt.iterate_stages([&](TaskStage &next) {
       //       next.end();
       //       TestTaskImpl destroy;
       //       destroy = std::move(tt);

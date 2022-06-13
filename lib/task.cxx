@@ -6,20 +6,20 @@ namespace com
 {
   namespace dag_scheduler
   {
-    task::task() :
+    Task::Task() :
       iterating_(false),
       kill_(false)
     {
       label_ = uuid_.as_string();
     }
 
-    task::task(std::vector<std::unique_ptr<task_stage>> &stages) :
-      task(stages, "")
+    Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages) :
+      Task(stages, "")
     {
       label_ = uuid_.as_string();
     }
 
-    task::task(std::vector<std::unique_ptr<task_stage>> &stages,
+    Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages,
       const std::string &label) :
       iterating_(false),
       kill_(false),
@@ -27,7 +27,7 @@ namespace com
       label_(label)
     {}
 
-    task::task(std::vector<std::unique_ptr<task_stage>> &stages,
+    Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages,
       const std::string &label,
       std::function<void (bool)> complete_callback) :
       iterating_(false),
@@ -37,10 +37,10 @@ namespace com
       complete_callback_(complete_callback)
     {}
 
-    task::~task()
+    Task::~Task()
     {}
 
-    task::task(task &&other) :
+    Task::Task(Task &&other) :
       iterating_(false),
       kill_(false),
       stages_(std::move(other.stages_)),
@@ -51,7 +51,7 @@ namespace com
         "task");
     }
 
-    task &task::operator=(task &&other)
+    Task &Task::operator=(Task &&other)
     {
       assert(not other.iterating_.load() && "You cannot move an itterating"
         "task");
@@ -65,18 +65,18 @@ namespace com
       return (*this);
     }
 
-    const std::string &task::label() const
+    const std::string &Task::label() const
     {
       return label_;
     }
 
-    const uuid &task::get_uuid() const
+    const UUID &Task::get_uuid() const
     {
       return uuid_;
     }
 
-    bool task::iterate_stages(
-      const std::function<bool(task_stage &)> &next_stage)
+    bool Task::iterate_stages(
+      const std::function<bool(TaskStage &)> &next_stage)
     {
       bool ran_all = false;
 
@@ -84,7 +84,7 @@ namespace com
         iterating_.store(true);
         {
           ran_all = std::all_of(stages_.begin(), stages_.end(),
-            [&](class std::unique_ptr<task_stage> &next) {
+            [&](class std::unique_ptr<TaskStage> &next) {
               bool ran = next_stage(*next);
               next->cleanup();
               bool ret = (ran && next->end() && (not kill_.load()));
@@ -97,51 +97,51 @@ namespace com
       return ran_all;
     }
 
-    bool task::kill()
+    bool Task::kill()
     {
       kill_.store(true);
       return kill_.load();
     }
 
-    void task::complete(bool status)
+    void Task::complete(bool status)
     {
       if (complete_callback_) {
         complete_callback_(status);
       }
     }
 
-    bool operator==(const task &lhs, const task &rhs)
+    bool operator==(const Task &lhs, const Task &rhs)
     {
       return lhs.uuid_ == rhs.uuid_;
     }
 
-    bool operator!=(const task &lhs, const task &rhs)
+    bool operator!=(const Task &lhs, const Task &rhs)
     {
       return !(lhs == rhs);
     }
 
-    std::ostream &operator<<(std::ostream &out, const task &t)
+    std::ostream &operator<<(std::ostream &out, const Task &t)
     {
       out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }
       std::for_each(t.stages_.begin(), t.stages_.end(),
-        [&](const std::unique_ptr<task_stage> &s) {
+        [&](const std::unique_ptr<TaskStage> &s) {
           out << (*s) << " ";
         });
 
       return out;
     }
 
-    std::stringstream &operator<<(std::stringstream &out, const task &t)
+    std::stringstream &operator<<(std::stringstream &out, const Task &t)
     {
       out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
         out << " uuid = " << t.uuid_;
       }
       std::for_each(t.stages_.begin(), t.stages_.end(),
-        [&](const std::unique_ptr<task_stage> &s) {
+        [&](const std::unique_ptr<TaskStage> &s) {
           out << (*s) << " ";
         });
 

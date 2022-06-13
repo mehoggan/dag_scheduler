@@ -15,34 +15,34 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class concurrent_task_queue
+    class ConcurrentTaskQueue
     {
     private:
       struct queue_not_empty
       {
       public:
-        queue_not_empty(const std::deque<std::unique_ptr<task>>& queue);
+        queue_not_empty(const std::deque<std::unique_ptr<Task>>& queue);
 
         bool operator()() const;
 
       private:
-        const std::deque<std::unique_ptr<task>>& queue_;
+        const std::deque<std::unique_ptr<Task>>& queue_;
       };
 
     public:
       /**
        * @brief Default ctor.
        */
-      concurrent_task_queue();
+      ConcurrentTaskQueue();
 
-      concurrent_task_queue(const concurrent_task_queue &) = delete;
+      ConcurrentTaskQueue(const ConcurrentTaskQueue &) = delete;
 
-      concurrent_task_queue &operator=(const concurrent_task_queue &) =
+      ConcurrentTaskQueue &operator=(const ConcurrentTaskQueue &) =
         delete;
 
-      concurrent_task_queue(concurrent_task_queue &&) = delete;
+      ConcurrentTaskQueue(ConcurrentTaskQueue &&) = delete;
 
-      concurrent_task_queue &operator=(concurrent_task_queue &&) = delete;
+      ConcurrentTaskQueue &operator=(ConcurrentTaskQueue &&) = delete;
 
       /**
        * @brief A function to check how many items are on the queue.
@@ -59,17 +59,17 @@ namespace com
       /**
        * @brief A function that pushes a generic type onto the queue.
        *
-       * A member function of \ref concurrent_task_queue<task> that pushes
+       * A member function of \ref ConcurrentTaskQueue<Task> that pushes
        * a instance of \ref task onto the queue FIFO thread safe manner.
        *
        * @param[in] data The \ref task to push onto the queue.
        */
-      void push(std::unique_ptr<task> &&data);
+      void push(std::unique_ptr<Task> &&data);
 
       /**
        * @brief A function that checks to see if the queue has data in it.
        *
-       * A member function of \ref concurrent_task_queue<task> that checks
+       * A member function of \ref ConcurrentTaskQueue<Task> that checks
        * to see if the queue has data in it.
        *
        * WARNING: The accuracy of this function only applies to the exact
@@ -83,7 +83,7 @@ namespace com
       /**
        * @brief A function that empties the contents of the queue.
        *
-       * A member function of \ref concurrent_task_queue<task> removes all
+       * A member function of \ref ConcurrentTaskQueue<Task> removes all
        * data from the queue in thread safe manner.
        */
       void clear();
@@ -92,9 +92,9 @@ namespace com
        * @brief A function that removes \ref task from queue if it is not
        *        empty.
        *
-       * A member function of \ref concurrent_task_queue<task> that attempts
+       * A member function of \ref ConcurrentTaskQueue<Task> that attempts
        * to remove a \ref task from the queue if it is not empty. If the
-       * \ref concurrent_task_queue<task> is not empty the item is removed
+       * \ref ConcurrentTaskQueue<Task> is not empty the item is removed
        * and returned.
        *
        * @param[out] popped_value The \ref task to assign to if queue is
@@ -102,15 +102,15 @@ namespace com
        *
        * @return True if queue was not empty and item was removed. 
        */
-      bool try_pop(std::unique_ptr<task> &popped_value);
+      bool try_pop(std::unique_ptr<Task> &popped_value);
 
       /**
        * @brief A function that removes \ref task from queue if it is not
        *        empty
        *
-       * A member function of \ref concurrent_task_queue<task> that attempts
+       * A member function of \ref ConcurrentTaskQueue<Task> that attempts
        * to remove a \ref task from the queue if it is not empty. If the
-       * \ref concurrent_task_queue<task> is not empty the item is removed
+       * \ref ConcurrentTaskQueue<Task> is not empty the item is removed
        * and returned based on if there are items on the queue.
        *
        * WARNING: Will block indefinetly or until the underlying mutex is lost
@@ -118,15 +118,15 @@ namespace com
        * @return popped_value The \ref task to assign to if queue is
        *                      NOT empty.
        */
-      std::unique_ptr<task> wait_and_pop();
+      std::unique_ptr<Task> wait_and_pop();
 
       /**
        * @brief A function that removes \ref task from queue if it is not
        *        empty
        *
-       * A member function of \ref concurrent_task_queue<task> that attempts
+       * A member function of \ref ConcurrentTaskQueue<Task> that attempts
        * to remove a \ref task from the queue if it is not empty. If the
-       * \ref concurrent_task_queue<task> is not empty the item is removed
+       * \ref ConcurrentTaskQueue<Task> is not empty the item is removed
        * and returned based on if there are items on the queue.
        *
        * Used to deal with the Lost Wake Up Problem (Antonym of Spurious
@@ -144,7 +144,7 @@ namespace com
        * @return "true" if queue was not empty and item was removed.
        */
       template <typename Rep, typename Period>
-      bool wait_for_and_pop(std::unique_ptr<task> &popped_value,
+      bool wait_for_and_pop(std::unique_ptr<Task> &popped_value,
         const std::chrono::duration<Rep, Period> &wait_duration)
       {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -161,7 +161,7 @@ namespace com
       /**
        * @brief A function to remove an item from the queue.
        *
-       * A member function of \ref concurrent_task_queue<task> that attempts
+       * A member function of \ref ConcurrentTaskQueue<Task> that attempts
        * to remove a defined item from anywhere in the queue. If the user calls
        * this that task will be removed permenantly from the queue and not
        * returned
@@ -173,11 +173,11 @@ namespace com
        *
        * @return "true" if item was found and removed, false otherwise.
        */
-      void remove_task_from_queue(const uuid &to_remove,
-        std::unique_ptr<task> &ret_ptr);
+      void remove_task_from_queue(const UUID &to_remove,
+        std::unique_ptr<Task> &ret_ptr);
 
     private:
-       std::deque<std::unique_ptr<task>> queue_;
+       std::deque<std::unique_ptr<Task>> queue_;
        mutable std::mutex mutex_;
        std::condition_variable condition_variable_;
     };

@@ -12,62 +12,62 @@ namespace com
 {
   namespace dag_scheduler
   {
-    typedef std::vector<std::vector<dag_vertex>> processed_order_type;
+    typedef std::vector<std::vector<DAGVertex>> processed_order_type;
 
     /**
      * @brief Takes a dag and finds all dag_vertices with no incomming edges.
      *
-     * Takes in a dag and returns all \ref dag_vertex with no incomming
+     * Takes in a dag and returns all \ref DAGVertex with no incomming
      * \ref dag_edge (s).
      *
      * @param[in] g The \ref dag for which to apply the search.
      *
-     * @return A \ref std::vector<\ref std::shared_ptr<\ref dag_vertex>> of
-     *         all the \ref dag_vertex (s) which have no incomming edges. 
+     * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>> of
+     *         all the \ref DAGVertex (s) which have no incomming edges. 
      */
-    DLLSPEC_DAGTASKS std::vector<std::shared_ptr<dag_vertex>>
-    dag_vertices_with_no_incomming_edges(dag &g);
+    DLLSPEC_DAGTASKS std::vector<std::shared_ptr<DAGVertex>>
+    dag_vertices_with_no_incomming_edges(DAG &g);
 
     /**
-     * @brief Takes a dag and returns a list of \ref dag_vertex (s) in
+     * @brief Takes a dag and returns a list of \ref DAGVertex (s) in
      *        "order".
      *
      * A function that takes in a dag and returns a ordering of a directed
      * graph is a linear ordering of its vertices such that for every directed
-     * \ref dag_edge uv from \ref dag_vertex u to \ref dag_vertex v, u comes
+     * \ref dag_edge uv from \ref DAGVertex u to \ref DAGVertex v, u comes
      * before v in the ordering
      *
      * @param[in] g The \ref dag to sort.
-     * @param[out] sorted_vertices The topological sorted \ref dag_vertex
+     * @param[out] sorted_vertices The topological sorted \ref DAGVertex
      *                             from \ref g.
      *
      * @return true \ref dag has a cycle, false otherwise. 
      */
-    DLLSPEC_DAGTASKS bool dag_topological_sort(dag &g,
-      std::list<dag_vertex> &sorted_vertices);
+    DLLSPEC_DAGTASKS bool dag_topological_sort(DAG &g,
+      std::list<DAGVertex> &sorted_vertices);
 
     /**
-     * @brief Takes a dag and processes in parallel all \ref dag_vertex that
-     *        can be grouped by checking for all \ref dag_vertex with no
+     * @brief Takes a dag and processes in parallel all \ref DAGVertex that
+     *        can be grouped by checking for all \ref DAGVertex with no
      *        incomming dag_edge (s). Subsequently it removes them and
-     *        continues on until not \ref dag_vertex (s) are left in \ref g.
+     *        continues on until not \ref DAGVertex (s) are left in \ref g.
      *
-     * Takes a dag and process in parallel all \ref dag_vertex that can
-     * be grouped by checking for all \ref dag_vertex with no incomming
+     * Takes a dag and process in parallel all \ref DAGVertex that can
+     * be grouped by checking for all \ref DAGVertex with no incomming
      * \ref dag_edge (s). Subsequently it removes them and continues on
-     * until not \ref dag_vertex (s) are left in \ref g.
+     * until not \ref DAGVertex (s) are left in \ref g.
      *
      * @param[in] g The \ref dag to sort.
-     * @param[out] out A \ref std::vector<\ref std::vector<\ref dag_vertex>>
+     * @param[out] out A \ref std::vector<\ref std::vector<\ref DAGVertex>>
      *                 which is an orderd set of collections that contain
-     *                 a set of \ref dag_vertex which represents batches
-     *                 of \ref dag_vertex (s) processed.
+     *                 a set of \ref DAGVertex which represents batches
+     *                 of \ref DAGVertex (s) processed.
      *
-     * @return False if \ref g could not have all \ref dag_vertex (s)
+     * @return False if \ref g could not have all \ref DAGVertex (s)
      *         visited. 
      */
-    DLLSPEC_DAGTASKS bool process_dag(dag &g, processed_order_type &out,
-      task_scheduler &scheduler);
+    DLLSPEC_DAGTASKS bool process_dag(DAG &g, processed_order_type &out,
+      TaskScheduler &scheduler);
   }
 }
 

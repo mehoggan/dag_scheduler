@@ -13,34 +13,34 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class https_session :
-      public logged_class<https_session>,
-      public std::enable_shared_from_this<https_session>
+    class HTTPSSession :
+      public LoggedClass<HTTPSSession>,
+      public std::enable_shared_from_this<HTTPSSession>
       {
       private:
         friend class https_listener;
 
       private:
         class session_responder :
-          public responder
+          public Responder
         {
         public:
-          explicit session_responder(https_session& self);
+          explicit session_responder(HTTPSSession& self);
 
           virtual void send(StringMessageType &&) override;
           virtual void send(EmptyMessageType &&) override;
 
         private:
-          https_session& self_;
+          HTTPSSession& self_;
         };
 
       public:
-        https_session(
+        HTTPSSession(
           boost::asio::ip::tcp::socket&& socket,
           boost::asio::ssl::context& ctx,
           const std::shared_ptr<const std::string>& doc_root,
-          workflow_service::https_listener& owner,
-          workflow_service::router& router_);
+          WorkflowService::https_listener& owner,
+          WorkflowService::router& router_);
 
         void run();
 
@@ -58,11 +58,11 @@ namespace com
         boost::beast::ssl_stream<boost::beast::tcp_stream> stream_;
         boost::beast::flat_buffer buffer_;
         std::shared_ptr<std::string const> doc_root_;
-        endpoint_handler::StringRequestType req_;
+        EndpointHandler::StringRequestType req_;
         std::shared_ptr<void> res_;
-        std::unique_ptr<responder> responder_;
-        workflow_service::https_listener&  owner_;
-        workflow_service::router& router_;
+        std::unique_ptr<Responder> responder_;
+        WorkflowService::https_listener&  owner_;
+        WorkflowService::router& router_;
     };
   }
 }
