@@ -19,40 +19,40 @@ namespace com
      * @tparam DerivedType Used in RTTI for an instance of \tref DerivedType.
      */
     template <typename DerivedType>
-    class logged_class
+    class LoggedClass
     {
     public:
       /**
        * @brief ctor
        *
        * @param[in] d An instance of \tref DerivedType used to generate a
-       *              \ref log_tag.
+       *              \ref LogTag.
        * @param[in] cout_level The level at which to log to std::cout.
        * @param[in] cerr_level The level at which to log to std::cerr.
        */
-      explicit logged_class(const DerivedType &d,
+      explicit LoggedClass(const DerivedType &d,
         boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
         boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR) :
-        LOG_TAG(logging::log_tag_for_this(d))
+        LOG_TAG(Logging::LogTag_for_this(d))
       {
-        logging::add_std_cout_logger(LOG_TAG, cout_level);
-        logging::add_std_cerr_logger(LOG_TAG, cerr_level);
+        Logging::add_std_cout_logger(LOG_TAG, cout_level);
+        Logging::add_std_cerr_logger(LOG_TAG, cerr_level);
       }
 
       /**
        * @brief dtor
        */
-      virtual ~logged_class()
+      virtual ~LoggedClass()
       {}
 
     protected:
-      log_tag LOG_TAG;
+      LogTag LOG_TAG;
 
     private:
-      logged_class(const logged_class &other) = delete;
-      logged_class &operator=(const logged_class &rhs) = delete;
-      logged_class(logged_class &&rhs) = delete;
-      logged_class &operator=(logged_class &&rhs) = delete;
+      LoggedClass(const LoggedClass &other) = delete;
+      LoggedClass &operator=(const LoggedClass &rhs) = delete;
+      LoggedClass(LoggedClass &&rhs) = delete;
+      LoggedClass &operator=(LoggedClass &&rhs) = delete;
     };
   }
 }

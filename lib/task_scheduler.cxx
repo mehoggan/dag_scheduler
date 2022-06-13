@@ -9,18 +9,18 @@ namespace com
 {
   namespace dag_scheduler
   {
-    task_scheduler::task_scheduler() :
-      logged_class<task_scheduler>(*this),
+    TaskScheduler::TaskScheduler() :
+      LoggedClass<TaskScheduler>(*this),
       pause_(true),
       kill_(true)
     {
       for (std::uint8_t id = 0; id < thread_pool_.size(); ++id) {
         thread_pool_[id].reset(
-            new interruptible_task_thread(log_tag(std::to_string(id))));
+            new InterruptibleTaskThread(LogTag(std::to_string(id))));
       }
     }
 
-    bool task_scheduler::startup()
+    bool TaskScheduler::startup()
     {
       pause_.store(false);
       kill_.store(false);
@@ -29,10 +29,10 @@ namespace com
         bool should_get_next = !(
           kill_.load() || pause_.load());
         if (should_get_next) {
-          std::unique_ptr<task> next_task = nullptr;
+          std::unique_ptr<Task> next_task = nullptr;
           queue_.wait_for_and_pop(next_task, refresh_time);
           if (next_task) {
-            logging::info(LOG_TAG, "next task =", (*next_task));
+            Logging::info(LOG_TAG, "next task =", (*next_task));
             while (true) {
               if (kill_.load()) {
                 if (next_task) {
@@ -67,50 +67,50 @@ namespace com
       return true;
     }
 
-    void task_scheduler::queue_task(std::unique_ptr<task> &&t)
+    void TaskScheduler::queue_task(std::unique_ptr<Task> &&t)
     {
       queue_.push(std::move(t));
     }
 
-    bool task_scheduler::kill_task(const task &t)
+    bool TaskScheduler::kill_task(const Task &t)
     {
       return kill_task(t.get_uuid());
     }
 
-    bool task_scheduler::kill_task(const uuid &u)
+    bool TaskScheduler::kill_task(const UUID &u)
     {
-      std::unique_ptr<task> to_kill;
+      std::unique_ptr<Task> to_kill;
       queue_.remove_task_from_queue(u, to_kill);
       return true;;
     }
 
-    void task_scheduler::pause()
+    void TaskScheduler::pause()
     {
       pause_.store(true);
     }
 
-    void task_scheduler::resume()
+    void TaskScheduler::resume()
     {
       pause_.store(false);
     }
 
-    bool task_scheduler::is_paused()
+    bool TaskScheduler::is_paused()
     {
       return pause_.load();
     }
 
-    void task_scheduler::shutdown()
+    void TaskScheduler::shutdown()
     {
       pause();
       kill_.store(true);
     }
 
-    bool task_scheduler::is_shutdown()
+    bool TaskScheduler::is_shutdown()
     {
       return kill_.load();
     }
 
-    std::size_t task_scheduler::first_unused_thread()
+    std::size_t TaskScheduler::first_unused_thread()
     {
       std::lock_guard<std::mutex> lock(thread_pool_lock_);
       std::size_t first_unused_index = static_cast<std::size_t>(-1);

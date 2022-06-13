@@ -14,11 +14,11 @@ namespace com
   {
     class TestConcurrentTaskQueue :
       public ::testing::Test,
-      public logged_class<TestConcurrentTaskQueue>
+      public LoggedClass<TestConcurrentTaskQueue>
     {
     public:
       TestConcurrentTaskQueue() :
-        logged_class<TestConcurrentTaskQueue>(*this)
+        LoggedClass<TestConcurrentTaskQueue>(*this)
       {}
 
     protected:
@@ -29,19 +29,19 @@ namespace com
 
     TEST_F(TestConcurrentTaskQueue, test_size_when_empty)
     {
-      concurrent_task_queue empty_queue;
+      ConcurrentTaskQueue empty_queue;
       EXPECT_EQ(0u, empty_queue.size());
     }
 
     TEST_F(TestConcurrentTaskQueue, test_size_predictable_conccurent)
     {
-      concurrent_task_queue non_empty_queue;
-      std::unique_ptr<task> task_ptr(new task);
+      ConcurrentTaskQueue non_empty_queue;
+      std::unique_ptr<Task> task_ptr(new Task);
       non_empty_queue.push(std::move(task_ptr));
       EXPECT_EQ(1u, non_empty_queue.size());
 
       std::thread t([&]() {
-        std::unique_ptr<task> task_ptr(new task);
+        std::unique_ptr<Task> task_ptr(new Task);
         non_empty_queue.push(std::move(task_ptr));
       });
 
@@ -51,33 +51,33 @@ namespace com
 
     TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data)
     {
-      concurrent_task_queue queue;
+      ConcurrentTaskQueue queue;
 
       std::vector<std::string> uuids;
       std::thread t([&]() {
         for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-          std::vector<std::unique_ptr<task_stage>> stages;
-          std::unique_ptr<task> task_ptr(new task(stages, std::to_string(i)));
+          std::vector<std::unique_ptr<TaskStage>> stages;
+          std::unique_ptr<Task> task_ptr(new Task(stages, std::to_string(i)));
           uuids.push_back(task_ptr->get_uuid().as_string());
           queue.push(std::move(task_ptr));
         }
       });
 
       t.join();
-      std::unique_ptr<task> j;
+      std::unique_ptr<Task> j;
       ASSERT_TRUE(queue.try_pop(j));
       EXPECT_EQ(uuids[0], j->get_uuid().as_string());
     }
 
     TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data)
     {
-      concurrent_task_queue queue;
+      ConcurrentTaskQueue queue;
 
       std::vector<std::string> uuids;
       std::thread t([&]() {
         for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-          std::vector<std::unique_ptr<task_stage>> stages;
-          std::unique_ptr<task> task_ptr(new task(stages, std::to_string(i)));
+          std::vector<std::unique_ptr<TaskStage>> stages;
+          std::unique_ptr<Task> task_ptr(new Task(stages, std::to_string(i)));
           ASSERT_TRUE(task_ptr.get() != nullptr);
           auto uuid_str = task_ptr->get_uuid().as_string();
           uuids.push_back(uuid_str);
@@ -85,7 +85,7 @@ namespace com
         }
       });
 
-      std::unique_ptr<task> j;
+      std::unique_ptr<Task> j;
       bool found = queue.wait_for_and_pop(j, std::chrono::seconds(8));
       ASSERT_TRUE(j != nullptr);
       ASSERT_TRUE(found);
@@ -96,9 +96,9 @@ namespace com
 
     TEST_F(TestConcurrentTaskQueue, test_empty)
     {
-      concurrent_task_queue queue;
+      ConcurrentTaskQueue queue;
       EXPECT_TRUE(queue.empty());
-      std::unique_ptr<task> task_ptr(new task);
+      std::unique_ptr<Task> task_ptr(new Task);
       queue.push(std::move(task_ptr));
       EXPECT_FALSE(queue.empty());
       queue.clear();
@@ -107,11 +107,11 @@ namespace com
 
     TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue)
     {
-      concurrent_task_queue queue;
-      std::unique_ptr<task> task_ptr(new task);
-      const uuid &ref = task_ptr->get_uuid();
+      ConcurrentTaskQueue queue;
+      std::unique_ptr<Task> task_ptr(new Task);
+      const UUID &ref = task_ptr->get_uuid();
       queue.push(std::move(task_ptr));
-      std::unique_ptr<task> removed;
+      std::unique_ptr<Task> removed;
       queue.remove_task_from_queue(ref, removed);
       ASSERT_TRUE(removed != nullptr);
       EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string());
@@ -120,23 +120,23 @@ namespace com
 
     TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok)
     {
-      concurrent_task_queue queue;
+      ConcurrentTaskQueue queue;
 
-      std::unique_ptr<task> task_ptr(new task);
-      const uuid &ref = task_ptr->get_uuid();
+      std::unique_ptr<Task> task_ptr(new Task);
+      const UUID &ref = task_ptr->get_uuid();
       queue.push(std::move(task_ptr));
 
-      std::unique_ptr<task> task_ptr_remains(new task);
-      const uuid &ref_remains = task_ptr_remains->get_uuid();
+      std::unique_ptr<Task> task_ptr_remains(new Task);
+      const UUID &ref_remains = task_ptr_remains->get_uuid();
       queue.push(std::move(task_ptr_remains));
 
-      std::unique_ptr<task> removed;
+      std::unique_ptr<Task> removed;
       queue.remove_task_from_queue(ref, removed);
       ASSERT_TRUE(removed != nullptr);
       EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string()); 
       EXPECT_FALSE(queue.empty());
 
-      std::unique_ptr<task> remains_check;
+      std::unique_ptr<Task> remains_check;
       queue.try_pop(remains_check);
       EXPECT_EQ(ref_remains.as_string(),
         remains_check->get_uuid().as_string());

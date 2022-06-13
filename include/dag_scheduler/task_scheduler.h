@@ -17,15 +17,15 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS task_scheduler :
-      public logged_class<task_scheduler>,
+    class DLLSPEC_DAGTASKS TaskScheduler :
+      public LoggedClass<TaskScheduler>,
       public boost::noncopyable
     {
     public:
       /**
        * @brief 
        */
-      task_scheduler();
+      TaskScheduler();
 
       /**
        * @brief 
@@ -39,7 +39,7 @@ namespace com
        *
        * @param t
        */
-      void queue_task(std::unique_ptr<task> &&t);
+      void queue_task(std::unique_ptr<Task> &&t);
 
       /**
        * @brief 
@@ -48,7 +48,7 @@ namespace com
        *
        * @return 
        */
-      bool kill_task(const task &t);
+      bool kill_task(const Task &t);
 
       /**
        * @brief 
@@ -57,7 +57,7 @@ namespace com
        *
        * @return 
        */
-      bool kill_task(const uuid &u);
+      bool kill_task(const UUID &u);
 
       /**
        * @brief 
@@ -92,10 +92,10 @@ namespace com
       std::size_t first_unused_thread();
 
     private:
-      concurrent_task_queue queue_;
+      ConcurrentTaskQueue queue_;
       volatile std::atomic_bool pause_;
       volatile std::atomic_bool kill_;
-      std::array<std::unique_ptr<interruptible_task_thread>, 10> thread_pool_;
+      std::array<std::unique_ptr<InterruptibleTaskThread>, 10> thread_pool_;
       std::mutex thread_pool_lock_;
     };
   }

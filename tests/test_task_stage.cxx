@@ -13,11 +13,11 @@ namespace com
   {
     class TestTaskStage :
       public ::testing::Test,
-      public logged_class<TestTaskStage>
+      public LoggedClass<TestTaskStage>
     {
     public:
       TestTaskStage() :
-        logged_class<TestTaskStage>(*this)
+        LoggedClass<TestTaskStage>(*this)
       {}
 
     protected:
@@ -27,14 +27,14 @@ namespace com
 
     TEST_F(TestTaskStage, default_ctor)
     {
-      std::unique_ptr<task_stage> test(new TestTaskStageImpl);
+      std::unique_ptr<TaskStage> test(new TestTaskStageImpl);
       EXPECT_NE(nullptr, test);
       EXPECT_EQ(test->get_uuid().as_string(), test->label());
     }
 
     TEST_F(TestTaskStage, label_ctor)
     {
-      std::unique_ptr<task_stage> test(new TestTaskStageImpl("test_label"));
+      std::unique_ptr<TaskStage> test(new TestTaskStageImpl("test_label"));
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
@@ -45,7 +45,7 @@ namespace com
       TestTaskStageImpl tt;
       EXPECT_TRUE(tt.run());
 
-      std::unique_ptr<task_stage> tt_ptr(new TestTaskStageImpl);
+      std::unique_ptr<TaskStage> tt_ptr(new TestTaskStageImpl);
       EXPECT_TRUE(tt_ptr->run());
     }
 
@@ -54,7 +54,7 @@ namespace com
       TestTaskStageImpl tt;
       EXPECT_TRUE(tt.end());
 
-      std::unique_ptr<task_stage> tt_ptr(new TestTaskStageImpl);
+      std::unique_ptr<TaskStage> tt_ptr(new TestTaskStageImpl);
       EXPECT_TRUE(tt_ptr->end());
       EXPECT_FALSE(tt_ptr->is_running());
       EXPECT_TRUE(tt_ptr->run());

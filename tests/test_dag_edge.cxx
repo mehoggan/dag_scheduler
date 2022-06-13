@@ -19,62 +19,62 @@ namespace com
 
     TEST_F(TestDagEdge, ctor)
     {
-      dag_edge e;
-      EXPECT_EQ(dag_edge::status::initialized, e.current_status());
+      DAGEdge e;
+      EXPECT_EQ(DAGEdge::Status::initialized, e.current_status());
       EXPECT_EQ(std::string("initialized"), e.current_status_as_string());
       EXPECT_FALSE(e.get_uuid().as_string().empty());
     }
 
     TEST_F(TestDagEdge, dtor)
     {
-      dag_edge e;
-      e.~dag_edge();
-      EXPECT_EQ(dag_edge::status::non_traverable, e.current_status());
+      DAGEdge e;
+      e.~DAGEdge();
+      EXPECT_EQ(DAGEdge::Status::non_traverable, e.current_status());
       EXPECT_FALSE(e.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e.get_connection().lock().get());
     }
 
     TEST_F(TestDagEdge, mtor)
     {
-      dag_edge e1;
-      dag_edge e2(std::move(e1));
+      DAGEdge e1;
+      DAGEdge e2(std::move(e1));
 
-      EXPECT_EQ(dag_edge::status::non_traverable, e1.current_status());
+      EXPECT_EQ(DAGEdge::Status::non_traverable, e1.current_status());
       EXPECT_FALSE(e1.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e1.get_connection().lock().get());
 
-      EXPECT_EQ(dag_edge::status::initialized, e2.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e2.current_status());
       EXPECT_TRUE(e2.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e2.get_connection().lock().get());
 
       // Test safety of move ctor by moving an object that has already been
       // moved.
-      dag_edge e3(std::move(e1));
-      EXPECT_EQ(dag_edge::status::non_traverable, e3.current_status());
+      DAGEdge e3(std::move(e1));
+      EXPECT_EQ(DAGEdge::Status::non_traverable, e3.current_status());
       EXPECT_EQ(nullptr, e3.get_connection().lock().get());
     }
 
     TEST_F(TestDagEdge, massign)
     {
-      dag_edge e1;
-      dag_edge e2;
+      DAGEdge e1;
+      DAGEdge e2;
       e2 = std::move(e1);
 
-      EXPECT_EQ(dag_edge::status::non_traverable, e1.current_status());
+      EXPECT_EQ(DAGEdge::Status::non_traverable, e1.current_status());
       EXPECT_FALSE(e1.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e1.get_connection().lock().get());
 
-      EXPECT_EQ(dag_edge::status::initialized, e2.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e2.current_status());
       EXPECT_TRUE(e2.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e2.get_connection().lock().get());
     }
 
     TEST_F(TestDagEdge, connect_and_clone)
     {
-      dag_edge e;
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
+      DAGEdge e;
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
       EXPECT_TRUE(e.connect_to(v1));
-      dag_edge clone = e.clone();
+      DAGEdge clone = e.clone();
 
       EXPECT_NE(clone.get_connection().lock(), e.get_connection().lock());
       EXPECT_NE(nullptr, e.get_connection().lock().get());
@@ -82,7 +82,7 @@ namespace com
       EXPECT_EQ(2u, e.get_connection().lock().use_count());
       EXPECT_EQ(nullptr, clone.get_connection().lock());
 
-      std::shared_ptr<dag_vertex> tmp = std::make_shared<dag_vertex>(
+      std::shared_ptr<DAGVertex> tmp = std::make_shared<DAGVertex>(
         e.get_connection().lock()->clone());
       clone.connect_to(tmp);
       std::uintptr_t clone_connect_addr = reinterpret_cast<std::uintptr_t>(
@@ -105,8 +105,8 @@ namespace com
 
     TEST_F(TestDagEdge, connect_to_null)
     {
-      dag_edge e;
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
+      DAGEdge e;
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
       EXPECT_TRUE(e.connect_to(v1));
       EXPECT_EQ(e.get_connection().lock(), v1);
       EXPECT_EQ(1ul, v1->incomming_edge_count());
@@ -118,41 +118,41 @@ namespace com
 
     TEST_F(TestDagEdge, connections)
     {
-      dag_edge e;
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
+      DAGEdge e;
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
       EXPECT_TRUE(e.connect_to(v1));
       EXPECT_TRUE(e.is_a_connection_to(*v1));
 
-      std::shared_ptr<dag_vertex> v2 = std::make_shared<dag_vertex>("ot");
+      std::shared_ptr<DAGVertex> v2 = std::make_shared<DAGVertex>("ot");
       EXPECT_FALSE(e.is_a_connection_to(*v2));
 
-      v1 = std::make_shared<dag_vertex>("from");
+      v1 = std::make_shared<DAGVertex>("from");
       EXPECT_FALSE(e.is_a_connection_to(*v1));
     }
 
     TEST_F(TestDagEdge, copy_ctor)
     {
-      dag_edge e;
-      dag_edge e_copy(e);
+      DAGEdge e;
+      DAGEdge e_copy(e);
 
-      EXPECT_EQ(dag_edge::status::initialized, e.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e.current_status());
       EXPECT_TRUE(e.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e.get_connection().lock().get());
 
-      EXPECT_EQ(dag_edge::status::initialized, e_copy.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e_copy.current_status());
       EXPECT_TRUE(e_copy.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e_copy.get_connection().lock().get());
 
       EXPECT_EQ(e, e_copy);
 
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
       EXPECT_TRUE(e.connect_to(v1));
 
       EXPECT_NE(e, e_copy);
 
-      dag_edge e_copy_post_connect(e);
-      std::shared_ptr<dag_vertex> v1_clone =
-        std::make_shared<dag_vertex>(v1->clone());
+      DAGEdge e_copy_post_connect(e);
+      std::shared_ptr<DAGVertex> v1_clone =
+        std::make_shared<DAGVertex>(v1->clone());
       EXPECT_NE(e, e_copy_post_connect);
       e_copy_post_connect.connect_to(v1_clone);
       EXPECT_EQ(e, e_copy_post_connect);
@@ -160,29 +160,29 @@ namespace com
 
     TEST_F(TestDagEdge, assignment_operator)
     {
-      dag_edge e;
-      dag_edge e_copy;
+      DAGEdge e;
+      DAGEdge e_copy;
       e_copy = e;
 
-      EXPECT_EQ(dag_edge::status::initialized, e.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e.current_status());
       EXPECT_TRUE(e.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e.get_connection().lock().get());
 
-      EXPECT_EQ(dag_edge::status::initialized, e_copy.current_status());
+      EXPECT_EQ(DAGEdge::Status::initialized, e_copy.current_status());
       EXPECT_TRUE(e_copy.get_uuid().is_initialized());
       EXPECT_EQ(nullptr, e_copy.get_connection().lock().get());
 
       EXPECT_EQ(e, e_copy);
 
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
       EXPECT_TRUE(e.connect_to(v1));
 
       EXPECT_NE(e, e_copy);
 
-      dag_edge e_copy_post_connect;
+      DAGEdge e_copy_post_connect;
       e_copy_post_connect = e;
-      std::shared_ptr<dag_vertex> v1_clone =
-        std::make_shared<dag_vertex>(v1->clone());
+      std::shared_ptr<DAGVertex> v1_clone =
+        std::make_shared<DAGVertex>(v1->clone());
       EXPECT_NE(e, e_copy_post_connect);
       e_copy_post_connect.connect_to(v1_clone);
       EXPECT_EQ(e, e_copy_post_connect);
@@ -190,8 +190,8 @@ namespace com
 
     TEST_F(TestDagEdge, equality_operators_no_connection)
     {
-      dag_edge e;
-      dag_edge e_copy = e.clone();
+      DAGEdge e;
+      DAGEdge e_copy = e.clone();
 
       EXPECT_EQ(e, e_copy);
       EXPECT_EQ(e_copy, e);
@@ -201,10 +201,10 @@ namespace com
 
     TEST_F(TestDagEdge, equality_operators_with_connection)
     {
-      dag_edge e;
-      dag_edge e_clone = e.clone();
-      std::shared_ptr<dag_vertex> v1 = std::make_shared<dag_vertex>("to");
-      std::shared_ptr<dag_vertex> v1_clone = std::make_shared<dag_vertex>(
+      DAGEdge e;
+      DAGEdge e_clone = e.clone();
+      std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
+      std::shared_ptr<DAGVertex> v1_clone = std::make_shared<DAGVertex>(
         v1->clone()
       );
       e.connect_to(v1);

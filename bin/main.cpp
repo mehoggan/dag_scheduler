@@ -42,9 +42,9 @@ int main(int argc, char* argv[])
       YAML::Node yaml_node = YAML::LoadFile(service_yaml_file);
       std::cout << "Loaded YAML file." << std::endl;
       auto ci = yaml_node.as<
-        com::dag_scheduler::workflow_service::connection_info>();
+        com::dag_scheduler::WorkflowService::ConnectionInfo>();
       std::cout << "Deserialized YAML file." << std::endl;
-      com::dag_scheduler::workflow_service ws(ci);
+      com::dag_scheduler::WorkflowService ws(ci);
     } catch (const std::exception &e) {
       std::cerr << "Error: " << e.what() << std::endl;
       ret = EXIT_FAILURE;

@@ -12,37 +12,37 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS interruptible_task_thread
+    class DLLSPEC_DAGTASKS InterruptibleTaskThread
     {
     public:
       /**
        * @brief
        */
-      interruptible_task_thread();
+      InterruptibleTaskThread();
 
       /**
        * @brief
        *
        * @param[in] tag
        */
-      explicit interruptible_task_thread(const log_tag &tag);
+      explicit InterruptibleTaskThread(const LogTag &tag);
 
       /**
        * @brief
        */
-      ~interruptible_task_thread();
+      ~InterruptibleTaskThread();
 
-      interruptible_task_thread(const interruptible_task_thread &) = delete;
+      InterruptibleTaskThread(const InterruptibleTaskThread &) = delete;
 
-      interruptible_task_thread &operator=(
-        const interruptible_task_thread &) = delete;
+      InterruptibleTaskThread &operator=(
+        const InterruptibleTaskThread &) = delete;
 
       /**
        * @brief
        *
        * @param[out] other
        */
-      interruptible_task_thread(interruptible_task_thread &&other);
+      InterruptibleTaskThread(InterruptibleTaskThread &&other);
 
       /**
        * @brief
@@ -51,7 +51,7 @@ namespace com
        *
        * @return
        */
-      interruptible_task_thread &operator=(interruptible_task_thread &&rhs);
+      InterruptibleTaskThread &operator=(InterruptibleTaskThread &&rhs);
 
       /**
        * @brief
@@ -62,7 +62,7 @@ namespace com
        *
        * @return
        */
-      bool set_task_and_run(std::unique_ptr<task> &&task);
+      bool set_task_and_run(std::unique_ptr<Task> &&task);
 
       /**
        * @brief
@@ -100,9 +100,9 @@ namespace com
       void shutdown();
 
     private:
-      std::unique_ptr<task> task_;
+      std::unique_ptr<Task> task_;
       mutable std::mutex task_lock_;
-      log_tag LOG_TAG;
+      LogTag LOG_TAG;
       volatile std::atomic_bool interrupt_;
       volatile std::atomic_bool running_;
       std::thread thread_;

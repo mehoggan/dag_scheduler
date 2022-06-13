@@ -9,7 +9,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    struct responder
+    struct Responder
     {
     public:
       typedef boost::beast::http::empty_body EmptyBodyType;
@@ -20,70 +20,70 @@ namespace com
       typedef boost::beast::http::message<false, EmptyBodyType, FieldsType>
         EmptyMessageType;
 
-      virtual ~responder();
+      virtual ~Responder();
 
       virtual void send(StringMessageType &&) = 0;
       virtual void send(EmptyMessageType &&) = 0;
     };
 
-    struct endpoint_handler
+    struct EndpointHandler
     {
     public:
       typedef boost::beast::http::string_body StringBodyType;
       typedef boost::beast::http::request<StringBodyType> StringRequestType;
 
     public:
-      endpoint_handler();
+      EndpointHandler();
 
-      explicit endpoint_handler(const boost::beast::string_view& endpoint);
+      explicit EndpointHandler(const boost::beast::string_view& endpoint);
 
-      virtual ~endpoint_handler();
-
-      virtual bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder);
+      virtual ~EndpointHandler();
 
       virtual bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) const;
+        std::unique_ptr<Responder>&& responder);
+
+      virtual bool operator()(StringRequestType&& req,
+        std::unique_ptr<Responder>&& responder) const;
 
     private:
       boost::beast::string_view endpoint_;
     };
 
-    struct doc_root_endpoint :
-      public endpoint_handler,
-      logged_class<doc_root_endpoint>
+    struct DocRootEndpoint :
+      public EndpointHandler,
+      LoggedClass<DocRootEndpoint>
     {
     public:
-      explicit doc_root_endpoint(const boost::beast::string_view& doc_root);
+      explicit DocRootEndpoint(const boost::beast::string_view& doc_root);
 
-      virtual ~doc_root_endpoint();
-
-      bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) final;
+      virtual ~DocRootEndpoint();
 
       bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) const final;
+        std::unique_ptr<Responder>&& responder) final;
+
+      bool operator()(StringRequestType&& req,
+        std::unique_ptr<Responder>&& responder) const final;
 
     private:
       bool handle_request(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) const;
+        std::unique_ptr<Responder>&& responder) const;
 
     private:
       boost::beast::string_view doc_root_;
     };
 
-    struct register_dag_endpoint :
-      public endpoint_handler,
-      logged_class<register_dag_endpoint>
+    struct RegisterDAGEndpoint :
+      public EndpointHandler,
+      LoggedClass<RegisterDAGEndpoint>
     {
     public:
-      ~register_dag_endpoint() final;
+      ~RegisterDAGEndpoint();
 
       bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) final;
+        std::unique_ptr<Responder>&& responder) final;
 
       bool operator()(StringRequestType&& req,
-        std::unique_ptr<responder>&& responder) const final;
+        std::unique_ptr<Responder>&& responder) const final;
     };
   }
 }

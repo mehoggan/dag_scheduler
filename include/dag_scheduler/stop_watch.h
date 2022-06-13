@@ -15,13 +15,13 @@ namespace com
      * @brief A class that sets up stderror and stdout loggers for a derived
      *        class.
      */
-    class stop_watch
+    class StopWatch
     {
     public:
       /**
        * @brief ctor which starts timer conditionally at construction time.
        *
-       * @param[in] tag The tag used to log the time. If the log_tag has not
+       * @param[in] tag The tag used to log the time. If the LogTag has not
        *                been added to the logger it will be as a std::cout
        *                logger.
        * @param[in] memo The note the user wants printed in the results.
@@ -29,77 +29,77 @@ namespace com
        *                                  stop watch start at construction
        *                                  time.
        */
-      stop_watch(const log_tag &tag, const std::string &memo,
+      StopWatch(const LogTag &tag, const std::string &memo,
         bool start_on_construction = true);
 
       /**
        * @brief dtor
        */
-      ~stop_watch();
+      ~StopWatch();
 
       /**
-       * @brief copy ctor for stop_watch.
+       * @brief copy ctor for StopWatch.
        *
        * The copy constructor behaves like a full reset of the
-       * \ref stop_watch in the since that in sets the current time to now
+       * \ref StopWatch in the since that in sets the current time to now
        * and puts it into a running state.
        *
        * @param other The stop watch to copy into this.
        */
-      stop_watch(const stop_watch &other);
+      StopWatch(const StopWatch &other);
 
       /**
        *
        */
       /**
-       * @brief assignement operator for stop_watch.
+       * @brief assignement operator for StopWatch.
        *
        * The assignment operator behaves like a full reset of the
-       * \ref stop_watch in the since that in sets the current time to now
+       * \ref StopWatch in the since that in sets the current time to now
        * and puts it into a running state.
        *
-       * @param[in] rh The stop_watch to copy into this.
+       * @param[in] rh The StopWatch to copy into this.
        *
        * @return A reference to (*this).
        */
-      stop_watch &operator=(const stop_watch &rhs);
+      StopWatch &operator=(const StopWatch &rhs);
 
       /**
-       * @brief move copy constructor for stop_watch
+       * @brief move copy constructor for StopWatch
        *
        * The move copy constructor behaves like a full reset of the
-       * \ref stop_watch in the since that it sets the current time to now
+       * \ref StopWatch in the since that it sets the current time to now
        * and puts it into a running state.
        *
-       * @param[out] other The stop_watch to move into this.
+       * @param[out] other The StopWatch to move into this.
        */
-      stop_watch(stop_watch &&other);
+      StopWatch(StopWatch &&other);
 
       /**
-       * @brief move assignement operator for stop_watch.
+       * @brief move assignement operator for StopWatch.
        *
        * The move assignment operator behaves like a full reset of the
        * \ref stop watch in the since that it sets the current time to now
        * and it puts it into a running state.
        *
-       * @param[out] rhs The stop_watch to move into this.
+       * @param[out] rhs The StopWatch to move into this.
        *
        * @return A reference to this.
        */
-      stop_watch &operator=(stop_watch &&rhs);
+      StopWatch &operator=(StopWatch &&rhs);
 
       /**
-       * @brief Used to start the stop_watch.
+       * @brief Used to start the StopWatch.
        *
-       * If the stop_watch is not already running the start it. Otherwise
+       * If the StopWatch is not already running the start it. Otherwise
        * ignore the request from the user.
        */
       void start();
 
       /**
-       * @brief Used to stop the stop_watch.
+       * @brief Used to stop the StopWatch.
        *
-       * If the stop_watch is not already stoped it stops it.
+       * If the StopWatch is not already stoped it stops it.
        *
        * @return The duration from the start time.
        */
@@ -114,8 +114,8 @@ namespace com
       std::chrono::nanoseconds mark();
 
       /**
-       * @brief Identical to calling \ref stop_watch::stop then
-       *        \ref stop_watch::start.
+       * @brief Identical to calling \ref StopWatch::stop then
+       *        \ref StopWatch::start.
        */
       void reset();
 
@@ -124,7 +124,7 @@ namespace com
         const std::chrono::high_resolution_clock::time_point &stop);
 
     private:
-      log_tag LOG_TAG;
+      LogTag LOG_TAG;
       std::string memo_;
       std::atomic_bool was_stopped_;
       std::atomic_bool was_started_;

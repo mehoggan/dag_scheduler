@@ -6,31 +6,31 @@ namespace com
 {
   namespace dag_scheduler
   {
-    task_stage::task_stage() :
-      task_stage("")
+    TaskStage::TaskStage() :
+      TaskStage("")
     {
       label_ = uuid_.as_string();
     }
 
-    task_stage::task_stage(const std::string &label) :
+    TaskStage::TaskStage(const std::string &label) :
       label_(label)
     {}
 
-    task_stage::~task_stage()
+    TaskStage::~TaskStage()
     {}
 
-    task_stage::task_stage(task_stage &&other) :
+    TaskStage::TaskStage(TaskStage &&other) :
       label_(std::move(other.label_)),
       uuid_(std::move(other.uuid_))
     {
       assert(not other.is_running() &&
-        "You cannot move a running task_stage");
+        "You cannot move a running TaskStage");
     }
 
-    task_stage &task_stage::operator=(task_stage &&other)
+    TaskStage &TaskStage::operator=(TaskStage &&other)
     {
       assert(not other.is_running() &&
-        "You cannot move a running task_stage");
+        "You cannot move a running TaskStage");
 
       label_ = std::move(other.label_);
       uuid_ = std::move(other.uuid_);
@@ -38,27 +38,27 @@ namespace com
       return (*this);
     }
 
-    const std::string &task_stage::label() const
+    const std::string &TaskStage::label() const
     {
       return label_;
     }
 
-    const uuid &task_stage::get_uuid() const
+    const UUID &TaskStage::get_uuid() const
     {
       return uuid_;
     }
 
-    bool operator==(const task_stage &lhs, const task_stage &rhs)
+    bool operator==(const TaskStage &lhs, const TaskStage &rhs)
     {
       return lhs.uuid_ == rhs.uuid_;
     }
 
-    bool operator!=(const task_stage &lhs, const task_stage &rhs)
+    bool operator!=(const TaskStage &lhs, const TaskStage &rhs)
     {
       return !(lhs == rhs);
     }
 
-    std::ostream &operator<<(std::ostream &out, const task_stage &t)
+    std::ostream &operator<<(std::ostream &out, const TaskStage &t)
     {
       out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {
@@ -68,7 +68,7 @@ namespace com
       return out;
     }
 
-    std::stringstream &operator<<(std::stringstream &out, const task_stage &t)
+    std::stringstream &operator<<(std::stringstream &out, const TaskStage &t)
     {
       out << "label = " << t.label_;
       if (t.label_ != t.uuid_.as_string()) {

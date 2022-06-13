@@ -21,88 +21,88 @@ namespace com
      * an item like a \ref dag or a \ref dag_vertex for the purposes of
      * mutating it while not impacting the original.
      */
-    class DLLSPEC_DAGTASKS uuid
+    class DLLSPEC_DAGTASKS UUID
     {
     public:
       /**
        * @brief ctor
        */
-      uuid();
+      UUID();
 
       /**
        * @brief dtor
        */
-      ~uuid();
+      ~UUID();
 
       /**
        * @brief move copy ctor
        *
-       * @param[out] other The \ref uuid to move into (this).
+       * @param[out] other The \ref UUID to move into (this).
        */
-      uuid(uuid &&other);
+      UUID(UUID &&other);
 
       /**
        * @brief move assignment operator.
        *
-       * @param[out] rhs The \ref uuid to move into (this).
+       * @param[out] rhs The \ref UUID to move into (this).
        *
        * @return A reference to (this) once \p rhs has been moved into it.
        */
-      uuid &operator=(uuid &&rhs);
+      UUID &operator=(UUID &&rhs);
 
       /**
-       * @brief Clones (this) into an identical \ref uuid.
+       * @brief Clones (this) into an identical \ref UUID.
        *
        * At times the client might want to mutate an object that owns
-       * a \ref uuid without mutating the original. This member function
-       * does a deep copy on the underlying data that represents a \ref uuid.
+       * a \ref UUID without mutating the original. This member function
+       * does a deep copy on the underlying data that represents a \ref UUID.
        *
-       * @return A \ref uuid that is an identical copy of this.
+       * @return A \ref UUID that is an identical copy of this.
        */
-      uuid clone();
+      UUID clone();
 
       /**
-       * @brief Used to ensure a uuid is in a valid state.
+       * @brief Used to ensure a UUID is in a valid state.
        *
-       * If a move operation is performed on a \ref uuid the underlying data
-       * is put into an invalid state for the \ref uuid that was moved into
-       * another \ref uuid.
+       * If a move operation is performed on a \ref UUID the underlying data
+       * is put into an invalid state for the \ref UUID that was moved into
+       * another \ref UUID.
        *
        * @return true if (this) was maved false otherwise.
        */
       bool is_initialized() const;
 
       /**
-       * @brief Get a string representation of a \ref uuid.
+       * @brief Get a string representation of a \ref UUID.
        *
-       * @return A string representation of the \ref uuid.
+       * @return A string representation of the \ref UUID.
        */
       std::string as_string() const;
 
       /**
-       * @brief A utility function used to write a \ref uuid to a stream.
+       * @brief A utility function used to write a \ref UUID to a stream.
        *
        * @param[out] out The stream to write \p u to.
-       * @param[in] u The \ref uuid to write to \p out.
+       * @param[in] u The \ref UUID to write to \p out.
        *
        * @return The stream \p out after \p u was written to it.
        */
-      friend std::ostream &operator<<(std::ostream &out, const uuid &u)
+      friend std::ostream &operator<<(std::ostream &out, const UUID &u)
       {
         out << u.as_string();
         return out;
       }
 
       /**
-       * @brief A utility function used to write a \ref uuid to a stream.
+       * @brief A utility function used to write a \ref UUID to a stream.
        *
        * @param[out] out The stream to write \p u to.
-       * @param[in] u The \ref uuid to write to \p out.
+       * @param[in] u The \ref UUID to write to \p out.
        *
        * @return The stream \p out after \p u was written to it.
        */
       friend std::stringstream &operator<<(std::stringstream &out,
-        const uuid &u)
+        const UUID &u)
       {
         out << u.as_string();
         return out;
@@ -111,14 +111,14 @@ namespace com
       /**
        * @brief Equality operator.
        *
-       * @param[in] lhs The \ref uuid to the left hand side of the ==.
-       * @param[in] rhs The \ref uuid to the right hand side of the ==.
+       * @param[in] lhs The \ref UUID to the left hand side of the ==.
+       * @param[in] rhs The \ref UUID to the right hand side of the ==.
        *
        * @return true if \p lhs and \p rhs are not initialized, or
        *         if the string representation of \p rhs equals that of
        *         \p rhs, false otherwise. 
        */
-      friend bool operator==(const uuid &lhs, const uuid &rhs)
+      friend bool operator==(const UUID &lhs, const UUID &rhs)
       {
         bool ret = true;
 
@@ -137,14 +137,14 @@ namespace com
       /**
        * @brief Inequality operator.
        *
-       * @param[in] lhs The \ref uuid to the left hand side of the !=.
-       * @param[in] rhs The \ref uuid to the right hand side of the !=.
+       * @param[in] lhs The \ref UUID to the left hand side of the !=.
+       * @param[in] rhs The \ref UUID to the right hand side of the !=.
        *
        * @return false if \p lhs and \p rhs are not initialized, or
        *         if the string representation of \p rhs equals that of
        *         \p rhs, true otherwise. 
        */
-      friend bool operator!=(const uuid &lhs, const uuid &rhs)
+      friend bool operator!=(const UUID &lhs, const UUID &rhs)
       {
         return !(lhs == rhs);
       }
@@ -152,8 +152,8 @@ namespace com
     private:
       uuid_t uuid_;
 
-      uuid(const uuid &other);
-      uuid &operator=(const uuid &rhs);
+      UUID(const UUID &other);
+      UUID &operator=(const UUID &rhs);
     };
   }
 }

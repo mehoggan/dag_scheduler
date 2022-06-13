@@ -28,7 +28,7 @@ namespace detail
 
   void load_server_cert(
     boost::asio::ssl::context& ctx,
-    com::dag_scheduler::log_tag& LOG_TAG);
+    com::dag_scheduler::LogTag& LOG_TAG);
 
   boost::beast::http::response<boost::beast::http::string_body>
   bad_request_handler(

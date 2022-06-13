@@ -26,11 +26,11 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS workflow_service :
-      public logged_class<workflow_service>
+    class DLLSPEC_DAGTASKS WorkflowService :
+      public LoggedClass<WorkflowService>
     {
     public:
-      struct connection_info
+      struct ConnectionInfo
       {
         std::string address_;
         std::uint32_t port_;
@@ -42,19 +42,19 @@ namespace com
       {
       public:
         bool register_endpoint(const boost::beast::string_view &endpoint,
-          std::unique_ptr<endpoint_handler> handler);
+          std::unique_ptr<EndpointHandler> handler);
 
-        std::unique_ptr<endpoint_handler>& operator[](
+        std::unique_ptr<EndpointHandler>& operator[](
           const boost::beast::string_view &endpoint);
 
       private:
         std::unordered_map<
           boost::beast::string_view,
-          std::unique_ptr<endpoint_handler>> router_;
+          std::unique_ptr<EndpointHandler>> router_;
       };
 
       class https_listener :
-        public logged_class<https_listener>,
+        public LoggedClass<https_listener>,
         public std::enable_shared_from_this<https_listener>
       {
       public:
@@ -92,7 +92,7 @@ namespace com
       /**
        * @brief default ctor
        */
-      explicit workflow_service(const connection_info& ci);
+      explicit WorkflowService(const ConnectionInfo& ci);
 
     private:
       boost::asio::io_context ioc_;
@@ -105,10 +105,10 @@ namespace com
 namespace YAML
 {
   template<>
-  struct convert<com::dag_scheduler::workflow_service::connection_info>
+  struct convert<com::dag_scheduler::WorkflowService::ConnectionInfo>
   {
     static bool decode(const Node& node,
-      com::dag_scheduler::workflow_service::connection_info &rhs)
+      com::dag_scheduler::WorkflowService::ConnectionInfo &rhs)
     {
       if (node.size() != 4) {
         return false;

@@ -6,45 +6,45 @@ namespace com
 {
   namespace dag_scheduler
   {
-    dag_edge::dag_edge() :
-      current_status_(status::initialized)
+    DAGEdge::DAGEdge() :
+      current_status_(Status::initialized)
     {}
 
-    dag_edge::~dag_edge()
+    DAGEdge::~DAGEdge()
     {
-      current_status_ = status::non_traverable;
+      current_status_ = Status::non_traverable;
       connection_.reset();
     }
 
-    dag_edge::dag_edge(dag_edge &&other)
+    DAGEdge::DAGEdge(DAGEdge &&other)
     {
       uuid_ = std::move(other.uuid_);
       current_status_ = other.current_status_;
       connection_ = std::move(other.connection_);
-      other.current_status_ = status::non_traverable;
+      other.current_status_ = Status::non_traverable;
     }
 
-    dag_edge &dag_edge::operator=(dag_edge &&rhs)
+    DAGEdge &DAGEdge::operator=(DAGEdge &&rhs)
     {
       uuid_ = std::move(rhs.uuid_);
       current_status_ = rhs.current_status_;
       connection_ = std::move(rhs.connection_);
-      rhs.current_status_ = status::non_traverable;
+      rhs.current_status_ = Status::non_traverable;
 
       return (*this);
     }
 
-    dag_edge dag_edge::clone()
+    DAGEdge DAGEdge::clone()
     {
       return (*this);
     }
 
-    std::weak_ptr<dag_vertex> dag_edge::get_connection()
+    std::weak_ptr<DAGVertex> DAGEdge::get_connection()
     {
       return connection_;
     }
 
-    bool dag_edge::connect_to(std::shared_ptr<dag_vertex> v)
+    bool DAGEdge::connect_to(std::shared_ptr<DAGVertex> v)
     {
       bool ret = true;
 
@@ -61,7 +61,7 @@ namespace com
       return ret;
     }
 
-    bool dag_edge::is_a_connection_to(const dag_vertex &v) const
+    bool DAGEdge::is_a_connection_to(const DAGVertex &v) const
     {
       bool ret = false;
 
@@ -72,30 +72,30 @@ namespace com
       return ret;
     }
 
-    const uuid &dag_edge::get_uuid() const
+    const UUID &DAGEdge::get_uuid() const
     {
       return uuid_;
     }
 
-    const dag_edge::status &dag_edge::current_status() const
+    const DAGEdge::Status &DAGEdge::current_status() const
     {
       return current_status_;
     }
 
-    std::string dag_edge::current_status_as_string() const
+    std::string DAGEdge::current_status_as_string() const
     {
       std::string ret;
 
       switch(current_status_) {
-      case status::initialized: {
+      case Status::initialized: {
         ret = "initialized";
       }
         break;
-      case status::traversed: {
+      case Status::traversed: {
         ret = "traversed";
       }
         break;
-      case status::non_traverable: {
+      case Status::non_traverable: {
         ret = "non_traverable";
       }
         break;
@@ -104,15 +104,15 @@ namespace com
       return ret;
     }
 
-    dag_edge::dag_edge(const dag_edge &other) :
-      uuid_(const_cast<dag_edge *>(&other)->uuid_.clone()),
+    DAGEdge::DAGEdge(const DAGEdge &other) :
+      uuid_(const_cast<DAGEdge *>(&other)->uuid_.clone()),
       current_status_(other.current_status()),
       connection_(/*We cannot connect because we do NOT own.*/)
     {}
 
-    dag_edge &dag_edge::operator=(const dag_edge &rhs)
+    DAGEdge &DAGEdge::operator=(const DAGEdge &rhs)
     {
-      uuid_ = const_cast<dag_edge *>(&rhs)->uuid_.clone();
+      uuid_ = const_cast<DAGEdge *>(&rhs)->uuid_.clone();
       current_status_ = rhs.current_status();
       connection_.reset(/*We cannot connect because we do NOT own.*/);
 
@@ -126,7 +126,7 @@ namespace com
       return out;
     }
 
-    std::ostream &operator<<(std::ostream &out, const dag_edge &e)
+    std::ostream &operator<<(std::ostream &out, const DAGEdge &e)
     {
       out << "uuid_ = " << e.uuid_ << " current_status_ = "
         << "(" << e.current_status_as_string() << ") connection = ";
@@ -140,15 +140,15 @@ namespace com
       return out;
     }
 
-    bool operator==(const dag_edge &lhs, const dag_edge &rhs)
+    bool operator==(const DAGEdge &lhs, const DAGEdge &rhs)
     {
       bool ret = true;
 
       ret &= (lhs.uuid_.as_string() == rhs.uuid_.as_string());
       ret &= (lhs.current_status_ == rhs.current_status_);
 
-      std::shared_ptr<dag_vertex> lhs_connection = lhs.connection_.lock();
-      std::shared_ptr<dag_vertex> rhs_connection = rhs.connection_.lock();
+      std::shared_ptr<DAGVertex> lhs_connection = lhs.connection_.lock();
+      std::shared_ptr<DAGVertex> rhs_connection = rhs.connection_.lock();
 
       if (lhs_connection != nullptr && rhs_connection != nullptr) {
         ret &= (lhs.connection_.lock().use_count() ==
@@ -164,7 +164,7 @@ namespace com
       return ret;
     }
 
-    bool operator!=(const dag_edge &lhs, const dag_edge &rhs)
+    bool operator!=(const DAGEdge &lhs, const DAGEdge &rhs)
     {
       bool ret = !(lhs == rhs);
 

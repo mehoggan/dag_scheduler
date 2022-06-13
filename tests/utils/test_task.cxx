@@ -8,22 +8,22 @@ namespace com
     TestTaskImpl::TestTaskImpl()
     {
       label_ = uuid_.as_string();
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("A")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("B")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("C")));
     }
 
     TestTaskImpl::TestTaskImpl(const std::string &label)
     {
       label_ = label;
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("A")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("B")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("C")));
     }
 
@@ -32,11 +32,11 @@ namespace com
       std::function<void (bool)> complete_callback)
     {
       label_ = label;
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("A")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("B")));
-      task::stages_.push_back(std::unique_ptr<task_stage>(
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
         new TestTaskStageImpl("C")));
       complete_callback_ = complete_callback;
     }
@@ -45,12 +45,12 @@ namespace com
     {}
 
     TestTaskImpl::TestTaskImpl(TestTaskImpl &&other) :
-      task(std::move(other))
+      Task(std::move(other))
     {}
     
     TestTaskImpl &TestTaskImpl::operator=(TestTaskImpl &&other)
     {
-      task::operator=(std::move(other));
+      Task::operator=(std::move(other));
 
       return (*this);
     }

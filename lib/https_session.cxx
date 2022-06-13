@@ -13,45 +13,45 @@ namespace com
 {
   namespace dag_scheduler
   {
-    https_session::session_responder::session_responder(https_session &self) :
+    HTTPSSession::session_responder::session_responder(HTTPSSession &self) :
       self_(self)
     {}
 
-    void https_session::session_responder::send(
-      responder::StringMessageType&& msg)
+    void HTTPSSession::session_responder::send(
+      Responder::StringMessageType&& msg)
     {
-      auto sp = std::make_shared<responder::StringMessageType>(std::move(msg));
+      auto sp = std::make_shared<Responder::StringMessageType>(std::move(msg));
       self_.res_ = sp;
       boost::beast::http::async_write(
         self_.stream_,
         *sp,
         boost::beast::bind_front_handler(
-          &https_session::on_write,
+          &HTTPSSession::on_write,
           self_.shared_from_this(),
           sp->need_eof()));
     }
 
-    void https_session::session_responder::send(
-      responder::EmptyMessageType&& msg)
+    void HTTPSSession::session_responder::send(
+      Responder::EmptyMessageType&& msg)
     {
-      auto sp = std::make_shared<responder::EmptyMessageType>(std::move(msg));
+      auto sp = std::make_shared<Responder::EmptyMessageType>(std::move(msg));
       self_.res_ = sp;
       boost::beast::http::async_write(
         self_.stream_,
         *sp,
         boost::beast::bind_front_handler(
-          &https_session::on_write,
+          &HTTPSSession::on_write,
           self_.shared_from_this(),
           sp->need_eof()));
     }
 
-    https_session::https_session(
+    HTTPSSession::HTTPSSession(
       boost::asio::ip::tcp::socket&& socket,
       boost::asio::ssl::context& ctx,
       const std::shared_ptr<const std::string>& doc_root,
-      workflow_service::https_listener& owner,
-      workflow_service::router& router) :
-      logged_class<https_session>(*this),
+      WorkflowService::https_listener& owner,
+      WorkflowService::router& router) :
+      LoggedClass<HTTPSSession>(*this),
       stream_(std::move(socket), ctx),
       doc_root_(doc_root),
       responder_(new session_responder(*this)),
@@ -59,69 +59,69 @@ namespace com
       router_(router)
    {}
 
-   void https_session::run()
+   void HTTPSSession::run()
    {
-     logging::info(LOG_TAG, "HTTP session startup...");
+     Logging::info(LOG_TAG, "HTTP session startup...");
      boost::asio::dispatch(
        stream_.get_executor(),
        boost::beast::bind_front_handler(
-         &https_session::on_run, shared_from_this()));
+         &HTTPSSession::on_run, shared_from_this()));
    }
 
-    void https_session::on_run()
+    void HTTPSSession::on_run()
     {
-      logging::info(LOG_TAG, "HTTP session executing...");
+      Logging::info(LOG_TAG, "HTTP session executing...");
       boost::beast::get_lowest_layer(stream_).expires_after(
         std::chrono::seconds(30));
       stream_.async_handshake(
         boost::asio::ssl::stream_base::server,
         boost::beast::bind_front_handler(
-          &https_session::on_handshake,
+          &HTTPSSession::on_handshake,
           shared_from_this()));
     }
 
-    void https_session::on_handshake(boost::beast::error_code ec)
+    void HTTPSSession::on_handshake(boost::beast::error_code ec)
     {
       if (ec) {
-        logging::error(LOG_TAG, "Failed to handshake with", ec.message());
+        Logging::error(LOG_TAG, "Failed to handshake with", ec.message());
         do_close();
       } else {
         do_read();
-        logging::info(LOG_TAG, "SSL handshake successful.");
+        Logging::info(LOG_TAG, "SSL handshake successful.");
       }
     }
 
-    void https_session::do_read()
+    void HTTPSSession::do_read()
     {
       req_ = {};
       boost::beast::get_lowest_layer(stream_).expires_after(
         std::chrono::seconds(30));
-      logging::info(LOG_TAG, "Going to read in request...");
+      Logging::info(LOG_TAG, "Going to read in request...");
       boost::beast::http::async_read(stream_, buffer_, req_,
         boost::beast::bind_front_handler(
-          &https_session::on_read, shared_from_this()));
+          &HTTPSSession::on_read, shared_from_this()));
     }
 
-    void https_session::on_read(
+    void HTTPSSession::on_read(
       boost::beast::error_code ec,
       std::size_t bytes_transferred)
     {
       boost::ignore_unused(bytes_transferred);
 
       if (ec == boost::beast::http::error::end_of_stream) {
-        logging::info(LOG_TAG, "End of stream detected.");
+        Logging::info(LOG_TAG, "End of stream detected.");
         do_close();
       } else if (ec) {
-        logging::error(LOG_TAG, "Failed to read in session with", ec.message());
+        Logging::error(LOG_TAG, "Failed to read in session with", ec.message());
       } else {
-        logging::info(LOG_TAG, "Going to handle request...");
+        Logging::info(LOG_TAG, "Going to handle request...");
         try {
           auto& handler_ptr =router_[req_.target()];
           if (not handler_ptr) {
             throw std::runtime_error("Failed to handle " +
               req_.target().to_string());
           } else {
-            endpoint_handler& handler = *(router_[req_.target()]);
+            EndpointHandler& handler = *(router_[req_.target()]);
             bool status = handler(std::move(req_), std::move(responder_));
             if (not status) {
               responder_->send(detail::server_error_handler(
@@ -130,7 +130,7 @@ namespace com
             }
           }
         } catch (std::runtime_error& rte) {
-          logging::error(LOG_TAG, "Failed to handle", req_.target().to_string(),
+          Logging::error(LOG_TAG, "Failed to handle", req_.target().to_string(),
             "with", rte.what());
           responder_->send(detail::not_found_handler(
             req_.target(),
@@ -139,37 +139,37 @@ namespace com
       }
     }
 
-    void https_session::do_close()
+    void HTTPSSession::do_close()
     {
       boost::beast::get_lowest_layer(stream_).expires_after(
         std::chrono::seconds(30));
 
-      logging::info(LOG_TAG, "Closing session...");
+      Logging::info(LOG_TAG, "Closing session...");
       stream_.async_shutdown(boost::beast::bind_front_handler(
-        &https_session::on_shutdown, shared_from_this()));
+        &HTTPSSession::on_shutdown, shared_from_this()));
     }
 
-    void https_session::on_shutdown(boost::beast::error_code ec)
+    void HTTPSSession::on_shutdown(boost::beast::error_code ec)
     {
       if (ec) {
-        logging::error(LOG_TAG, "Failed to shutdown with", ec.message());
+        Logging::error(LOG_TAG, "Failed to shutdown with", ec.message());
       }
       owner_.reset();
     }
 
-    void https_session::on_write(
+    void HTTPSSession::on_write(
       bool close,
       boost::beast::error_code ec,
       std::size_t bytes_transferred)
     {
       boost::ignore_unused(bytes_transferred);
-      logging::info(LOG_TAG, "Going to write response...");
+      Logging::info(LOG_TAG, "Going to write response...");
       if (ec) {
-        logging::error(LOG_TAG, "Failed to write response with", ec.message());
+        Logging::error(LOG_TAG, "Failed to write response with", ec.message());
       } else if (close) {
         do_close();
       } else {
-        logging::info(LOG_TAG, "Going to read another request...");
+        Logging::info(LOG_TAG, "Going to read another request...");
         res_ = nullptr;
         do_read();
       }

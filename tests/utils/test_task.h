@@ -13,7 +13,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestTaskImpl : public task
+    class TestTaskImpl : public Task
     {
     private:
       FRIEND_TEST(TestTask,

@@ -13,16 +13,16 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS task_stage
+    class DLLSPEC_DAGTASKS TaskStage
     {
     public:
       /**
        * @brief default ctor
        */
-      task_stage();
+      TaskStage();
 
       /**
-       * @brief A constructor for a task_stage that assigns a user defined
+       * @brief A constructor for a TaskStage that assigns a user defined
        *        label.
        *
        * The \p label is used only to describe what the task is for. It
@@ -30,16 +30,16 @@ namespace com
        *
        * @param[in] label The user defined label.
        */
-      explicit task_stage(const std::string &label);
+      explicit TaskStage(const std::string &label);
 
       /**
        * @brief dtor
        */
-      virtual ~task_stage();
+      virtual ~TaskStage();
 
-      task_stage(const task_stage &other) = delete;
+      TaskStage(const TaskStage &other) = delete;
 
-      task_stage &operator=(const task_stage &other) = delete;
+      TaskStage &operator=(const TaskStage &other) = delete;
 
       /**
        * @brief move copy ctor.
@@ -49,9 +49,9 @@ namespace com
        * running. Doing so will result in termination of the graph and
        * the program.
        *
-       * @param[out] other The \ref task_stage to move int (this).
+       * @param[out] other The \ref TaskStage to move int (this).
        */
-      task_stage(task_stage &&other);
+      TaskStage(TaskStage &&other);
 
       /**
        * @brief move assignment operator.
@@ -61,18 +61,18 @@ namespace com
        * running. Doing so will result in termination of the graph and
        * the program.
        *
-       * @param[out] other The \ref task_stage to move into this.
+       * @param[out] other The \ref TaskStage to move into this.
        *
        * @return A reference to (this).
        */
-      task_stage &operator=(task_stage &&other);
+      TaskStage &operator=(TaskStage &&other);
 
       /**
        * @brief Getter for the user friendly label that identifies a
-       *        \ref task_stage.
+       *        \ref TaskStage.
        *
-       * Each \ref task_stage should be easily identifed by users. This is
-       * done by allowing users to assign a label to a task_stage. This member
+       * Each \ref TaskStage should be easily identifed by users. This is
+       * done by allowing users to assign a label to a TaskStage. This member
        * function returns that label.
        *
        * @return The label specified by the user.
@@ -87,16 +87,16 @@ namespace com
        *
        * @return The \ref uuid owned by (this).
        */
-      const uuid &get_uuid() const;
+      const UUID &get_uuid() const;
 
     public:
       /**
-       * @brief A pure virtual function used to run a \ref task_stage.
+       * @brief A pure virtual function used to run a \ref TaskStage.
        *
-       * A pure virtual function used to run what a derived \ref task_stage
+       * A pure virtual function used to run what a derived \ref TaskStage
        * is supposed to do.
        *
-       * @return true if \ref task_stage was started successfully. false
+       * @return true if \ref TaskStage was started successfully. false
        *         otherwise.
        */
       virtual bool run() = 0;
@@ -108,18 +108,18 @@ namespace com
        * recomended that it return only true if \ref run was called and
        * the stage is still activly running.
        *
-       * @return true if \ref task_stage was run successfully, false
+       * @return true if \ref TaskStage was run successfully, false
        *         otherwise.
        */
       virtual bool is_running() const = 0;
 
       /**
-       * @brief A pure virtual function used to end a \ref task_stage 's
+       * @brief A pure virtual function used to end a \ref TaskStage 's
        *        current path of execution. It is up to a running
-       *        \ref task_stage to check this flag and ensure that it
+       *        \ref TaskStage to check this flag and ensure that it
        *        it ends what is running in a thread safe maner.
        *
-       * @return true if \ref task_stage was ended successfully. flase
+       * @return true if \ref TaskStage was ended successfully. flase
        *         otherwise.
        */
       virtual bool end() = 0;
@@ -127,15 +127,15 @@ namespace com
       /**
        * @brief A pure virtual function used to force users to cleanup any
        *        memory that was alloctaed during a call to
-       *        \ref task_stage::run.
+       *        \ref TaskStage::run.
        */
       virtual void cleanup() = 0;
 
     public:
       /**
-       * @brief Equality operator for a \ref task_stage.
+       * @brief Equality operator for a \ref TaskStage.
        *
-       * Two \ref task_stage (s) are considerede equal if and only if their
+       * Two \ref TaskStage (s) are considerede equal if and only if their
        * \ref uuid (s) are the equal.
        *
        * @param[in] lhs The left hand side of the equivalence operator.
@@ -143,48 +143,48 @@ namespace com
        *
        * @return true if \p lhs has the same \ref uuid as \p rhs.
        */
-      friend bool operator==(const task_stage &lhs, const task_stage &rhs);
+      friend bool operator==(const TaskStage &lhs, const TaskStage &rhs);
 
       /**
-       * @brief Inequality operator for a \ref task_stage.
+       * @brief Inequality operator for a \ref TaskStage.
        *
        * @param[in] lhs The left hand side of the inequivalence operator.
        * @param[in] rhs The right hand side of the inequivalence operator.
        *
        * @return false if \p lhs has the same \ref uuid as \p rhs.
        */
-      friend bool operator!=(const task_stage &lhs, const task_stage &rhs);
+      friend bool operator!=(const TaskStage &lhs, const TaskStage &rhs);
 
       /**
-       * @brief A utility function to print a \ref task_stage to a stream.
+       * @brief A utility function to print a \ref TaskStage to a stream.
        *
-       * A utility function to used to write the members of a \ref task_stage
+       * A utility function to used to write the members of a \ref TaskStage
        * to a stream.
        *
        * @param[out] out The std::ostream to write \p t to.
-       * @param[in] t The \ref task_stage to write to \p out.
+       * @param[in] t The \ref TaskStage to write to \p out.
        *
        * @return The stream after \p t has been written to it.
        */
-      friend std::ostream &operator<<(std::ostream &out, const task_stage &t);
+      friend std::ostream &operator<<(std::ostream &out, const TaskStage &t);
 
       /**
-       * @brief A utility function to print a \ref task_stage to a stream.
+       * @brief A utility function to print a \ref TaskStage to a stream.
        *
-       * A utility function to used to write the members of a \ref task_stage
+       * A utility function to used to write the members of a \ref TaskStage
        * to a stream.
        *
        * @param[out] out The std::ostream to write \p t to.
-       * @param[in] t The \ref task_stage to write to \p out.
+       * @param[in] t The \ref TaskStage to write to \p out.
        *
        * @return The stream after \p t has been written to it.
        */
       friend std::stringstream &operator<<(std::stringstream &out,
-        const task_stage &t);
+        const TaskStage &t);
 
     protected:
       std::string label_;
-      uuid uuid_;
+      UUID uuid_;
     };
   }
 }

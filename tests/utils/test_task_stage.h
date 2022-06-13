@@ -11,7 +11,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestTaskStageImpl : public task_stage
+    class TestTaskStageImpl : public TaskStage
     {
     public:
       TestTaskStageImpl();
