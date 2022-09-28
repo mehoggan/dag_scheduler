@@ -52,7 +52,7 @@ namespace com
     {
       std::unique_ptr<EndpointHandler> ret(nullptr);
       if (router_.find(endpoint) == router_.end()) {
-        std::string err_msg = "No handler for " + endpoint.to_string() +
+        std::string err_msg = "No handler for " + std::string(endpoint) +
           " was found.";
         throw std::runtime_error(err_msg);
       } else {
@@ -67,7 +67,7 @@ namespace com
       ctx_(boost::asio::ssl::context::tlsv12)
     {
       Logging::info(LOG_TAG, "Workflow service startup...");
-      detail::load_server_cert(ctx_, LOG_TAG);
+      detail::load_server_cert(ctx_, ci.pem_, LOG_TAG);
       Logging::info(LOG_TAG, "Setting up https_listener...");
       auto doc_root = std::make_shared<const std::string>(ci.doc_root_);
       auto const address = boost::asio::ip::make_address(ci.address_);

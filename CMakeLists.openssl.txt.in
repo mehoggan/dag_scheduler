@@ -19,6 +19,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     CONFIGURE_COMMAND /bin/sh
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/configure.openssl.sh
       ${CMAKE_BINARY_DIR}
+      ${CMAKE_BUILD_TYPE}
     BUILD_COMMAND /bin/sh
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build.openssl.sh
       ${CMAKE_BINARY_DIR}

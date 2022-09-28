@@ -64,7 +64,7 @@ namespace com
       std::unique_ptr<Responder>&& Responder) const
     {
       com::dag_scheduler::Logging::info(LOG_TAG, "Handling request for",
-        doc_root_.to_string());
+          doc_root_);
       Responder::StringMessageType response;
       if (req.method() != boost::beast::http::verb::get &&
       req.method() != boost::beast::http::verb::head) {

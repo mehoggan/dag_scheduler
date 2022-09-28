@@ -10,6 +10,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <array>
+#include <memory>
 #include <mutex>
 #include <tuple>
 

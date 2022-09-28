@@ -13,7 +13,7 @@ namespace std
   {
     std::size_t operator()(const boost::beast::string_view& sv) const
     {
-      return std::hash<string>()(sv.to_string());
+      return std::hash<string>()(sv);
     }
   };
 }
@@ -28,6 +28,7 @@ namespace detail
 
   void load_server_cert(
     boost::asio::ssl::context& ctx,
+    const boost::filesystem::path &pem_path_,
     com::dag_scheduler::LogTag& LOG_TAG);
 
   boost::beast::http::response<boost::beast::http::string_body>

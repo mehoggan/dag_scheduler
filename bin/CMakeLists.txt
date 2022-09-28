@@ -25,6 +25,10 @@ target_link_libraries(main
 )
 
 configure_file("${CMAKE_CURRENT_LIST_DIR}/resources/server.yml"
-    "${CMAKE_CURRENT_BINARY_DIR}/resources/server.yml"
-    COPYONLY
+  "${CMAKE_CURRENT_BINARY_DIR}/resources/server.yml"
+  COPYONLY
+)
+configure_file("${CMAKE_CURRENT_LIST_DIR}/resources/server.pem"
+  "${CMAKE_CURRENT_BINARY_DIR}/resources/server.pem"
+  COPYONLY
 )
