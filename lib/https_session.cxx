@@ -119,7 +119,7 @@ namespace com
           auto& handler_ptr =router_[req_.target()];
           if (not handler_ptr) {
             throw std::runtime_error("Failed to handle " +
-              req_.target().to_string());
+              std::string(req_.target()));
           } else {
             EndpointHandler& handler = *(router_[req_.target()]);
             bool status = handler(std::move(req_), std::move(responder_));
@@ -130,8 +130,8 @@ namespace com
             }
           }
         } catch (std::runtime_error& rte) {
-          Logging::error(LOG_TAG, "Failed to handle", req_.target().to_string(),
-            "with", rte.what());
+          Logging::error(LOG_TAG, "Failed to handle", req_.target(), "with",
+              rte.what());
           responder_->send(detail::not_found_handler(
             req_.target(),
             req_));

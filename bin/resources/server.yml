@@ -3,3 +3,4 @@ address: "localhost"
 port: 8888
 doc-root: "/Users/matthew.hoggan/Desktop"
 threads: 2
+pem: "/Users/matthew.hoggan/Devel/build/gitlab/mehoggan/dag_scheduler/bin/resources/server.pem"

@@ -36,6 +36,7 @@ namespace com
         std::uint32_t port_;
         std::string doc_root_;
         std::uint16_t threads_;
+        std::string pem_;
       };
 
       struct router
@@ -110,7 +111,7 @@ namespace YAML
     static bool decode(const Node& node,
       com::dag_scheduler::WorkflowService::ConnectionInfo &rhs)
     {
-      if (node.size() != 4) {
+      if (node.size() != 5) {
         return false;
       }
       rhs.address_ = node["address"].as<std::string>();
@@ -120,6 +121,7 @@ namespace YAML
       rhs.port_ = node["port"].as<std::uint32_t>();
       rhs.doc_root_ = node["doc-root"].as<std::string>();
       rhs.threads_ = node["threads"].as<std::uint16_t>();
+      rhs.pem_ = node["pem"].as<std::string>();
       return true;
     }
   };
