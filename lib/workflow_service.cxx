@@ -1,8 +1,6 @@
 #include "dag_scheduler/workflow_service.h"
 
 #include "dag_scheduler/https_session.h"
-#include "dag_scheduler/logging.h"
-#include "dag_scheduler/service_helpers.h"
 
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/strand.hpp>
@@ -18,7 +16,7 @@ namespace com
   {
     namespace
     {
-      std::shared_ptr<com::dag_scheduler::WorkflowService::https_listener>
+      std::shared_ptr<com::dag_scheduler::WorkflowService::HTTPSListener>
       make_https_listener(
         boost::asio::io_context& ioc,
         boost::asio::ssl::context& ctx,
@@ -29,7 +27,7 @@ namespace com
       {
         auto endpoint = boost::asio::ip::tcp::endpoint(address, port);
         return std::make_shared<
-          com::dag_scheduler::WorkflowService::https_listener>(
+          com::dag_scheduler::WorkflowService::HTTPSListener>(
             ioc, ctx, endpoint, doc_root, router);
       }
     }
@@ -86,7 +84,7 @@ namespace com
       boost::asio::signal_set signals(ioc_, SIGINT);
       signals.async_wait(sig_handler);
 
-      std::shared_ptr<https_listener> listener = make_https_listener(
+      std::shared_ptr<HTTPSListener> listener = make_https_listener(
         ioc_, ctx_, doc_root, address, port, router_);
       std::vector<std::thread> v;
       v.reserve(ci.threads_ - 1);
@@ -103,13 +101,13 @@ namespace com
       }
    }
 
-   WorkflowService::https_listener::https_listener(
+   WorkflowService::HTTPSListener::HTTPSListener(
       boost::asio::io_context& ioc,
       boost::asio::ssl::context& ctx,
       boost::asio::ip::tcp::endpoint& endpoint,
       std::shared_ptr<const std::string>& doc_root,
       router& router) :
-      LoggedClass<https_listener>(*this),
+      LoggedClass<HTTPSListener>(*this),
       ioc_(ioc),
       ctx_(ctx),
       acceptor_(ioc),
@@ -120,34 +118,34 @@ namespace com
       create_acceptor();
     }
 
-    WorkflowService::https_listener::~https_listener()
+    WorkflowService::HTTPSListener::~HTTPSListener()
     {
       Logging::info(LOG_TAG, "Shutting down https_listener...");
     }
 
-    void WorkflowService::https_listener::run()
+    void WorkflowService::HTTPSListener::run()
     {
       do_accept();
     }
 
-    void WorkflowService::https_listener::reset()
+    void WorkflowService::HTTPSListener::reset()
     {
       acceptor_.close();
       create_acceptor();
       run();
     }
 
-    void WorkflowService::https_listener::do_accept()
+    void WorkflowService::HTTPSListener::do_accept()
     {
       acceptor_.async_accept(
         boost::asio::make_strand(ioc_),
         boost::beast::bind_front_handler(
-          &https_listener::on_accept,
+          &HTTPSListener::on_accept,
           shared_from_this()));
       Logging::info(LOG_TAG, "Acceptor now accepting connections...");
     }
 
-    void WorkflowService::https_listener::on_accept(
+    void WorkflowService::HTTPSListener::on_accept(
       boost::beast::error_code ec,
       boost::asio::ip::tcp::socket socket)
     {
@@ -165,13 +163,13 @@ namespace com
       }
     }
 
-    void WorkflowService::https_listener::create_acceptor()
+    void WorkflowService::HTTPSListener::create_acceptor()
     {
       Logging::info(LOG_TAG, "Setting up connection acceptor...");
       boost::beast::error_code ec;
       acceptor_.open(endpoint_.protocol(), ec);
       if (ec) {
-        Logging::error(LOG_TAG, "Failed to accept incomming connections!");
+        Logging::error(LOG_TAG, "Failed to accept incoming connections!");
         throw boost::beast::system_error(ec);
       }
 

@@ -38,6 +38,10 @@ add_executable(unit_test
   utils/test_task_stage.cxx
 )
 
+set(BOOST_PREFIX "/boostbeast-download/boostbeast-prefix/src/boost/stage")
+target_link_directories(unit_test
+  PUBLIC "${CMAKE_BINARY_DIR}${BOOST_PREFIX}/lib")
+
 target_link_libraries(unit_test
   dagtasks
   gtest

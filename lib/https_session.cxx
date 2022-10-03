@@ -8,6 +8,8 @@
 #include <boost/beast/core/string_type.hpp>
 #include <boost/beast/http/empty_body.hpp>
 #include <boost/system/detail/error_code.hpp>
+#include <utility>
+#include <utility>
 
 namespace com
 {
@@ -46,18 +48,18 @@ namespace com
     }
 
     HTTPSSession::HTTPSSession(
-      boost::asio::ip::tcp::socket&& socket,
-      boost::asio::ssl::context& ctx,
-      const std::shared_ptr<const std::string>& doc_root,
-      WorkflowService::https_listener& owner,
-      WorkflowService::router& router) :
+      boost::asio::ip::tcp::socket &&socket,
+      boost::asio::ssl::context &ctx,
+      std::shared_ptr<const std::string> doc_root,
+      WorkflowService::HTTPSListener &owner,
+      WorkflowService::router &router) :
       LoggedClass<HTTPSSession>(*this),
       stream_(std::move(socket), ctx),
-      doc_root_(doc_root),
+      doc_root_(std::move(std::move(doc_root))),
       responder_(new session_responder(*this)),
       owner_(owner),
       router_(router)
-   {}
+    {}
 
    void HTTPSSession::run()
    {
@@ -116,7 +118,7 @@ namespace com
       } else {
         Logging::info(LOG_TAG, "Going to handle request...");
         try {
-          auto& handler_ptr =router_[req_.target()];
+          auto& handler_ptr = router_[req_.target()];
           if (not handler_ptr) {
             throw std::runtime_error("Failed to handle " +
               std::string(req_.target()));

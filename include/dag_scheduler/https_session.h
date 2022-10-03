@@ -18,7 +18,7 @@ namespace com
       public std::enable_shared_from_this<HTTPSSession>
       {
       private:
-        friend class https_listener;
+        friend class HTTPSListener;
 
       private:
         class session_responder :
@@ -27,8 +27,8 @@ namespace com
         public:
           explicit session_responder(HTTPSSession& self);
 
-          virtual void send(StringMessageType &&) override;
-          virtual void send(EmptyMessageType &&) override;
+          void send(StringMessageType &&) override;
+          void send(EmptyMessageType &&) override;
 
         private:
           HTTPSSession& self_;
@@ -36,11 +36,11 @@ namespace com
 
       public:
         HTTPSSession(
-          boost::asio::ip::tcp::socket&& socket,
-          boost::asio::ssl::context& ctx,
-          const std::shared_ptr<const std::string>& doc_root,
-          WorkflowService::https_listener& owner,
-          WorkflowService::router& router_);
+          boost::asio::ip::tcp::socket &&socket,
+          boost::asio::ssl::context &ctx,
+          std::shared_ptr<const std::string> doc_root,
+          WorkflowService::HTTPSListener &owner,
+          WorkflowService::router &router);
 
         void run();
 
@@ -61,7 +61,7 @@ namespace com
         EndpointHandler::StringRequestType req_;
         std::shared_ptr<void> res_;
         std::unique_ptr<Responder> responder_;
-        WorkflowService::https_listener&  owner_;
+        WorkflowService::HTTPSListener&  owner_;
         WorkflowService::router& router_;
     };
   }

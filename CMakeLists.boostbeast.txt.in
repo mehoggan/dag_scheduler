@@ -41,7 +41,7 @@ else()
     BUILD_COMMAND "cd"
       "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
       "&&"
-      "./b2" "-j2" "cxxstd=11"
+      "./b2" "-j2" "cxxstd=14"
     INSTALL_COMMAND "cd"
       "${CMAKE_BINARY_DIR}/boostbeast-download/boostbeast-prefix/src/boost"
       "&&"

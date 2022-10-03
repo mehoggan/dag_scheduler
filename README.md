@@ -1,17 +1,35 @@
 # Change Notes
 
+## Thursday September 29, 2022
+
+On Fedora release 36 one must run
+```bash
+> sudo dnf -y install perl
+```
+if perl is not already installed, otherwise the openssl build will fail <br />
+to configure.
+
+Furthermore, on Fedora release 36 libuuid is needed along with its <br />
+development package. Doxygen was also installed to remove a CMake warning <br />
+with:
+
+```bash
+> sudo dnf install -y uuid-c++ uuid-c++-devel libuuid-devel
+> sudo dnf install -y doxygen
+```
+
 ## Wednesday March 30, 2021
 On OSx Big Sur one needs to:
-```
-sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+```bash
+> sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
 ```
 after installing xcode from the App Store.
 
 ## Wednesday December 1, 2021
-* The following file: nboostbeast/include/boost/core/noinit_adaptor.hpp needs
-to have its contents changed to
+* The following file: boostbeast/include/boost/core/noinit_adaptor.hpp <br />
+needs to have its contents changed to
 
-```
+```c++
 template<class U>
 void destroy(U* p) {
     using UClass = typename U::U;
@@ -19,7 +37,6 @@ void destroy(U* p) {
     (void)p;
 } 
 ```
-
 in order for it to compile on OSX Big Sur.
 
 ## Tuesday August 17, 2021
@@ -28,14 +45,14 @@ in order for it to compile on OSX Big Sur.
   * Checked interuptible_task_thread for tests.
 
 ## WIP: Sunday March 22, 2020
-* Added in ycm changes to support development in Ubuntu 18.04 after a long
-  break from development. 
+* Added in ycm changes to support development in Ubuntu 18.04 after a <br />
+  long break from development. 
 
 
 # Developer's Notes
 
 ## Testing
 
-Please be sure to add /* Tested [✓] */ in the .cxx or .hpp files for methods
-that have been tested. Once the class has been completely tested please feel
-free to remove the comment.
+Please be sure to add /* Tested [✓] */ in the .cxx or .hpp files for <br />
+methods that have been tested. Once the class has been completely tested <br />
+please feel free to remove the comment.
