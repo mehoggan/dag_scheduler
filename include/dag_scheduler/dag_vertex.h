@@ -3,7 +3,7 @@
 
 #include "declspec.h"
 
-#include "dag_scheduler/Task.h"
+#include "dag_scheduler/task.h"
 #include "dag_scheduler/uuid.h"
 
 #include <atomic>

@@ -54,19 +54,19 @@ namespace com
           std::unique_ptr<EndpointHandler>> router_;
       };
 
-      class https_listener :
-        public LoggedClass<https_listener>,
-        public std::enable_shared_from_this<https_listener>
+      class HTTPSListener :
+        public LoggedClass<HTTPSListener>,
+        public std::enable_shared_from_this<HTTPSListener>
       {
       public:
-        https_listener(
+        HTTPSListener(
           boost::asio::io_context& ioc,
           boost::asio::ssl::context& ctx,
           boost::asio::ip::tcp::endpoint& endpoint,
           std::shared_ptr<const std::string>& doc_root,
           router& router_);
 
-        ~https_listener() override;
+        ~HTTPSListener() override;
 
         void run();
 
