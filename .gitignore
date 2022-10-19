@@ -1,12 +1,21 @@
 ######
-Directories
+# Directories
 ######
-build/
-.idea/
-cmake-build-debug/
-cmake-build-release/
 
 ######
-files
+# Files
 ######
 tags
+COPYING
+INSTALL
+**/Makefile.in
+**/aclocal.m4
+**/autom4te.cache/
+**/compile
+**/config.guess
+**/config.sub
+**/configure
+**/configure~
+**/install-sh
+**/ltmain.sh
+**/missing

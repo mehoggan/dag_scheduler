@@ -181,7 +181,7 @@ namespace com
 
       acceptor_.set_option(boost::asio::socket_base::keep_alive(true), ec);
       if (ec) {
-        Logging::error(LOG_TAG, "Failet to set options on acceptor!");
+        Logging::error(LOG_TAG, "Failed to set options on acceptor!");
         throw boost::beast::system_error(ec);
       }
 

@@ -8,18 +8,18 @@
 #include <boost/beast/core/string_type.hpp>
 #include <boost/beast/http/empty_body.hpp>
 #include <boost/system/detail/error_code.hpp>
-#include <utility>
+#include <boost/beast/version.hpp>
 #include <utility>
 
 namespace com
 {
   namespace dag_scheduler
   {
-    HTTPSSession::session_responder::session_responder(HTTPSSession &self) :
+    HTTPSSession::SessionResponder::SessionResponder(HTTPSSession &self) :
       self_(self)
     {}
 
-    void HTTPSSession::session_responder::send(
+    void HTTPSSession::SessionResponder::send(
       Responder::StringMessageType&& msg)
     {
       auto sp = std::make_shared<Responder::StringMessageType>(std::move(msg));
@@ -33,7 +33,7 @@ namespace com
           sp->need_eof()));
     }
 
-    void HTTPSSession::session_responder::send(
+    void HTTPSSession::SessionResponder::send(
       Responder::EmptyMessageType&& msg)
     {
       auto sp = std::make_shared<Responder::EmptyMessageType>(std::move(msg));
@@ -56,7 +56,7 @@ namespace com
       LoggedClass<HTTPSSession>(*this),
       stream_(std::move(socket), ctx),
       doc_root_(std::move(std::move(doc_root))),
-      responder_(new session_responder(*this)),
+      responder_(new SessionResponder(*this)),
       owner_(owner),
       router_(router)
     {}
@@ -73,8 +73,8 @@ namespace com
     void HTTPSSession::on_run()
     {
       Logging::info(LOG_TAG, "HTTP session executing...");
-      boost::beast::get_lowest_layer(stream_).expires_after(
-        std::chrono::seconds(30));
+      boost::beast::get_lowest_layer(stream_);//.expires_after(
+        //std::chrono::seconds(30));
       stream_.async_handshake(
         boost::asio::ssl::stream_base::server,
         boost::beast::bind_front_handler(
@@ -88,16 +88,16 @@ namespace com
         Logging::error(LOG_TAG, "Failed to handshake with", ec.message());
         do_close();
       } else {
-        do_read();
         Logging::info(LOG_TAG, "SSL handshake successful.");
+        do_read();
       }
     }
 
     void HTTPSSession::do_read()
     {
       req_ = {};
-      boost::beast::get_lowest_layer(stream_).expires_after(
-        std::chrono::seconds(30));
+      boost::beast::get_lowest_layer(stream_);//.expires_after(
+        //std::chrono::seconds(120));
       Logging::info(LOG_TAG, "Going to read in request...");
       boost::beast::http::async_read(stream_, buffer_, req_,
         boost::beast::bind_front_handler(

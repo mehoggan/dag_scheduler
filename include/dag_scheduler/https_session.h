@@ -21,11 +21,11 @@ namespace com
         friend class HTTPSListener;
 
       private:
-        class session_responder :
+        class SessionResponder :
           public Responder
         {
         public:
-          explicit session_responder(HTTPSSession& self);
+          explicit SessionResponder(HTTPSSession& self);
 
           void send(StringMessageType &&) override;
           void send(EmptyMessageType &&) override;
