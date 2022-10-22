@@ -11,9 +11,7 @@ docker-build:
   services:
     - docker:dind
   before_script:
-    - apt install -y git-all
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - git submodule update --recursive --remote
   script:
     - |
       if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
