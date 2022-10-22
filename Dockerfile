@@ -1,22 +1,25 @@
-# This docker file uses the latest version of cmake but it also can be
-# configured using the CMAKE_TAR variable. To build using another version
-# run the docker build command as follows:
-
-# docker build \
-#   --build-arg CMAKE_TAR="<URL to cmake tar>"
-#   --build-arg CMAKE_VER=<Version found in the URL above>
-#   .
 FROM debian
 
 RUN mkdir -p /home/dag_scheduler
+
+WORKDIR /home/dag_scheduler
+RUN ls -la .
 
 RUN apt-get update
 RUN apt-get install -y \
   g++ \
   uuid \
   uuid-dev \
-  git \
+  git-all \
   build-essential \
   valgrind \
+  autoconf \
+  automake \
+  libtool \
+  autoconf-archive \
+  libgtest-dev \
+  rapidjson-dev \
+  libyaml-cpp-dev \
   doxygen
-RUN ls -lR
+RUN autoreconf -i
+RUN mkdir -p ./build; pushd ./build; ../configure && make; popd

@@ -37,6 +37,13 @@ following command from the root directory of this repository. </br>
 > sudo dfn install -y ...
 ```
 
+## Debian Apt System Setup
+
+```sh
+> sudo apt install -y git-all autoconf automake libtool autoconf-archive \
+    libgtest-dev rapidjson-dev 	libyaml-cpp-dev
+```
+
 ## Build file generation Unix Systems
 
 ```sh
