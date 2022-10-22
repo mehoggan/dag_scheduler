@@ -74,7 +74,7 @@ namespace com
           bool all_ran = false;
           if (self->task_ != nullptr) {
             self->running_.store(true);
-            all_ran = self->task_->iterate_stages([&](TaskStage & next) {
+            all_ran = self->task_->iterate_stages([&](TaskStage &next) {
               bool stage_status = false;
               {
                 std::lock_guard<std::mutex> lock(task_lock_);

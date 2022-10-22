@@ -35,15 +35,15 @@ namespace com
     public:
       EndpointHandler();
 
-      explicit EndpointHandler(const boost::beast::string_view& endpoint);
+      explicit EndpointHandler(const boost::beast::string_view &endpoint);
 
       virtual ~EndpointHandler();
 
-      virtual bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder);
+      virtual bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder);
 
-      virtual bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) const;
+      virtual bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) const;
 
     private:
       boost::beast::string_view endpoint_;
@@ -54,19 +54,19 @@ namespace com
       LoggedClass<DocRootEndpoint>
     {
     public:
-      explicit DocRootEndpoint(const boost::beast::string_view& doc_root);
+      explicit DocRootEndpoint(const boost::beast::string_view &doc_root);
 
       virtual ~DocRootEndpoint();
 
-      bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) final;
+      bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) final;
 
-      bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) const final;
+      bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) const final;
 
     private:
-      bool handle_request(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) const;
+      bool handle_request(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) const;
 
     private:
       boost::beast::string_view doc_root_;
@@ -79,11 +79,11 @@ namespace com
     public:
       ~RegisterDAGEndpoint();
 
-      bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) final;
+      bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) final;
 
-      bool operator()(StringRequestType&& req,
-        std::unique_ptr<Responder>&& responder) const final;
+      bool operator()(StringRequestType &&req,
+        std::unique_ptr<Responder> &&responder) const final;
     };
   }
 }

@@ -20,7 +20,7 @@ namespace com
     {}
 
     void HTTPSSession::SessionResponder::send(
-      Responder::StringMessageType&& msg)
+      Responder::StringMessageType &&msg)
     {
       auto sp = std::make_shared<Responder::StringMessageType>(std::move(msg));
       self_.res_ = sp;
@@ -34,7 +34,7 @@ namespace com
     }
 
     void HTTPSSession::SessionResponder::send(
-      Responder::EmptyMessageType&& msg)
+      Responder::EmptyMessageType &&msg)
     {
       auto sp = std::make_shared<Responder::EmptyMessageType>(std::move(msg));
       self_.res_ = sp;
@@ -52,7 +52,7 @@ namespace com
       boost::asio::ssl::context &ctx,
       std::shared_ptr<const std::string> doc_root,
       WorkflowService::HTTPSListener &owner,
-      WorkflowService::router &router) :
+      WorkflowService::Router &router) :
       LoggedClass<HTTPSSession>(*this),
       stream_(std::move(socket), ctx),
       doc_root_(std::move(std::move(doc_root))),
@@ -118,12 +118,12 @@ namespace com
       } else {
         Logging::info(LOG_TAG, "Going to handle request...");
         try {
-          auto& handler_ptr = router_[req_.target()];
+          auto &handler_ptr = router_[req_.target()];
           if (not handler_ptr) {
             throw std::runtime_error("Failed to handle " +
               std::string(req_.target()));
           } else {
-            EndpointHandler& handler = *(router_[req_.target()]);
+            EndpointHandler &handler = *(router_[req_.target()]);
             bool status = handler(std::move(req_), std::move(responder_));
             if (not status) {
               responder_->send(detail::server_error_handler(
@@ -131,7 +131,7 @@ namespace com
                 req_));
             }
           }
-        } catch (std::runtime_error& rte) {
+        } catch (std::runtime_error &rte) {
           Logging::error(LOG_TAG, "Failed to handle", req_.target(), "with",
               rte.what());
           responder_->send(detail::not_found_handler(

@@ -80,9 +80,9 @@ namespace detail
   }
 
   void load_server_cert(
-    boost::asio::ssl::context& ctx,
+    boost::asio::ssl::context &ctx,
     const boost::filesystem::path &pem_path_,
-    com::dag_scheduler::LogTag& LOG_TAG)
+    com::dag_scheduler::LogTag &LOG_TAG)
   {
     /*
      * The certificate was generated from CMD.EXE on Windows 10 using:
@@ -112,7 +112,7 @@ namespace detail
   boost::beast::http::response<boost::beast::http::string_body>
   bad_request_handler(
     boost::beast::string_view why,
-    boost::beast::http::request<boost::beast::http::string_body>& req)
+    boost::beast::http::request<boost::beast::http::string_body> &req)
   {
     boost::beast::http::response<boost::beast::http::string_body> res(
       boost::beast::http::status::bad_request, req.version());
@@ -127,7 +127,7 @@ namespace detail
    boost::beast::http::response<boost::beast::http::string_body>
    not_found_handler(
      boost::beast::string_view target,
-     boost::beast::http::request<boost::beast::http::string_body>& req)
+     boost::beast::http::request<boost::beast::http::string_body> &req)
    {
      boost::beast::http::response<boost::beast::http::string_body> res(
        boost::beast::http::status::not_found, req.version());
@@ -142,7 +142,7 @@ namespace detail
    boost::beast::http::response<boost::beast::http::string_body>
    server_error_handler(
      boost::beast::string_view what,
-     boost::beast::http::request<boost::beast::http::string_body>& req)
+     boost::beast::http::request<boost::beast::http::string_body> &req)
    {
      boost::beast::http::response<boost::beast::http::string_body> res(
        boost::beast::http::status::internal_server_error, req.version());

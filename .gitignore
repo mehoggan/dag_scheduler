@@ -1,21 +1,39 @@
 ######
 # Directories
 ######
+**/.idea
+**/autom4te.cache/
+deps/build/
+lib/.deps/
+lib/.libs/
 
 ######
 # Files
 ######
-tags
-COPYING
-INSTALL
+**/*.swp
+**/Makefile
 **/Makefile.in
 **/aclocal.m4
-**/autom4te.cache/
+**/build
 **/compile
 **/config.guess
 **/config.sub
-**/configure
-**/configure~
 **/install-sh
 **/ltmain.sh
 **/missing
+COPYING
+INSTALL
+ar-lib
+config.h
+config.h.in
+config.log
+config.status
+configure~
+depcomp
+lib/*.la
+lib/*.lo
+lib/*.o
+libtool
+stamp-h1
+tags
+test-driver

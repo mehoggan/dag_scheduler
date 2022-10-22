@@ -17,28 +17,28 @@ namespace com
     {}
 
     EndpointHandler::EndpointHandler(
-      const boost::beast::string_view& endpoint) :
+      const boost::beast::string_view &endpoint) :
       endpoint_(endpoint)
     {}
 
-    bool EndpointHandler::operator()(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder)
+    bool EndpointHandler::operator()(StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder)
     {
       (void) req;
-      (void) Responder;
+      (void) responder;
       return false;
     }
 
-    bool EndpointHandler::operator()(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder) const
+    bool EndpointHandler::operator()(StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder) const
     {
       (void) req;
-      (void) Responder;
+      (void) responder;
       return false;
     }
 
     DocRootEndpoint::DocRootEndpoint(
-      const boost::beast::string_view& doc_root) :
+      const boost::beast::string_view &doc_root) :
       EndpointHandler(),
       LoggedClass<DocRootEndpoint>(*this),
       doc_root_(doc_root)
@@ -48,20 +48,20 @@ namespace com
     {}
 
     bool DocRootEndpoint::operator()(
-      EndpointHandler::StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder)
+      EndpointHandler::StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder)
     {
-      return handle_request(std::move(req), std::move(Responder));
+      return handle_request(std::move(req), std::move(responder));
     }
 
-    bool DocRootEndpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder) const
+    bool DocRootEndpoint::operator()(StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder) const
     {
-      return handle_request(std::move(req), std::move(Responder));
+      return handle_request(std::move(req), std::move(responder));
     }
 
-    bool DocRootEndpoint::handle_request(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder) const
+    bool DocRootEndpoint::handle_request(StringRequestType &&req,
+      std::unique_ptr<Responder> &&Responder) const
     {
       com::dag_scheduler::Logging::info(LOG_TAG, "Handling request for",
           doc_root_);
@@ -125,19 +125,19 @@ namespace com
     {
     }
 
-    bool RegisterDAGEndpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder)
+    bool RegisterDAGEndpoint::operator()(StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder)
     {
       (void) req;
-      (void) Responder;
+      (void) responder;
       return true;
     }
 
-    bool RegisterDAGEndpoint::operator()(StringRequestType&& req,
-      std::unique_ptr<Responder>&& Responder) const
+    bool RegisterDAGEndpoint::operator()(StringRequestType &&req,
+      std::unique_ptr<Responder> &&responder) const
     {
       (void) req;
-      (void) Responder;
+      (void) responder;
       return true;
     }
   }

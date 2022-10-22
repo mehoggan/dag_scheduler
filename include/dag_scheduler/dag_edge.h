@@ -1,8 +1,6 @@
 #ifndef DAG_EDGE_H_INCLUDED
 #define DAG_EDGE_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/dag_vertex.h"
 #include "dag_scheduler/uuid.h"
 
@@ -27,7 +25,7 @@ namespace com
      * operations that can be performed on it. Users can check for connected
      * \ref DAGVertex and get access to the connected \ref DAGVertex.
      */
-    class DLLSPEC_DAGTASKS DAGEdge
+    class DAGEdge
     {
     private:
       friend class DAG;

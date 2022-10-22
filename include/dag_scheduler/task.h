@@ -1,8 +1,6 @@
 #ifndef TASK_H_INCLUDED
 #define TASK_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
 
@@ -17,7 +15,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS Task
+    class Task
     {
     public:
       /**

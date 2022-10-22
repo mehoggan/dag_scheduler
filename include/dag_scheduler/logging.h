@@ -3,8 +3,6 @@
 
 #define BOOST_LOG_DYN_LINK 1
 
-#include "declspec.h"
-
 #include <boost/filesystem/path.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>

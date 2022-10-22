@@ -18,12 +18,12 @@ namespace com
     {
       std::shared_ptr<com::dag_scheduler::WorkflowService::HTTPSListener>
       make_https_listener(
-        boost::asio::io_context& ioc,
-        boost::asio::ssl::context& ctx,
+        boost::asio::io_context &ioc,
+        boost::asio::ssl::context &ctx,
         std::shared_ptr<const std::string> doc_root,
-        const boost::asio::ip::address& address,
+        const boost::asio::ip::address &address,
         const uint16_t port,
-        WorkflowService::router& router)
+        WorkflowService::Router &router)
       {
         auto endpoint = boost::asio::ip::tcp::endpoint(address, port);
         return std::make_shared<
@@ -32,7 +32,7 @@ namespace com
       }
     }
 
-    bool WorkflowService::router::register_endpoint(
+    bool WorkflowService::Router::register_endpoint(
       const boost::beast::string_view &endpoint,
       std::unique_ptr<EndpointHandler> handler)
     {
@@ -45,7 +45,7 @@ namespace com
       return ret;
     }
 
-    std::unique_ptr<EndpointHandler>& WorkflowService::router::operator[](
+    std::unique_ptr<EndpointHandler> &WorkflowService::Router::operator[](
       const boost::beast::string_view &endpoint)
     {
       std::unique_ptr<EndpointHandler> ret(nullptr);
@@ -59,7 +59,7 @@ namespace com
     }
 
     WorkflowService::WorkflowService(
-      const WorkflowService::ConnectionInfo& ci) :
+      const WorkflowService::ConnectionInfo &ci) :
       LoggedClass<WorkflowService>(*this),
       ioc_(ci.threads_),
       ctx_(boost::asio::ssl::context::tlsv12)
@@ -76,7 +76,7 @@ namespace com
       router_.register_endpoint("/index.html", std::move(doc_root_handler));
 
       auto sig_handler = [&](
-        const boost::system::error_code& ec, int signum) {
+        const boost::system::error_code &ec, int signum) {
           Logging::info(LOG_TAG, "Exiting with", ec.message(), "and signal",
             signum);
           exit(signum);
@@ -102,11 +102,11 @@ namespace com
    }
 
    WorkflowService::HTTPSListener::HTTPSListener(
-      boost::asio::io_context& ioc,
-      boost::asio::ssl::context& ctx,
-      boost::asio::ip::tcp::endpoint& endpoint,
-      std::shared_ptr<const std::string>& doc_root,
-      router& router) :
+      boost::asio::io_context &ioc,
+      boost::asio::ssl::context &ctx,
+      boost::asio::ip::tcp::endpoint &endpoint,
+      std::shared_ptr<const std::string> &doc_root,
+      Router &router) :
       LoggedClass<HTTPSListener>(*this),
       ioc_(ioc),
       ctx_(ctx),

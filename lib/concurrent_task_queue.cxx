@@ -9,7 +9,7 @@ namespace com
   namespace dag_scheduler
   {
     ConcurrentTaskQueue::queue_not_empty::queue_not_empty(
-      const std::deque<std::unique_ptr<Task>>& queue) :
+      const std::deque<std::unique_ptr<Task>> &queue) :
       queue_(queue)
     {}
 

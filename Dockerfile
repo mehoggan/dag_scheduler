@@ -19,3 +19,4 @@ RUN apt-get install -y \
   build-essential \
   valgrind \
   doxygen
+RUN ls -lR

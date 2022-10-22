@@ -1,8 +1,6 @@
 #ifndef TASK_SCHEDULER_H_INCLUDED
 #define TASK_SCHEDULER_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/concurrent_task_queue.h"
 #include "dag_scheduler/interruptible_task_thread.h"
 #include "dag_scheduler/logged_class.hpp"
@@ -19,7 +17,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS TaskScheduler :
+    class TaskScheduler :
       public LoggedClass<TaskScheduler>,
       public boost::noncopyable
     {
