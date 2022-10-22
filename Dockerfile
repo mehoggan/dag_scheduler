@@ -5,6 +5,7 @@ RUN mkdir -p /home/dag_scheduler
 WORKDIR /home/dag_scheduler
 RUN ls -la .
 
+RUN apt-get install -y apt-transport-https
 RUN apt-get update
 RUN apt-get install -y \
   g++ \
