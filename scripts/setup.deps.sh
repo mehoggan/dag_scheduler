@@ -1,4 +1,5 @@
 #!/bin/bash
+BUILD_TYPE=${1}
 
 set -e
 
@@ -15,7 +16,7 @@ mkdir "${BUILD_DIR}/build"
 function build_openssl {
   ./scripts/configure.openssl.sh \
     "${BUILD_DIR}" \
-    "Debug" \
+    "${BUILD_TYPE}" \
     "openssl"
 
   ./scripts/build.openssl.sh \

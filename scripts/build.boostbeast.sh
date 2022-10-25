@@ -1,4 +1,4 @@
-set -x
+set -e
 
 BUILD_DIR=${1}
 SUB_FOLDER=${2}
@@ -6,10 +6,10 @@ SUB_FOLDER=${2}
 MAKE_CMD=$(which make)
 echo "Going to build boost in ${BUILD_DIR} with ${MAKE_CMD}..."
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
     ./b2 cxxstd=17
-elif [[ "$OSTYPE" == "darwin"* ]]; then
+elif [[ "${OSTYPE}" == "darwin"* ]]; then
   PYTHON_INCLUDES="/Library/Frameworks/Python.framework/Versions/3.8"
   PYTHON_INCLUDES="${PYTHON_INCLUDES}/include/python3.8"
   cd ${BUILD_DIR}/${SUB_FOLDER} && \

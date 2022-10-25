@@ -4,7 +4,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-docker-build:
+docker-build-debian-bullseye:
   # Use the official docker image.
   image: docker:latest
   stage: build
@@ -21,11 +21,11 @@ docker-build:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" -f debian.docker .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH
       exists:
-        - Dockerfile
+        - debian.docker
 

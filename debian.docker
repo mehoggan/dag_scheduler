@@ -1,0 +1,43 @@
+FROM debian
+
+# Configure system (pre setup)
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean
+RUN touch /etc/apt/apt.conf.d/99fixbadproxy && \
+  echo "Acquire::http::Pipeline-Depth 0;" > \
+    /etc/apt/apt.conf.d/99fixbadproxy && \
+  echo "Acquire::http::No-Cache true;" >> \
+    /etc/apt/apt.conf.d/99fixbadproxy && \
+  echo "Acquire::BrokenProxy true;" >> \
+    /etc/apt/apt.conf.d/99fixbadproxy && \
+  cat /etc/apt/apt.conf.d/99fixbadproxy
+RUN apt update
+RUN apt install -y build-essential autotools-dev autoconf-archive \
+  checkinstall zlib1g-dev libbz2-dev liblzma-dev libzstd-dev valgrind \
+  uuid-dev libgtest-dev libgmock-dev rapidjson-dev libyaml-cpp-dev doxygen \
+  autoconf-archive checkinstall libtool libtool-bin make packaging-dev
+
+# Add the source and build dependencies (actual setup)
+RUN mkdir -p /home/dag_scheduler
+ADD . /home/dag_scheduler
+WORKDIR /home/dag_scheduler
+RUN cd /home/dag_scheduler/deps/openssl && make clean distclean
+RUN rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
+RUN ./scripts/setup.deps.sh
+
+# Now build the actual project
+RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \
+  rm -rf ./build; \
+  autoreconf -i; \
+  mkdir -p ./build; \
+  cd ./build; \
+  ../configure && \
+  make -j5; \
+  cd ..
+
+# Verify the build was successful.
+RUN cd build && \
+  export TOP=/home/dag_scheduler/deps/build && \
+  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
+  make check

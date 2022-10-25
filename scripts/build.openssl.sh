@@ -1,4 +1,4 @@
-set -x
+set -e
 
 BUILD_DIR=${1}
 SUB_FOLDER=${2}
@@ -7,10 +7,10 @@ MAKE_CMD=$(which make)
 echo "Going to build openssl in ${BUILD_DIR}/${SUB_FOLDER} with ${MAKE_CMD}..."
 echo "PWD=${PWD}"
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
     ${MAKE_CMD}
-elif [[ "$OSTYPE" == "darwin"* ]]; then
+elif [[ "${OSTYPE}" == "darwin"* ]]; then
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
     export CC="/usr/bin/clang" && \
     export CXX="/usr/bin/clang++" && \

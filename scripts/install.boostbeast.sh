@@ -1,14 +1,16 @@
 BUILD_DIR=${1}
 SUB_FOLDER=${2}
 
+set -e
+
 echo "Going to install boost..."
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
   PYTHON_INCLUDES="/Library/Frameworks/Python.framework/Versions/3.8"
   PYTHON_INCLUDES="${PYTHON_INCLUDES}/include/python3.8"
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
     ./b2 install
-elif [[ "$OSTYPE" == "darwin"* ]]; then
+elif [[ "${OSTYPE}" == "darwin"* ]]; then
   PYTHON_INCLUDES="/Library/Frameworks/Python.framework/Versions/3.8"
   PYTHON_INCLUDES="${PYTHON_INCLUDES}/include/python3.8"
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
