@@ -1,7 +1,7 @@
 ######
 # Directories
 ######
-**/.idea
+.idea
 **/autom4te.cache/
 deps/build/
 lib/.deps/
@@ -10,6 +10,7 @@ lib/.libs/
 ######
 # Files
 ######
+.idea/**
 **/*.swp
 **/Makefile
 **/Makefile.in
