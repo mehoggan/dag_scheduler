@@ -21,7 +21,7 @@ RUN apt install -y build-essential autotools-dev autoconf-archive \
 RUN mkdir -p /home/dag_scheduler
 ADD . /home/dag_scheduler
 WORKDIR /home/dag_scheduler
-RUN cd /home/dag_scheduler/deps/openssl && make clean distclean
+RUN cd /home/dag_scheduler/deps/openssl && make distclean
 RUN rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
 RUN ./scripts/setup.deps.sh
 
