@@ -38,3 +38,4 @@ libtool
 stamp-h1
 tags
 test-driver
+scripts/**.log
