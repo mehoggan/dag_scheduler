@@ -58,3 +58,13 @@ RUN cd build && \
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib64 && \
   make check
+
+# Verify the service actually works.
+RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
+  export TOP=/home/dag_scheduler/deps/build && \
+  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
+  mkdir -p ${DOC_ROOT} && \
+  ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
+  sleep 5 && \
+  ./scripts/dag_scheduler_service_test.sh
