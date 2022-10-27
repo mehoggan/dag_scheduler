@@ -1,8 +1,6 @@
 #ifndef DAG_VERTEX_H_INCLUDED
 #define DAG_VERTEX_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/task.h"
 #include "dag_scheduler/uuid.h"
 
@@ -33,7 +31,7 @@ namespace com
      * how many \ref DAGEdges come from an instance, and check to see how
      * many \ref DAGEdges point at a given instance.
      */
-    class DLLSPEC_DAGTASKS DAGVertex
+    class DAGVertex
     {
     private:
       friend class DAGEdge;

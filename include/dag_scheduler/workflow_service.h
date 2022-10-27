@@ -14,8 +14,6 @@
 
 #include <memory>
 
-#include "declspec.h"
-
 /*
  * Code in this module borrowed from:
  * https://www.boost.org/doc/libs/develop/libs/beast/example/http/server/
@@ -26,7 +24,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS WorkflowService :
+    class WorkflowService :
       public LoggedClass<WorkflowService>
     {
     public:
@@ -39,13 +37,13 @@ namespace com
         std::string pem_;
       };
 
-      struct router
+      struct Router
       {
       public:
         bool register_endpoint(const boost::beast::string_view &endpoint,
           std::unique_ptr<EndpointHandler> handler);
 
-        std::unique_ptr<EndpointHandler>& operator[](
+        std::unique_ptr<EndpointHandler> &operator[](
           const boost::beast::string_view &endpoint);
 
       private:
@@ -60,11 +58,11 @@ namespace com
       {
       public:
         HTTPSListener(
-          boost::asio::io_context& ioc,
-          boost::asio::ssl::context& ctx,
-          boost::asio::ip::tcp::endpoint& endpoint,
-          std::shared_ptr<const std::string>& doc_root,
-          router& router_);
+          boost::asio::io_context &ioc,
+          boost::asio::ssl::context &ctx,
+          boost::asio::ip::tcp::endpoint &endpoint,
+          std::shared_ptr<const std::string> &doc_root,
+          Router &router_);
 
         ~HTTPSListener() override;
 
@@ -81,24 +79,24 @@ namespace com
         void create_acceptor();
 
       private:
-        boost::asio::io_context& ioc_;
-        boost::asio::ssl::context& ctx_;
+        boost::asio::io_context &ioc_;
+        boost::asio::ssl::context &ctx_;
         boost::asio::ip::tcp::acceptor acceptor_;
         boost::asio::ip::tcp::endpoint endpoint_;
         std::shared_ptr<const std::string> doc_root_;
-        router& router_;
+        Router &router_;
       };
 
     public:
       /**
        * @brief default ctor
        */
-      explicit WorkflowService(const ConnectionInfo& ci);
+      explicit WorkflowService(const ConnectionInfo &ci);
 
     private:
       boost::asio::io_context ioc_;
       boost::asio::ssl::context ctx_;
-      router router_;
+      Router router_;
     };
   }
 }
@@ -108,7 +106,7 @@ namespace YAML
   template<>
   struct convert<com::dag_scheduler::WorkflowService::ConnectionInfo>
   {
-    static bool decode(const Node& node,
+    static bool decode(const Node &node,
       com::dag_scheduler::WorkflowService::ConnectionInfo &rhs)
     {
       if (node.size() != 5) {

@@ -1,8 +1,6 @@
 #ifndef UUID_H_INCLUDED
 #define UUID_H_INCLUDED
 
-#include "declspec.h"
-
 #include <uuid/uuid.h>
 
 #include <ostream>
@@ -21,7 +19,7 @@ namespace com
      * an item like a \ref dag or a \ref dag_vertex for the purposes of
      * mutating it while not impacting the original.
      */
-    class DLLSPEC_DAGTASKS UUID
+    class UUID
     {
     public:
       /**

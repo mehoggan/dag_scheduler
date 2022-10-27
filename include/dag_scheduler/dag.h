@@ -1,8 +1,6 @@
 #ifndef DAG_H_INCLUDED
 #define DAG_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/dag_vertex.h"
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/uuid.h"
@@ -45,7 +43,7 @@ namespace com
      * If any connection would make the graph acyclic then an exception is
      * thrown and the connection is not made.
      */
-    class DLLSPEC_DAGTASKS DAG : public LoggedClass<DAG>
+    class DAG : public LoggedClass<DAG>
     {
     public:
       /**

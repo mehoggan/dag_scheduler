@@ -1,58 +1,53 @@
-# Change Notes
+# User Notes
 
-## Thursday September 29, 2022
+# Developer Notes
 
-On Fedora release 36 one must run
-```bash
-> sudo dnf -y install perl
-```
-if perl is not already installed, otherwise the openssl build will fail <br />
-to configure.
+## Build Dependencies
 
-Furthermore, on Fedora release 36 libuuid is needed along with its <br />
-development package. Doxygen was also installed to remove a CMake warning <br />
-with:
+If you wish to clone all dependencies at once at the time of clone run:
 
-```bash
-> sudo dnf install -y uuid-c++ uuid-c++-devel libuuid-devel
-> sudo dnf install -y doxygen
+```sh
+> git clone --recurse-submodules -j8 git@gitlab.com:m8665/dag_scheduler.git
 ```
 
-## Wednesday March 30, 2021
-On OSx Big Sur one needs to:
-```bash
-> sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+If you did not clone recursively then run the following.
+
+```sh
+> pushd ./deps/openssl; git submodule update --init --recursive; popd
+> pushd ./deps/boost; git submodule update --init --recursive; popd
 ```
-after installing xcode from the App Store.
 
-## Wednesday December 1, 2021
-* The following file: boostbeast/include/boost/core/noinit_adaptor.hpp <br />
-needs to have its contents changed to
+Once the dependencies and all their dependencies are up-to-date, run the </br>
+following command from the root directory of this repository. </br>
 
-```c++
-template<class U>
-void destroy(U* p) {
-    using UClass = typename U::U;
-    p->~UClass();
-    (void)p;
-} 
+```sh
+> ./scripts/setup.deps.sh
 ```
-in order for it to compile on OSX Big Sur.
 
-## Tuesday August 17, 2021
-* Added in ycm changes to support development in Mac OSX.
-* Work done on adding tasks to scheduler.
-  * Checked interuptible_task_thread for tests.
+## OSX System Setup
 
-## WIP: Sunday March 22, 2020
-* Added in ycm changes to support development in Ubuntu 18.04 after a <br />
-  long break from development. 
+```sh
+> brew install autoconf automake libtool autoconf-archive googletest \
+    rapidjson yaml-cpp
+```
 
+## Fedora DNF System Setup
 
-# Developer's Notes
+```sh
+> sudo dfn install -y ...
+```
 
-## Testing
+## Debian Apt System Setup
 
-Please be sure to add /* Tested [✓] */ in the .cxx or .hpp files for <br />
-methods that have been tested. Once the class has been completely tested <br />
-please feel free to remove the comment.
+```sh
+> sudo apt install -y git-all autoconf automake libtool autoconf-archive \
+    libgtest-dev rapidjson-dev 	libyaml-cpp-dev
+```
+
+## Build file generation Unix Systems
+
+```sh
+> autoreconf -i
+> ./configure
+> make
+```

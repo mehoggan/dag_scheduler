@@ -1,8 +1,6 @@
 #ifndef LOGGED_CLASS_H_INCLUDED
 #define LOGGED_CLASS_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/logging.h"
 
 namespace com

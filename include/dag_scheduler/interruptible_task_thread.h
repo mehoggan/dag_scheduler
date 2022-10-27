@@ -1,8 +1,6 @@
 #ifndef INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
 #define INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/logging.h"
 #include "dag_scheduler/task.h"
 
@@ -12,7 +10,7 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class DLLSPEC_DAGTASKS InterruptibleTaskThread
+    class InterruptibleTaskThread
     {
     public:
       /**

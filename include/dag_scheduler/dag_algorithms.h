@@ -1,8 +1,6 @@
 #ifndef DAG_ALGORITHMS_H_INCLUDED
 #define DAG_ALGORITHMS_H_INCLUDED
 
-#include "declspec.h"
-
 #include "dag_scheduler/dag.h"
 #include "dag_scheduler/task_scheduler.h"
 
@@ -25,7 +23,7 @@ namespace com
      * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>> of
      *         all the \ref DAGVertex (s) which have no incomming edges. 
      */
-    DLLSPEC_DAGTASKS std::vector<std::shared_ptr<DAGVertex>>
+    std::vector<std::shared_ptr<DAGVertex>>
     dag_vertices_with_no_incomming_edges(DAG &g);
 
     /**
@@ -43,7 +41,7 @@ namespace com
      *
      * @return true \ref dag has a cycle, false otherwise. 
      */
-    DLLSPEC_DAGTASKS bool dag_topological_sort(DAG &g,
+    bool dag_topological_sort(DAG &g,
       std::list<DAGVertex> &sorted_vertices);
 
     /**
@@ -66,7 +64,7 @@ namespace com
      * @return False if \ref g could not have all \ref DAGVertex (s)
      *         visited. 
      */
-    DLLSPEC_DAGTASKS bool process_dag(DAG &g, processed_order_type &out,
+    bool process_dag(DAG &g, processed_order_type &out,
       TaskScheduler &scheduler);
   }
 }

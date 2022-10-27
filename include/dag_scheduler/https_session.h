@@ -21,17 +21,17 @@ namespace com
         friend class HTTPSListener;
 
       private:
-        class session_responder :
+        class SessionResponder :
           public Responder
         {
         public:
-          explicit session_responder(HTTPSSession& self);
+          explicit SessionResponder(HTTPSSession &self);
 
           void send(StringMessageType &&) override;
           void send(EmptyMessageType &&) override;
 
         private:
-          HTTPSSession& self_;
+          HTTPSSession &self_;
         };
 
       public:
@@ -40,7 +40,7 @@ namespace com
           boost::asio::ssl::context &ctx,
           std::shared_ptr<const std::string> doc_root,
           WorkflowService::HTTPSListener &owner,
-          WorkflowService::router &router);
+          WorkflowService::Router &router);
 
         void run();
 
@@ -61,8 +61,8 @@ namespace com
         EndpointHandler::StringRequestType req_;
         std::shared_ptr<void> res_;
         std::unique_ptr<Responder> responder_;
-        WorkflowService::HTTPSListener&  owner_;
-        WorkflowService::router& router_;
+        WorkflowService::HTTPSListener &owner_;
+        WorkflowService::Router &router_;
     };
   }
 }

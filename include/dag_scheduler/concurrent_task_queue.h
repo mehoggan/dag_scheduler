@@ -21,12 +21,12 @@ namespace com
       struct queue_not_empty
       {
       public:
-        queue_not_empty(const std::deque<std::unique_ptr<Task>>& queue);
+        queue_not_empty(const std::deque<std::unique_ptr<Task>> &queue);
 
         bool operator()() const;
 
       private:
-        const std::deque<std::unique_ptr<Task>>& queue_;
+        const std::deque<std::unique_ptr<Task>> &queue_;
       };
 
     public:
