@@ -9,7 +9,7 @@ RUN sed -i \
 RUN dnf groupinstall -y "Development Tools"
 RUN dnf install -y perl-core zlib-devel libuuid-devel
 RUN dnf --enablerepo=powertools install -y autoconf-archive autogen \
-  gtest-devel gmock-devel
+  gtest-devel gmock-devel bzip2-devel
 
 # There are some packages not available to centos 8 so we manually build them.
 # This may be true for other future systems, use package managers where
@@ -64,7 +64,7 @@ RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
   export TOP=/home/dag_scheduler/deps/build && \
   export LD_LIBRARY_PATH=${TOP}/boost/lib && \
   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib64 && \
+  ldconfig /usr/local/lib64 && \
   mkdir -p ${DOC_ROOT} && \
   ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
   sleep 5 && \
