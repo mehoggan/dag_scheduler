@@ -30,19 +30,26 @@ namespace com
     DAG::DAG(const std::string &title) :
       LoggedClass(*this),
       title_(title)
-    {}
+    {
+      Logging::info(LOG_TAG, "Created DAG with title=", title_);
+    }
 
     DAG::~DAG()
     {}
 
     DAG::DAG(DAG &&other) :
       LoggedClass(*this),
-      graph_(std::move(other.graph_))
-    {}
+      graph_(std::move(other.graph_)),
+      title_(other.title_)
+    {
+      Logging::info(LOG_TAG, "Moved DAG with title=", title_);
+    }
 
     DAG &DAG::operator=(DAG &&other)
     {
       graph_ = std::move(other.graph_);
+      title_ = other.title_;
+      Logging::info(LOG_TAG, "Moved Assigned DAG with title=", title_);
       return (*this);
     }
 
@@ -481,6 +488,8 @@ namespace com
       for (std::size_t i = 0; i < graph_.size(); ++i) {
         clone_connections(*other.graph_[i], *graph_[i]);
       }
+      title_ = other.title_;
+      Logging::info(LOG_TAG, "Copied DAG with title=", title_);
     }
 
     DAG &DAG::operator=(const DAG &rhs)
@@ -496,12 +505,18 @@ namespace com
         clone_connections(*rhs.graph_[i], *graph_[i]);
       }
 
+      title_ = rhs.title_;
+      Logging::info(LOG_TAG, "Assigned DAG with title=", title_);
+
       return (*this);
     }
 
     std::ostream &operator<<(std::ostream &out, const DAG &g)
     {
-      out << "Title: --" << g.title_ << "--" << std::endl;
+      out << "Title: \"" << g.title_ << "\"";
+      if (not g.graph_.empty()) {
+        out << std::endl;
+      }
       for (std::shared_ptr<DAGVertex> v : g.graph_) {
         out << (*v) << std::endl;
       }

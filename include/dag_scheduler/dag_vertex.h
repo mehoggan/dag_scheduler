@@ -119,6 +119,41 @@ namespace com
       explicit DAGVertex(const std::string &label);
 
       /**
+       * @brief A constructor for a \ref DAGVertex
+       *
+       * A constructor for a \ref DAGVertex
+       *
+       * @param[in] label A string by which to identify one or more
+       *                  \ref DAGVertex.
+       * @param[in] task A DAGTask which contains stages to be executed.
+       */
+      DAGVertex(const std::string &label, std::unique_ptr<Task> &&task); 
+
+      /**
+       * @brief A constructor for a \ref DAGVertex
+       *
+       * A constructor for a \ref DAGVertex
+       *
+       * @param[in] label A string by which to identify one or more
+       *                  \ref DAGVertex.
+       * @param[in] task A DAGTask which contains stages to be executed.
+       * @param[in] uuid A user defined UUID.
+       */
+      DAGVertex(const std::string &label, std::unique_ptr<Task> &&task,
+        class UUID &&uuid); 
+
+      /**
+       * @brief A constructor for a \ref DAGVertex
+       *
+       * A constructor for a \ref DAGVertex
+       *
+       * @param[in] label A string by which to identify one or more
+       *                  \ref DAGVertex.
+       * @param[in] task A DAGTask which contains stages to be executed.
+       * @param[in] uuid A user defined UUID.
+       */
+
+      /**
        * @brief A destructor for a \ref DAGVertex 
        *
        * A destructor for a \ref DAGVertex
@@ -381,6 +416,14 @@ namespace com
       FRIEND_TEST(TestDagVertex, clone_all_edges);
       FRIEND_TEST(TestDagVertex, copy_ctor_with_edges);
       FRIEND_TEST(TestDagVertex, assignment_operator_with_edges);
+      FRIEND_TEST(TestDagVertex, move_ctor_with_edges_with_task);
+      FRIEND_TEST(TestDagVertex,
+        assignment_move_operator_with_edges_with_task);
+      FRIEND_TEST(TestDagVertex, copy_ctor_no_edges_with_task);
+      FRIEND_TEST(TestDagVertex, assignment_operator_no_edges_with_task);
+      FRIEND_TEST(TestDagVertex, clone_all_edges_with_task);
+      FRIEND_TEST(TestDagVertex, copy_ctor_with_edges_with_task);
+      FRIEND_TEST(TestDagVertex, assignment_operator_with_edges_with_task);
       FRIEND_TEST(TestDagVertex, add_incomming_edge);
       FRIEND_TEST(TestDagVertex, sub_incomming_edge);
       FRIEND_TEST(TestDagVertex, clear_edges);

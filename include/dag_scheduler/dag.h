@@ -20,6 +20,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"
 #pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <boost/beast.hpp>
 #ifdef __clang__
@@ -525,8 +526,8 @@ namespace com
       DAG &operator=(const DAG &rhs);
 
     private:
-      typedef std::vector<std::shared_ptr<DAGVertex>> dag_graph;
-      dag_graph graph_;
+      typedef std::vector<std::shared_ptr<DAGVertex>> DAG_t;
+      DAG_t graph_;
       std::string title_;
 
     private:

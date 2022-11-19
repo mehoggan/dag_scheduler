@@ -6,9 +6,11 @@ libdag_scheduler_la_CPPFLAGS = -Werror -Wall -pedantic \
     -I$(abs_top_srcdir)/deps/build/openssl/include
 
 libdag_scheduler_la_SOURCES = concurrent_task_queue.cxx \
+		base_task_stage.cxx \
     dag.cxx \
     dag_algorithms.cxx \
     dag_edge.cxx \
+		dag_serialization.cxx \
     dag_vertex.cxx \
     endpoints.cxx \
     https_session.cxx \

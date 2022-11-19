@@ -1,6 +1,7 @@
 #include "dag_scheduler/uuid.h"
 
 #include <iostream>
+#include <stdexcept>
 
 namespace com
 {
@@ -10,6 +11,15 @@ namespace com
     {
       uuid_generate(uuid_);
     }
+
+   UUID::UUID(const std::string &user_defined_uuid)
+   {
+     int status = uuid_parse(user_defined_uuid.c_str(), uuid_);
+     if (status == -1) {
+       throw std::runtime_error("Failed to parse user defined uuid of " +
+         user_defined_uuid);
+     }
+   }
 
     UUID::~UUID()
     {

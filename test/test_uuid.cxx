@@ -21,6 +21,15 @@ namespace com
       EXPECT_TRUE(uid1.is_initialized());
     }
 
+    TEST(U_DAG_UUID, ctor_user_defined)
+    {
+      std::string user_defined_uuid {"8fa73f0e-e83a-4610-99bd-9a4b618addde"};
+      UUID uid1(user_defined_uuid);;
+      EXPECT_TRUE(uid1.is_initialized());
+      const std::string &actual_uuid = uid1.as_string();
+      EXPECT_EQ(user_defined_uuid, actual_uuid);
+    }
+
     TEST(U_DAG_UUID, dtor)
     {
       UUID uid1;

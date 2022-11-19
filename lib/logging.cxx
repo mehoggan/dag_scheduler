@@ -11,7 +11,16 @@
 #include <boost/log/expressions/formatters/date_time.hpp>
 #include <boost/log/expressions/keyword.hpp>
 #include <boost/log/sources/severity_feature.hpp>
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <boost/log/support/date_time.hpp>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
@@ -91,7 +100,7 @@ namespace com
         boost::log::add_common_attributes();
         init_.store(true);
       }
-      return !init_.load();
+      return init_.load();
     }
 
     boost::filesystem::path Logging::mktmpdir(

@@ -3,8 +3,17 @@
 
 #include "dag_scheduler/logging.h"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <boost/asio/ssl.hpp>
 #include <boost/beast.hpp>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace std
 {

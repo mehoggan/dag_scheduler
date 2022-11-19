@@ -89,33 +89,34 @@ namespace com
       EXPECT_FALSE(ran_all);
     }
 
-    // TODO (mehoggan) enable these.
     TEST_F(TestTask, user_cannot_move_task_while_iterating_stages)
     {
-      // ASSERT_DEATH(
-      //   {
-      //     TestTaskImpl tt;
-      //     tt.iterate_stages([&](TaskStage &next) {
-      //       next.end();
-      //       TestTaskImpl destroy(std::move(tt));
-      //       return true;
-      //     });
-      //   },
-      //   ""
-      // );
+      // Test move copy ctor.
+      ASSERT_DEATH(
+        {
+          TestTaskImpl tt;
+          tt.iterate_stages([&](TaskStage &next) {
+            next.end();
+            TestTaskImpl destroy(std::move(tt));
+            return true;
+          });
+        },
+        ""
+      );
 
-      // ASSERT_DEATH(
-      //   {
-      //     TestTaskImpl tt;
-      //     tt.iterate_stages([&](TaskStage &next) {
-      //       next.end();
-      //       TestTaskImpl destroy;
-      //       destroy = std::move(tt);
-      //       return true;
-      //     });
-      //   },
-      //   ""
-      // );
+      // Test move assignment operator.
+      ASSERT_DEATH(
+        {
+          TestTaskImpl tt;
+          tt.iterate_stages([&](TaskStage &next) {
+            next.end();
+            TestTaskImpl destroy;
+            destroy = std::move(tt);
+            return true;
+          });
+        },
+        ""
+      );
     }
   }
 }

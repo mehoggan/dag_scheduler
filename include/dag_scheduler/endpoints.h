@@ -3,7 +3,16 @@
 
 #include "dag_scheduler/logged_class.hpp"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <boost/beast.hpp>
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace com
 {

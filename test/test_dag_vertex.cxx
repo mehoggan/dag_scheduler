@@ -4,6 +4,7 @@
 #include "dag_scheduler/dag_vertex.h"
 
 #include <iostream>
+#include <memory>
 
 namespace com
 {
@@ -23,12 +24,12 @@ namespace com
         v_ptr_.reset();
       }
 
-      DAGVertex &get_DAGVertex()
+      DAGVertex &get_dag_vertex()
       {
         return v_;
       }
 
-      std::shared_ptr<DAGVertex> get_DAGVertex_ptr()
+      std::shared_ptr<DAGVertex> get_dag_vertex_ptr()
       {
         return v_ptr_;
       }
@@ -47,6 +48,7 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v.get_task());
     }
 
     TEST_F(TestDagVertex, string_ctor)
@@ -58,6 +60,42 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v.get_task());
+    }
+
+    TEST_F(TestDagVertex, string_task_ctor)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ("1 Task", v.get_task()->label());
+      EXPECT_EQ(task_uuid, v.get_task()->get_uuid().as_string());
+    }
+
+    TEST_F(TestDagVertex, string_task_uuid_ctor)
+    {
+      class UUID user_generated_uuid;
+      const std::string user_generated_uuid_str =
+        user_generated_uuid.as_string();
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task), std::move(user_generated_uuid));
+      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ("1 Task", v.get_task()->label());
+      EXPECT_EQ(task_uuid, v.get_task()->get_uuid().as_string());
     }
 
     TEST_F(TestDagVertex, dtor_no_edges)
@@ -91,6 +129,7 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_TRUE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_moved.get_task());
     }
 
     TEST_F(TestDagVertex, assignment_move_operator_no_edges)
@@ -113,6 +152,7 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_TRUE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_moved.get_task());
     }
 
     TEST_F(TestDagVertex, clone_no_edges)
@@ -134,6 +174,7 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_cloned.get_task());
     }
 
     TEST_F(TestDagVertex, copy_ctor_no_edges)
@@ -155,6 +196,7 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_copied.get_task());
     }
 
     TEST_F(TestDagVertex, assignment_operator_no_edges)
@@ -177,40 +219,171 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_copied.get_task());
+    }
+
+    TEST_F(TestDagVertex, move_ctor_no_edges_with_task)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      DAGVertex v_moved = std::move(v);
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_moved.current_status_as_string());
+      EXPECT_EQ("1", v_moved.label());
+      EXPECT_EQ(0ul, v_moved.edge_count());
+      EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_moved.incomming_edge_count());
+
+      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
+      EXPECT_EQ("", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_TRUE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ("1 Task", v_moved.get_task()->label());
+      EXPECT_EQ(task_uuid, v_moved.get_task()->get_uuid().as_string());
+    }
+
+    TEST_F(TestDagVertex, assignment_move_operator_no_edges_with_task)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      DAGVertex v_moved;
+      v_moved = std::move(v);
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_moved.current_status_as_string());
+      EXPECT_EQ("1", v_moved.label());
+      EXPECT_EQ(0ul, v_moved.edge_count());
+      EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_moved.incomming_edge_count());
+
+      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
+      EXPECT_EQ("", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_TRUE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ("1 Task", v_moved.get_task()->label());
+      EXPECT_EQ(task_uuid, v_moved.get_task()->get_uuid().as_string());
+    }
+
+    TEST_F(TestDagVertex, clone_no_edges_with_task)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      DAGVertex v_cloned = v.clone();
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v_cloned.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_cloned.current_status_as_string());
+      EXPECT_EQ("1", v_cloned.label());
+      EXPECT_EQ(0ul, v_cloned.edge_count());
+      EXPECT_FALSE(v_cloned.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_cloned.incomming_edge_count());
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      std::cout << "Here 1" << std::endl;
+      EXPECT_EQ(nullptr, v_cloned.get_task());
+    }
+
+    TEST_F(TestDagVertex, copy_ctor_no_edges_with_task)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      DAGVertex v_copied(v);
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("1", v_copied.label());
+      EXPECT_EQ(0ul, v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_copied.get_task());
+    }
+
+    TEST_F(TestDagVertex, assignment_operator_no_edges_with_task)
+    {
+      std::vector<std::unique_ptr<TaskStage>> stages{};
+      auto task = std::make_unique<Task>(stages, "1 Task");
+      std::string task_uuid = task->get_uuid().as_string();
+      DAGVertex v("1", std::move(task));
+      DAGVertex v_copied;
+      v_copied = v;
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(std::string("initialized"),
+        v_copied.current_status_as_string());
+      EXPECT_EQ("1", v_copied.label());
+      EXPECT_EQ(0ul, v_copied.edge_count());
+      EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v_copied.incomming_edge_count());
+
+      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
+      EXPECT_EQ("1", v.label());
+      EXPECT_EQ(0ul, v.edge_count());
+      EXPECT_FALSE(v.get_uuid().as_string().empty());
+      EXPECT_EQ(0ul, v.incomming_edge_count());
+      EXPECT_EQ(nullptr, v_copied.get_task());
     }
 
     TEST_F(TestDagVertex, connect_and_contains_connection)
     {
       {
         std::shared_ptr<DAGVertex> v = std::make_shared<DAGVertex>("2");
-        EXPECT_TRUE(get_DAGVertex().connect(v));
-        EXPECT_TRUE(get_DAGVertex().contains_connection_to(*v));
-        EXPECT_EQ(1ul, get_DAGVertex().edge_count());
+        EXPECT_TRUE(get_dag_vertex().connect(v));
+        EXPECT_TRUE(get_dag_vertex().contains_connection_to(*v));
+        EXPECT_EQ(1ul, get_dag_vertex().edge_count());
       }
       {
         std::shared_ptr<DAGVertex> v = std::make_shared<DAGVertex>("2");
-        EXPECT_TRUE(get_DAGVertex().connect(v));
-        EXPECT_TRUE(get_DAGVertex().contains_connection_to(*v));
-        EXPECT_EQ(2ul, get_DAGVertex().edge_count());
+        EXPECT_TRUE(get_dag_vertex().connect(v));
+        EXPECT_TRUE(get_dag_vertex().contains_connection_to(*v));
+        EXPECT_EQ(2ul, get_dag_vertex().edge_count());
       }
       {
         std::shared_ptr<DAGVertex> v = std::make_shared<DAGVertex>("3");
-        EXPECT_TRUE(get_DAGVertex().connect(v));
-        EXPECT_TRUE(get_DAGVertex().contains_connection_to(*v));
-        EXPECT_EQ(3ul, get_DAGVertex().edge_count());
+        EXPECT_TRUE(get_dag_vertex().connect(v));
+        EXPECT_TRUE(get_dag_vertex().contains_connection_to(*v));
+        EXPECT_EQ(3ul, get_dag_vertex().edge_count());
       }
       {
         std::shared_ptr<DAGVertex> dup =
           std::make_shared<DAGVertex>("dup");
-        EXPECT_TRUE(get_DAGVertex().connect(dup));
-        EXPECT_TRUE(get_DAGVertex().contains_connection_to(*dup));
-        EXPECT_EQ(4ul, get_DAGVertex().edge_count());
-        EXPECT_FALSE(get_DAGVertex().connect(dup));
-        EXPECT_TRUE(get_DAGVertex().contains_connection_to(*dup));
-        EXPECT_EQ(4ul, get_DAGVertex().edge_count());
+        EXPECT_TRUE(get_dag_vertex().connect(dup));
+        EXPECT_TRUE(get_dag_vertex().contains_connection_to(*dup));
+        EXPECT_EQ(4ul, get_dag_vertex().edge_count());
+        EXPECT_FALSE(get_dag_vertex().connect(dup));
+        EXPECT_TRUE(get_dag_vertex().contains_connection_to(*dup));
+        EXPECT_EQ(4ul, get_dag_vertex().edge_count());
       }
-      get_DAGVertex().clear_edges();
-      ASSERT_EQ(0ul, get_DAGVertex().edge_count());
+      get_dag_vertex().clear_edges();
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestDagVertex, visit_all_edges_points_to_actual_verticies)
@@ -225,22 +398,22 @@ namespace com
       };
 
       for (std::shared_ptr<DAGVertex> v : connections) {
-        get_DAGVertex().connect(v);
+        get_dag_vertex().connect(v);
       }
-      EXPECT_EQ(connections.size(), get_DAGVertex().edge_count());
+      EXPECT_EQ(connections.size(), get_dag_vertex().edge_count());
 
       std::size_t index = 0;
-      get_DAGVertex().visit_all_edges([&](const DAGEdge &e) {
+      get_dag_vertex().visit_all_edges([&](const DAGEdge &e) {
           DAGEdge &e_ref = *const_cast<DAGEdge *>(&e);
           EXPECT_EQ(connections[index], e_ref.get_connection().lock());
           EXPECT_EQ(*connections[index], *(e_ref.get_connection().lock()));
           ++index;
         }
       );
-      EXPECT_EQ(get_DAGVertex().edge_count(), index);
+      EXPECT_EQ(get_dag_vertex().edge_count(), index);
 
-      get_DAGVertex().clear_edges();
-      ASSERT_EQ(0ul, get_DAGVertex().edge_count());
+      get_dag_vertex().clear_edges();
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestDagVertex, clone_all_edges_and_restablish_connections)
@@ -255,22 +428,22 @@ namespace com
       };
 
       for (std::shared_ptr<DAGVertex> v : connections) {
-        get_DAGVertex().connect(v);
+        get_dag_vertex().connect(v);
       }
-      EXPECT_EQ(connections.size(), get_DAGVertex().edge_count());
+      EXPECT_EQ(connections.size(), get_dag_vertex().edge_count());
 
       std::vector<DAGVertex::DAGVertex_connection> edges =
-        get_DAGVertex().clone_all_connections();
+        get_dag_vertex().clone_all_connections();
       // First vertex connects to itself.
       EXPECT_EQ(connections.size(), edges.size());
 
-      DAGVertex tmp = get_DAGVertex().clone();
+      DAGVertex tmp = get_dag_vertex().clone();
       std::vector<std::shared_ptr<DAGVertex>> connections_cloned =
         tmp.restablish_connections(edges);
-      EXPECT_EQ(get_DAGVertex(), tmp);
+      EXPECT_EQ(get_dag_vertex(), tmp);
 
       std::size_t index = 0;
-      get_DAGVertex().visit_all_edges([&](const DAGEdge &e) {
+      get_dag_vertex().visit_all_edges([&](const DAGEdge &e) {
           DAGEdge &e_ref = *const_cast<DAGEdge *>(&e);
           std::size_t j = 0;
           tmp.visit_all_edges([&](const DAGEdge &e_clone) {
@@ -286,8 +459,8 @@ namespace com
         }
       );
 
-      get_DAGVertex().clear_edges();
-      ASSERT_EQ(0ul, get_DAGVertex().edge_count());
+      get_dag_vertex().clear_edges();
+      ASSERT_EQ(0ul, get_dag_vertex().edge_count());
     }
 
     TEST_F(TestDagVertex, has_incomming_edge_and_incomming_edge_count)
@@ -303,22 +476,22 @@ namespace com
 
       std::size_t count = 0;
       for (std::shared_ptr<DAGVertex> v : connections) {
-        EXPECT_TRUE((*v).connect(get_DAGVertex_ptr()));
+        EXPECT_TRUE((*v).connect(get_dag_vertex_ptr()));
         ++count;
-        EXPECT_EQ(count, get_DAGVertex_ptr()->incomming_edge_count());
-        EXPECT_TRUE(get_DAGVertex_ptr()->has_incomming_edges());
+        EXPECT_EQ(count, get_dag_vertex_ptr()->incomming_edge_count());
+        EXPECT_TRUE(get_dag_vertex_ptr()->has_incomming_edges());
 
         EXPECT_EQ(1ul, v->edge_count());
         v->visit_all_edges([&](const DAGEdge &e) {
             DAGEdge &e_ref = *const_cast<DAGEdge *>(&e);
-            EXPECT_EQ(e_ref.get_connection().lock(), get_DAGVertex_ptr());
+            EXPECT_EQ(e_ref.get_connection().lock(), get_dag_vertex_ptr());
             EXPECT_EQ(*(e_ref.get_connection().lock()),
-              *(get_DAGVertex_ptr()));
+              *(get_dag_vertex_ptr()));
           }
         );
       }
-      EXPECT_EQ(0ul, get_DAGVertex_ptr()->edge_count());
-      EXPECT_EQ(count, get_DAGVertex_ptr()->incomming_edge_count());
+      EXPECT_EQ(0ul, get_dag_vertex_ptr()->edge_count());
+      EXPECT_EQ(count, get_dag_vertex_ptr()->incomming_edge_count());
     }
 
     TEST_F(TestDagVertex, move_ctor_with_edges)
@@ -464,7 +637,7 @@ namespace com
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
-      // dag_graph should be the object that orchestrates that.
+      // DAG_t should be the object that orchestrates that.
       std::vector<DAGVertex::DAGVertex_connection> orig_connections =
       v.clone_all_connections();
       std::vector<std::shared_ptr<DAGVertex>> cloned_connections =
@@ -612,7 +785,7 @@ namespace com
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
-      // dag_graph should be the object that orchestrates that.
+      // DAG_t should be the object that orchestrates that.
       std::vector<DAGVertex::DAGVertex_connection> orig_connections =
       v.clone_all_connections();
       std::vector<std::shared_ptr<DAGVertex>> copied_connections =
@@ -684,7 +857,7 @@ namespace com
 
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
-      // outside the class by the code that is cloning the DAGVertex. dag_graph
+      // outside the class by the code that is cloning the DAGVertex. DAG_t
       // should be the object that orchestrates that.
       std::vector<DAGVertex::DAGVertex_connection> orig_connections =
       v.clone_all_connections();

@@ -28,6 +28,11 @@ namespace com
       UUID();
 
       /**
+       * @brief ctor
+       */
+      explicit UUID(const std::string &user_defined_uuid);
+
+      /**
        * @brief dtor
        */
       ~UUID();

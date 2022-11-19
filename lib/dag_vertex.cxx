@@ -41,6 +41,26 @@ namespace com
       incomming_edge_count_(0)
     {}
 
+    DAGVertex::DAGVertex(
+      const std::string &label,
+      std::unique_ptr<Task> &&task) :
+      current_status_(Status::initialized),
+      label_(label),
+      incomming_edge_count_(0),
+      task_(std::move(task))
+    {}
+
+
+    DAGVertex::DAGVertex(const std::string &label,
+      std::unique_ptr<Task> &&task,
+      UUID &&uuid) :
+      uuid_(std::move(uuid)),
+      current_status_(Status::initialized),
+      label_(label),
+      incomming_edge_count_(0),
+      task_(std::move(task))
+    {}
+
     DAGVertex::~DAGVertex()
     {
       current_status_ = Status::invalid;
@@ -274,7 +294,11 @@ namespace com
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
-      // dag_graph should be the object that orchestrates that.
+      // DAG_t should be the object that orchestrates that.
+      // Also the internal task cannot be cloned nor can it be moved, for now
+      // we need to tell client code to assign another instance of the task
+      // which may be disruptive to the task if there is state inside the task
+      // that will be lost as a result of cloning.
     }
 
     DAGVertex &DAGVertex::operator=(const DAGVertex &rhs)
@@ -288,7 +312,11 @@ namespace com
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
-      // dag_graph should be the object that orchestrates that.
+      // DAG_t should be the object that orchestrates that.
+      // Also the internal task cannot be cloned nor can it be moved, for now
+      // we need to tell client code to assign another instance of the task
+      // which may be disruptive to the task if there is state inside the task
+      // that will be lost as a result of cloning.
       return (*this);
     }
 
@@ -297,12 +325,20 @@ namespace com
       out << "uuid_ = " << v.uuid_ << " current_status_ = "
         << v.current_status_as_string() << " label = " << v.label_ << " "
         << "incomming_edge_count = " << v.incomming_edge_count_ << " "
-        << " edges = " << std::endl;
-        //<< std::endl << "edges(" << v.edge_count() << "): ";
+        << " edges = " << std::endl
+        << std::endl << "edges(" << v.edge_count() << "): ";
       v.visit_all_edges([&](const DAGEdge &e) {
           out << "\t" << e << std::endl;
-        }
-      );
+        });
+
+      const std::unique_ptr<Task> &task_ptr =
+        const_cast<DAGVertex &>(v).get_task();
+      out << "task_ = ";
+      if (task_ptr) {
+        out << (*task_ptr);
+      } else {
+        out << "nullptr";
+      }
 
       return out;
     }
