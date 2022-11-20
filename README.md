@@ -44,10 +44,23 @@ following command from the root directory of this repository. </br>
     libgtest-dev rapidjson-dev 	libyaml-cpp-dev
 ```
 
-## Build file generation Unix Systems
+## Build file generation and compiling library and executable Unix Systems
 
 ```sh
 > autoreconf -i
 > ./configure
 > make
+```
+
+## Running Tests
+
+```sh
+> make check
+
+// If a test fails you can find that specific test in the build logs and then
+// run:
+> ./test/gtest_libdag_scheduler --gtest_filter=<name of test>
+
+// If you cannot find the logs then you can simply just run:
+> ./test/gtest_libdag_scheduler
 ```
