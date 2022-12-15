@@ -151,12 +151,19 @@ namespace com
     }
 
     std::unique_ptr<DAG> YAMLDagDeserializer::make_dag(
-      const YAML::Node &dag_node)
+      const YAML::Node &dag_node) const
     {
       Logging::info(LOG_TAG, "Going to build DAG from\n", dag_node);
 
       std::unique_ptr<DAG> ret;
       if (dag_node["DAG"]) {
+        if (not dag_node["DAG"].IsMap()) {
+          auto error = std::string("\"DAG\" the root elment must be a ") +
+            std::string("YAML map.");
+          throw_wrong_type(UpTo::DAG, error);
+        } // Not sure if this will ever get triggered. But better to
+          // communicate more than less to users.
+
         const YAML::Node dag_definition_node = dag_node["DAG"];
         if (dag_definition_node["Title"]) {
           auto title = dag_definition_node["Title"].as<std::string>();
@@ -169,20 +176,13 @@ namespace com
         }
 
         if (dag_definition_node["Veritices"]) {
-           if (dag_definition_node.IsMap()) {
-           } else {
-             throw YAMLDagWrongTypeError(
-               "Verticies was not declared correctly in\n" +
-               n2s(dag_definition_node) + "\nLooking for\n" +
-               "DAG:\n  Vertices:\n    Vertex:\n      ...");
-           }
+          make_vertices(dag_definition_node["Verticies"], ret);
         } else {
           Logging::warn(LOG_TAG, "No \"Vertices\": map found in",
             n2s(dag_node));
         }
       } else {
-        std::string sample = YAMLDagDeserializer::sample_dag_output(
-          YAMLDagDeserializer::UpTo::DAG);
+        std::string sample = YAMLDagDeserializer::sample_dag_output(UpTo::DAG);
         throw YAMLDagDeserializerError(
           "Root element of \"DAG\" not found in\n" + n2s(dag_node) +
           "\nFor example, as in\n" + sample);
@@ -192,10 +192,24 @@ namespace com
     }
 
     void YAMLDagDeserializer::make_vertices(const YAML::Node &vertices_node,
-      std::unique_ptr<DAG> &dag)
+      std::unique_ptr<DAG> &dag) const
     {
-      (void) vertices_node;
       (void) dag;
+      if (vertices_node.IsSequence()) {
+        if (vertices_node.size() >= 0) {
+        }
+      } else {
+        auto error = std::string("\"Vertices\" must be a YAML Sequence.");
+        throw_wrong_type(UpTo::VERTEX, error);
+      }
+    }
+
+    void YAMLDagDeserializer::throw_wrong_type(const UpTo &upto,
+      const std::string &error) const
+    {
+      std::string up_to_example = YAMLDagDeserializer::sample_dag_output(upto);
+      auto error_str = error + std::string(" As in") + up_to_example;
+      throw YAMLDagWrongTypeError(error_str);
     }
   }
 }

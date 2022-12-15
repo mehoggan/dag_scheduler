@@ -26,13 +26,6 @@ namespace com
     class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer>
     {
     public:
-      YAMLDagDeserializer();
-
-      std::unique_ptr<DAG> make_dag(const YAML::Node &dag_node);
-      void make_vertices(const YAML::Node &vertices_node,
-        std::unique_ptr<DAG> &dag);
-
-    public:
       enum class UpTo
       {
         CONNECTIONS,
@@ -45,6 +38,17 @@ namespace com
         STAGE
       };
 
+    public:
+      YAMLDagDeserializer();
+
+      std::unique_ptr<DAG> make_dag(const YAML::Node &dag_node) const;
+      void make_vertices(const YAML::Node &vertices_node,
+        std::unique_ptr<DAG> &dag) const;
+
+    private:
+      void throw_wrong_type(const UpTo &upto, const std::string &error) const;
+
+    public:
       static std::string sample_dag_output(const UpTo &upto);
       static std::string full_sample_output();
 

@@ -202,5 +202,19 @@ namespace com
       EXPECT_EQ("", test_dag->title());
       EXPECT_EQ(0ull, test_dag->vertex_count());
     }
+
+    TEST(TestYAMLDagDeserializer, make_dag_via_convert_vertices_not_sequence)
+    {
+      YAML::Node yaml_node;
+      yaml_node["DAG"] = std::map<std::string, std::string>({
+        {
+          "Title", "Test YAML DAG"
+        }
+      });
+      // TODO (mehoggan): Continue tests here.
+      yaml_node["Vertices"] = std::list<std::string> {};
+      ASSERT_NO_THROW(
+        yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>());
+    }
   }
 }
