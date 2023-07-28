@@ -23,6 +23,10 @@
 
 int main(int argc, char* argv[])
 {
+  std::string help_string = (std::string("\t--dag_yaml should point to a ") +
+    std::string("file with contents similar to:\n") +
+    com::dag_scheduler::YAMLDagDeserializer::full_sample_output());
+
   boost::program_options::options_description desc("Allowed options");
   desc.add_options()
     (
@@ -32,18 +36,19 @@ int main(int argc, char* argv[])
     )
     (
       "help",
-      "Help menu."
+      help_string.c_str()
     );
 
   boost::program_options::variables_map vm;
   boost::program_options::store(boost::program_options::parse_command_line(
       argc, argv, desc), vm);
-  boost::program_options::notify(vm);
 
   int ret = EXIT_FAILURE;
+  bool help = false;
   if (vm.count("help")) {
     std::cout << desc << std::endl;
     ret = EXIT_SUCCESS;
+    help = true;
   } else {
     try {
       std::cout << "Loading YAML file..." << std::endl;
@@ -57,6 +62,9 @@ int main(int argc, char* argv[])
       std::cerr << "Error: " << e.what() << std::endl;
       ret = EXIT_FAILURE;
     }
+  }
+  if (not help) {
+    boost::program_options::notify(vm);
   }
   return ret;
 }

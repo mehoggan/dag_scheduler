@@ -53,6 +53,7 @@ flags = [
     '-I/include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/deps/build/boost/include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/deps/build/openssl/include',
+    '-I/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1',
     '-W',
     '-Wall',
     '-Wcast-align',

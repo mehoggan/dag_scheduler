@@ -48,8 +48,10 @@ following command from the root directory of this repository. </br>
 
 ```sh
 > autoreconf -i
-> ./configure
-> make
+> rm -rf ./build && mkdir -p ./build
+> cd build/ && ./configure
+> cd ../
+> make -C build
 ```
 
 ## Running Tests
@@ -60,6 +62,8 @@ following command from the root directory of this repository. </br>
 // If a test fails you can find that specific test in the build logs and then
 // run:
 > ./test/gtest_libdag_scheduler --gtest_filter=<name of test>
+// example of gtest_filter is:
+//   "TestYAMLDagDeserializer.make_dag_vertices_not_list_of_obj"
 
 // If you cannot find the logs then you can simply just run:
 > ./test/gtest_libdag_scheduler

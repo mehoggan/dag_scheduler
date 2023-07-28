@@ -30,13 +30,13 @@ namespace com
     }
 
     DAGVertex::DAGVertex() :
-      current_status_(Status::initialized),
+      current_status_(Status::INITIALIZED),
       label_(uuid_.as_string()),
       incomming_edge_count_(0)
     {}
 
     DAGVertex::DAGVertex(const std::string &label) :
-      current_status_(Status::initialized),
+      current_status_(Status::INITIALIZED),
       label_(label),
       incomming_edge_count_(0)
     {}
@@ -44,7 +44,7 @@ namespace com
     DAGVertex::DAGVertex(
       const std::string &label,
       std::unique_ptr<Task> &&task) :
-      current_status_(Status::initialized),
+      current_status_(Status::INITIALIZED),
       label_(label),
       incomming_edge_count_(0),
       task_(std::move(task))
@@ -55,7 +55,7 @@ namespace com
       std::unique_ptr<Task> &&task,
       UUID &&uuid) :
       uuid_(std::move(uuid)),
-      current_status_(Status::initialized),
+      current_status_(Status::INITIALIZED),
       label_(label),
       incomming_edge_count_(0),
       task_(std::move(task))
@@ -63,7 +63,7 @@ namespace com
 
     DAGVertex::~DAGVertex()
     {
-      current_status_ = Status::invalid;
+      current_status_ = Status::INVALID;
       label_.clear();
       clear_edges();
       incomming_edge_count_.store(0);
@@ -79,7 +79,7 @@ namespace com
       task_ = std::move(other.task_);
 
       other.label_.clear();
-      other.current_status_ = Status::invalid;
+      other.current_status_ = Status::INVALID;
       other.incomming_edge_count_.store(0ul);
     }
 
@@ -93,7 +93,7 @@ namespace com
       task_ = std::move(rhs.task_);
 
       rhs.label_.clear();
-      rhs.current_status_ = Status::invalid;
+      rhs.current_status_ = Status::INVALID;
       rhs.incomming_edge_count_.store(0ul);
 
       return (*this);
@@ -210,27 +210,27 @@ namespace com
       std::string ret;
 
       switch(current_status_) {
-      case Status::initialized: {
+      case Status::INITIALIZED: {
         ret = "initialized";
       }
         break;
-      case Status::scheduled: {
+      case Status::SCHEDULED: {
         ret = "scheduled";
       }
         break;
-      case Status::running: {
+      case Status::RUNNING: {
         ret = "running";
       }
         break;
-      case Status::passed: {
+      case Status::PASSED: {
         ret = "passed";
       }
         break;
-      case Status::failed: {
+      case Status::FAILED: {
         ret = "failed";
       }
         break;
-      case Status::invalid: {
+      case Status::INVALID: {
         ret = "invalid";
       }
         break;
@@ -362,8 +362,8 @@ namespace com
          * We omit comparision of edges since a vertex checks its edges
          * in equality which would lead to infinite recursion.
          */
-      } else if (lhs.current_status_ == DAGVertex::Status::invalid &&
-        rhs.current_status_ == DAGVertex::Status::invalid){
+      } else if (lhs.current_status_ == DAGVertex::Status::INVALID &&
+        rhs.current_status_ == DAGVertex::Status::INVALID){
         ret = true;
       } else {
         ret = false;

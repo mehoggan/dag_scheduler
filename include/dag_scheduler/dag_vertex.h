@@ -92,12 +92,12 @@ namespace com
       // TODO: Use dag class to manage status.
       enum class Status
       {
-        initialized,
-        scheduled,
-        running,
-        passed,
-        failed,
-        invalid
+        INITIALIZED,
+        SCHEDULED,
+        RUNNING,
+        PASSED,
+        FAILED,
+        INVALID
       };
 
     public:

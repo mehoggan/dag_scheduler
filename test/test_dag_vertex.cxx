@@ -42,7 +42,7 @@ namespace com
     TEST_F(TestDagVertex, ctor)
     {
       DAGVertex v;
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ(v.get_uuid().as_string(), v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -54,7 +54,7 @@ namespace com
     TEST_F(TestDagVertex, string_ctor)
     {
       DAGVertex v("1");
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -69,7 +69,7 @@ namespace com
       auto task = std::make_unique<Task>(stages, "1 Task");
       std::string task_uuid = task->get_uuid().as_string();
       DAGVertex v("1", std::move(task));
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -88,7 +88,7 @@ namespace com
       auto task = std::make_unique<Task>(stages, "1 Task");
       std::string task_uuid = task->get_uuid().as_string();
       DAGVertex v("1", std::move(task), std::move(user_generated_uuid));
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -102,7 +102,7 @@ namespace com
     {
       DAGVertex v("1");
       v.~DAGVertex();
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -115,7 +115,7 @@ namespace com
       DAGVertex v("1");
       DAGVertex v_moved = std::move(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("1", v_moved.label());
@@ -123,7 +123,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -138,7 +138,7 @@ namespace com
       DAGVertex v_moved;
       v_moved = std::move(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("1", v_moved.label());
@@ -146,7 +146,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -160,7 +160,7 @@ namespace com
       DAGVertex v("1");
       DAGVertex v_cloned = v.clone();
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_cloned.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_cloned.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_cloned.current_status_as_string());
       EXPECT_EQ("1", v_cloned.label());
@@ -168,7 +168,7 @@ namespace com
       EXPECT_FALSE(v_cloned.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_cloned.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -182,7 +182,7 @@ namespace com
       DAGVertex v("1");
       DAGVertex v_copied(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("1", v_copied.label());
@@ -190,7 +190,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -205,7 +205,7 @@ namespace com
       DAGVertex v_copied;
       v_copied = v;
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("1", v_copied.label());
@@ -213,7 +213,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -230,7 +230,7 @@ namespace com
       DAGVertex v("1", std::move(task));
       DAGVertex v_moved = std::move(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("1", v_moved.label());
@@ -238,7 +238,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -257,7 +257,7 @@ namespace com
       DAGVertex v_moved;
       v_moved = std::move(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("1", v_moved.label());
@@ -265,7 +265,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -283,7 +283,7 @@ namespace com
       DAGVertex v("1", std::move(task));
       DAGVertex v_cloned = v.clone();
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_cloned.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_cloned.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_cloned.current_status_as_string());
       EXPECT_EQ("1", v_cloned.label());
@@ -291,7 +291,7 @@ namespace com
       EXPECT_FALSE(v_cloned.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_cloned.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -309,7 +309,7 @@ namespace com
       DAGVertex v("1", std::move(task));
       DAGVertex v_copied(v);
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("1", v_copied.label());
@@ -317,7 +317,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -335,7 +335,7 @@ namespace com
       DAGVertex v_copied;
       v_copied = v;
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("1", v_copied.label());
@@ -343,7 +343,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("1", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -531,7 +531,7 @@ namespace com
         }
       );
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("orig", v_moved.label());
@@ -539,7 +539,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -591,7 +591,7 @@ namespace com
         }
       );
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_moved.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_moved.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_moved.current_status_as_string());
       EXPECT_EQ("orig", v_moved.label());
@@ -599,7 +599,7 @@ namespace com
       EXPECT_FALSE(v_moved.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_moved.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::invalid, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INVALID, v.current_status());
       EXPECT_EQ(std::string("invalid"), v.current_status_as_string());
       EXPECT_EQ("", v.label());
       EXPECT_EQ(0ul, v.edge_count());
@@ -669,7 +669,7 @@ namespace com
         }
       );
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_cloned.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_cloned.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_cloned.current_status_as_string());
       EXPECT_EQ("orig", v_cloned.label());
@@ -677,7 +677,7 @@ namespace com
       EXPECT_FALSE(v_cloned.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_cloned.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("orig", v.label());
       EXPECT_EQ(connections.size(), v.edge_count());
@@ -817,7 +817,7 @@ namespace com
         }
       );
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("orig", v_copied.label());
@@ -825,7 +825,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("orig", v.label());
       EXPECT_EQ(connections.size(), v.edge_count());
@@ -890,7 +890,7 @@ namespace com
         }
       );
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v_copied.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v_copied.current_status());
       EXPECT_EQ(std::string("initialized"),
         v_copied.current_status_as_string());
       EXPECT_EQ("orig", v_copied.label());
@@ -898,7 +898,7 @@ namespace com
       EXPECT_FALSE(v_copied.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v_copied.incomming_edge_count());
 
-      EXPECT_EQ(DAGVertex::Status::initialized, v.current_status());
+      EXPECT_EQ(DAGVertex::Status::INITIALIZED, v.current_status());
       EXPECT_EQ(std::string("initialized"), v.current_status_as_string());
       EXPECT_EQ("orig", v.label());
       EXPECT_EQ(connections.size(), v.edge_count());

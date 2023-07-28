@@ -1,11 +1,21 @@
 #include "dag_scheduler/dag_serialization.h"
 
 #include <iostream>
+#include <memory>
 
 namespace com
 {
   namespace dag_scheduler
   {
+    const std::string YAMLDagDeserializer::DAG_KEY = "DAG";
+    const std::string YAMLDagDeserializer::VERTICES_KEY = "Vertices";
+    const std::string YAMLDagDeserializer::TASK_KEY = "Task";
+    const std::string YAMLDagDeserializer::STAGES_KEY = "Stages";
+
+    const std::string YAMLDagDeserializer::TITLE_KEY = "Title";
+    const std::string YAMLDagDeserializer::NAME_KEY = "Name";
+    const std::string YAMLDagDeserializer::UUID_KEY = "UUID";
+
     YAMLDagDeserializerError::YAMLDagDeserializerError(
       const std::string &what) :
       std::exception(),
@@ -156,30 +166,37 @@ namespace com
       Logging::info(LOG_TAG, "Going to build DAG from\n", dag_node);
 
       std::unique_ptr<DAG> ret;
-      if (dag_node["DAG"]) {
-        if (not dag_node["DAG"].IsMap()) {
+      if (dag_node[DAG_KEY]) {
+        if (not dag_node[DAG_KEY].IsMap()) {
           auto error = std::string("\"DAG\" the root elment must be a ") +
             std::string("YAML map.");
           throw_wrong_type(UpTo::DAG, error);
         } // Not sure if this will ever get triggered. But better to
           // communicate more than less to users.
 
-        const YAML::Node dag_definition_node = dag_node["DAG"];
-        if (dag_definition_node["Title"]) {
-          auto title = dag_definition_node["Title"].as<std::string>();
-          Logging::info(LOG_TAG, "Going to build DAG with title", title,
-            "from the following definition", dag_definition_node);
+        const YAML::Node &dag_definition_node = dag_node[DAG_KEY];
+        std::string title;
+        if (dag_definition_node[TITLE_KEY]) {
+          title = dag_definition_node[TITLE_KEY].as<std::string>();
           ret = std::make_unique<DAG>(title);
         } else {
-          Logging::warn(LOG_TAG, "No title specified is this intended?");
+          Logging::warn(LOG_TAG, "No title specified is this intended?\n",
+            "Sample input would look like:\n",
+            full_sample_output());
           ret = std::make_unique<DAG>();
         }
 
-        if (dag_definition_node["Veritices"]) {
-          make_vertices(dag_definition_node["Verticies"], ret);
+        Logging::info(LOG_TAG, "Going to build DAG with title --", title,
+          "-- from the following definition", dag_definition_node);
+
+        if (dag_definition_node[VERTICES_KEY]) {
+          const YAML::Node &vertex_node = dag_definition_node[VERTICES_KEY];
+          make_vertices(vertex_node, ret);
         } else {
-          Logging::warn(LOG_TAG, "No \"Vertices\": map found in",
-            n2s(dag_node));
+          Logging::warn(LOG_TAG, "No\"", VERTICES_KEY, "\" map found in",
+            n2s(dag_node),
+            "Sample input would look like:\n",
+            full_sample_output());
         }
       } else {
         std::string sample = YAMLDagDeserializer::sample_dag_output(UpTo::DAG);
@@ -196,7 +213,29 @@ namespace com
     {
       (void) dag;
       if (vertices_node.IsSequence()) {
+        const auto &vertices = vertices_node.as<std::vector<YAML::Node>>();
+        Logging::info(LOG_TAG, "Going to process vertices", vertices_node,
+          "...");
         if (vertices_node.size() >= 0) {
+          for (const YAML::Node &vertex_node : vertices) {
+            Logging::info(LOG_TAG, "Processing", vertex_node, "...");
+            std::string name;
+            if (vertex_node[NAME_KEY]) {
+              name = vertex_node[NAME_KEY].as<std::string>();
+            }
+
+            auto uuid_str = vertex_node[UUID_KEY].as<std::string>();
+            UUID uuid = UUID(uuid_str);
+            std::unique_ptr<Task> task;
+            if (vertex_node[TASK_KEY]) {
+              make_task(vertex_node[TASK_KEY], task);
+            } else {
+              Logging::warn(LOG_TAG, "A Vertex without a Task was provided",
+                "in", vertex_node);
+            }
+            DAGVertex next_vertex(name, std::move(task), std::move(uuid));
+            dag->add_vertex(std::move(next_vertex));
+          }
         }
       } else {
         auto error = std::string("\"Vertices\" must be a YAML Sequence.");
@@ -204,11 +243,29 @@ namespace com
       }
     }
 
+    void YAMLDagDeserializer::make_task(const YAML::Node &task_node,
+      std::unique_ptr<Task> &task) const
+    {
+      std::string task_name;
+      std::vector<std::unique_ptr<TaskStage>> stages;
+      if (task_node[NAME_KEY]) {
+        task_name = task_node[NAME_KEY].as<std::string>();
+      }
+      if (task_node[STAGES_KEY]) {
+        Logging::info(LOG_TAG, "Going to process stages in", task_node, "...");
+        // TODO (mehoggan): Write code to actually process stages.
+      } else {
+        Logging::warn(LOG_TAG, "Just created a task from", task_node[TASK_KEY],
+          "with no stages");
+      }
+      task = std::make_unique<Task>(stages, task_name);
+    }
+
     void YAMLDagDeserializer::throw_wrong_type(const UpTo &upto,
       const std::string &error) const
     {
       std::string up_to_example = YAMLDagDeserializer::sample_dag_output(upto);
-      auto error_str = error + std::string(" As in") + up_to_example;
+      auto error_str = error + std::string(" As in:\n") + up_to_example;
       throw YAMLDagWrongTypeError(error_str);
     }
   }

@@ -31,7 +31,7 @@ namespace com
       LoggedClass(*this),
       title_(title)
     {
-      Logging::info(LOG_TAG, "Created DAG with title=", title_);
+      Logging::info(LOG_TAG, "Created DAG with title=--", title_, "--");
     }
 
     DAG::~DAG()
