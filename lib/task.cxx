@@ -2,6 +2,9 @@
 
 #include "dag_scheduler/logging.h"
 
+void default_task_callback(bool)
+{}
+
 namespace com
 {
   namespace dag_scheduler

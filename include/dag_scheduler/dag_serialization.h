@@ -19,6 +19,9 @@ namespace com
      *         UUID: <valid uuid4 string>
      *         Task:
      *           Name: <optional string>
+     *           Callback: <optional>
+     *             LibraryName: <string>
+     *             MethodName: <string>
      *           Stages:
      *             - Stage:
      *               Name: <optional string>
@@ -58,6 +61,9 @@ namespace com
       const static std::string TITLE_KEY;
       const static std::string NAME_KEY;
       const static std::string UUID_KEY;
+      const static std::string CALLBACK_KEY;
+      const static std::string LIBRARY_NAME_KEY;
+      const static std::string METHOD_NAME_KEY;
 
     public:
       enum class UpTo
@@ -83,6 +89,8 @@ namespace com
       void make_task(const YAML::Node &task_node,
         std::unique_ptr<Task> &task) const;
       void throw_wrong_type(const UpTo &upto, const std::string &error) const;
+      std::function<void (bool)> make_task_callback(
+        const YAML::Node &callback_node) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);

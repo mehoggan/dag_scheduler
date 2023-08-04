@@ -49,7 +49,7 @@ following command from the root directory of this repository. </br>
 ```sh
 > autoreconf -i
 > rm -rf ./build && mkdir -p ./build
-> cd build/ && ./configure
+> cd build/ && ../configure
 > cd ../
 > make -C build
 ```

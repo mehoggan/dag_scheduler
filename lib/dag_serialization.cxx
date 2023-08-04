@@ -1,4 +1,7 @@
 #include "dag_scheduler/dag_serialization.h"
+#include "boost/dll/shared_library.hpp"
+
+#include <boost/dll.hpp>
 
 #include <iostream>
 #include <memory>
@@ -15,6 +18,9 @@ namespace com
     const std::string YAMLDagDeserializer::TITLE_KEY = "Title";
     const std::string YAMLDagDeserializer::NAME_KEY = "Name";
     const std::string YAMLDagDeserializer::UUID_KEY = "UUID";
+    const std::string YAMLDagDeserializer::CALLBACK_KEY = "Callback";
+    const std::string YAMLDagDeserializer::LIBRARY_NAME_KEY = "LibraryName";
+    const std::string YAMLDagDeserializer::METHOD_NAME_KEY = "MethodName";
 
     YAMLDagDeserializerError::YAMLDagDeserializerError(
       const std::string &what) :
@@ -68,11 +74,16 @@ namespace com
       if (ret.empty()) {
         ret = std::string("      Task:\n") +
           std::string("        Name: <optional string>\n") +
+          std::string("        Callback: <optional>\n") +
+          std::string("            LibraryName: <string>\n") +
+          std::string("            MethodName: <string>\n") +
           std::string("        ...");
       } else {
         ret = std::string("      Task:\n") +
           std::string("        Name: <optional string>\n") +
-          ret;
+          std::string("        Callback: <optional>\n") +
+          std::string("            LibraryName: <string>\n") +
+          std::string("            MethodName: <string>\n") + ret;
       }
     }
 
@@ -251,6 +262,12 @@ namespace com
       if (task_node[NAME_KEY]) {
         task_name = task_node[NAME_KEY].as<std::string>();
       }
+      std::function<void (bool)> task_callback;
+      if (task_node[CALLBACK_KEY]) {
+        Logging::info(LOG_TAG, "Going to create task callback from",
+          task_node[CALLBACK_KEY], "...");
+        task_callback = make_task_callback(task_node[CALLBACK_KEY]);
+      }
       if (task_node[STAGES_KEY]) {
         Logging::info(LOG_TAG, "Going to process stages in", task_node, "...");
         // TODO (mehoggan): Write code to actually process stages.
@@ -258,7 +275,7 @@ namespace com
         Logging::warn(LOG_TAG, "Just created a task from", task_node[TASK_KEY],
           "with no stages");
       }
-      task = std::make_unique<Task>(stages, task_name);
+      task = std::make_unique<Task>(stages, task_name, task_callback);
     }
 
     void YAMLDagDeserializer::throw_wrong_type(const UpTo &upto,
@@ -267,6 +284,21 @@ namespace com
       std::string up_to_example = YAMLDagDeserializer::sample_dag_output(upto);
       auto error_str = error + std::string(" As in:\n") + up_to_example;
       throw YAMLDagWrongTypeError(error_str);
+    }
+
+    std::function<void (bool)>  YAMLDagDeserializer::make_task_callback(
+      const YAML::Node &callback_node) const
+    {
+      auto library_name = callback_node[LIBRARY_NAME_KEY].as<std::string>();
+      auto method_name = callback_node[METHOD_NAME_KEY].as<std::string>();
+      Logging::info(LOG_TAG, "Going to load", method_name, "from",
+        library_name, "...");
+      boost::dll::shared_library lib(library_name);
+      Logging::info(LOG_TAG, "Succesfully loaded library", library_name,
+        "with is_loaded =", (lib.is_loaded() ? "true" : "false"));
+      Logging::info(LOG_TAG, "Looking for", method_name, "in", library_name);
+      std::function<void (bool)> ret = lib.get<void (bool)>(method_name);
+      return ret;
     }
   }
 }

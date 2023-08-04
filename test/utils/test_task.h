@@ -9,6 +9,8 @@
 #include <atomic>
 #include <functional>
 
+void default_task_callback(bool);
+
 namespace com
 {
   namespace dag_scheduler
