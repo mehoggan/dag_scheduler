@@ -19,6 +19,7 @@ libdag_scheduler_la_SOURCES = concurrent_task_queue.cxx \
     service_helpers.cxx \
     stop_watch.cxx \
     task.cxx \
+		task_callback_plugin.cxx \
     task_scheduler.cxx \
     task_stage.cxx \
     uuid.cxx \

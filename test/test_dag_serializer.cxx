@@ -76,7 +76,8 @@ namespace com
         std::string("        Name: <optional string>\n") +
         std::string("        Callback: <optional>\n") +
         std::string("            LibraryName: <string>\n") +
-        std::string("            MethodName: <string>\n") +
+        std::string("            SymbolName: <string>\n") +
+        std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        ...\n");
       std::string actual = YAMLDagDeserializer::sample_dag_output(
         YAMLDagDeserializer::UpTo::TASK);
@@ -96,7 +97,8 @@ namespace com
         std::string("        Name: <optional string>\n") +
         std::string("        Callback: <optional>\n") +
         std::string("            LibraryName: <string>\n") +
-        std::string("            MethodName: <string>\n") +
+        std::string("            SymbolName: <string>\n") +
+        std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        Stages:\n") +
         std::string("          ...\n");
       std::string actual = YAMLDagDeserializer::sample_dag_output(
@@ -117,7 +119,8 @@ namespace com
         std::string("        Name: <optional string>\n") +
         std::string("        Callback: <optional>\n") +
         std::string("            LibraryName: <string>\n") +
-        std::string("            MethodName: <string>\n") +
+        std::string("            SymbolName: <string>\n") +
+        std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        Stages:\n") +
         std::string("          - Stage:\n") +
         std::string("            Name: <optional string>\n") +
@@ -155,7 +158,8 @@ namespace com
         std::string("        Name: <optional string>\n") +
         std::string("        Callback: <optional>\n") +
         std::string("            LibraryName: <string>\n") +
-        std::string("            MethodName: <string>\n") +
+        std::string("            SymbolName: <string>\n") +
+        std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        Stages:\n") +
         std::string("          - Stage:\n") +
         std::string("            Name: <optional string>\n") +
@@ -400,19 +404,17 @@ namespace com
         [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node("Library DNE");
       first_vertex[YAMLDagDeserializer::TASK_KEY]
         [YAMLDagDeserializer::CALLBACK_KEY]
-        [YAMLDagDeserializer::METHOD_NAME_KEY] = YAML::Node("Method DNE");
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] = YAML::Node("Method DNE");
       std::vector<YAML::Node> vertices = {first_vertex};
       yaml_node[YAMLDagDeserializer::DAG_KEY]
         [YAMLDagDeserializer::VERTICES_KEY] = vertices;
       try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
-      } catch (const boost::system::system_error &system_error) {
-        std::cout << system_error.what() << std::endl;
+      } catch (const YAMLDagDeserializerError &yaml_deserialization_error) {
         auto expected_error_substr =
-          std::string("boost::dll::shared_library::load() ") +
-          std::string("failed (dlerror system message: dlopen");
-        auto actual_error_str = std::string(system_error.what());
+          std::string("Could not load library from ");
+        auto actual_error_str = std::string(yaml_deserialization_error.what());
         EXPECT_TRUE(actual_error_str.find(expected_error_substr) !=
           std::string::npos);
       }
@@ -439,26 +441,26 @@ namespace com
         [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
       first_vertex[YAMLDagDeserializer::TASK_KEY]
         [YAMLDagDeserializer::CALLBACK_KEY]
-        [YAMLDagDeserializer::METHOD_NAME_KEY] = YAML::Node("Method DNE");
+        [YAMLDagDeserializer::CALLBACK_TYPE_KEY] = YAML::Node("Function");
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] = YAML::Node("Method DNE");
       std::vector<YAML::Node> vertices = {first_vertex};
       yaml_node[YAMLDagDeserializer::DAG_KEY]
         [YAMLDagDeserializer::VERTICES_KEY] = vertices;
       try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
-      } catch (const boost::system::system_error &system_error) {
-        std::cout << system_error.what() << std::endl;
-        auto expected_error_substr = std::string("boost::dll::") +
-          std::string("shared_library::get() failed (dlerror system ") +
-          std::string("message: dlsym");
-        auto actual_error_str = std::string(system_error.what());
+      } catch (const YAMLDagDeserializerError &yaml_deserialization_error) {
+        auto expected_error_substr =
+          std::string("Failed to load Method DNE from");
+        auto actual_error_str = std::string(yaml_deserialization_error.what());
         EXPECT_TRUE(actual_error_str.find(expected_error_substr) !=
           std::string::npos);
       }
     }
 
-    TEST(TestYAMLDagDeserializer,
-      make_dag_via_vertices_with_ill_formed_callback_lib_found_method_found)
+    TEST(TestYAMLDagDeserializer, make_dag_via_vertices_with_task_callback)
     {
       YAML::Node yaml_node;
       yaml_node[YAMLDagDeserializer::DAG_KEY] =
@@ -478,12 +480,20 @@ namespace com
         [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
       first_vertex[YAMLDagDeserializer::TASK_KEY]
         [YAMLDagDeserializer::CALLBACK_KEY]
-        [YAMLDagDeserializer::METHOD_NAME_KEY] = YAML::Node(
-          "default_task_callback");
+        [YAMLDagDeserializer::CALLBACK_TYPE_KEY] = YAML::Node("Function");
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] = YAML::Node("task_callback");
       std::vector<YAML::Node> vertices = {first_vertex};
       yaml_node[YAMLDagDeserializer::DAG_KEY]
         [YAMLDagDeserializer::VERTICES_KEY] = vertices;
       auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+      ASSERT_TRUE(test_dag != nullptr);
+      std::shared_ptr<DAGVertex> test_vertex =
+        test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+      EXPECT_TRUE(test_vertex != nullptr);
+      EXPECT_TRUE(test_vertex->get_task() != nullptr);
+      EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
     }
   }
 }

@@ -2,6 +2,7 @@
 
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
+#include "dag_scheduler/task_callback_plugin.h"
 
 #include "utils/test_task.h"
 
@@ -23,6 +24,29 @@ namespace com
     protected:
       virtual void SetUp() {}
       virtual void TearDown() {}
+    };
+
+    class TestTaskCallbackPlugin :
+      public TaskCallbackPlugin,
+      public ::testing::Test,
+      public LoggedClass<TestTaskCallbackPlugin>
+    {
+    public:
+      TestTaskCallbackPlugin():
+        LoggedClass<TestTaskCallbackPlugin>(*this)
+      {}
+
+      virtual ~TestTaskCallbackPlugin()
+      {}
+
+      virtual void completed(bool completed, Task &task)
+      {
+        Logging::info(LOG_TAG, "completed called with", (completed ? "true" :
+          "false"), "and", task);
+      }
+
+      virtual void TestBody()
+      {}
     };
 
     TEST_F(TestTask, default_ctor)
@@ -50,6 +74,19 @@ namespace com
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
+      test->complete(true);
+    }
+
+    TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin)
+    {
+      std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
+        std::make_unique<TestTaskCallbackPlugin>();
+      std::unique_ptr<Task> test(
+        new TestTaskImpl("test_label", std::move(complete_callback_plugin)));
+      EXPECT_NE(nullptr, test);
+      EXPECT_NE(test->get_uuid().as_string(), test->label());
+      EXPECT_EQ("test_label", test->label());
+      EXPECT_TRUE(test->callback_plugin_is_set());
       test->complete(true);
     }
 

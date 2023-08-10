@@ -1,8 +1,11 @@
 #ifndef TASK_H_INCLUDED
 #define TASK_H_INCLUDED
 
+#include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
+
+#include <boost/config.hpp>
 
 #include <atomic>
 #include <functional>
@@ -11,11 +14,18 @@
 #include <ostream>
 #include <vector>
 
+
+#define API extern "C" BOOST_SYMBOL_EXPORT
+API void default_task_callback(bool) noexcept;
+
 namespace com
 {
   namespace dag_scheduler
   {
-    class Task
+    class TaskCallbackPlugin;
+
+    class Task :
+      public LoggedClass<Task>
     {
     public:
       /**
@@ -65,6 +75,24 @@ namespace com
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
         std::function<void (bool)> complete_callback);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional \ref TaskCallbackPlugin that
+       *                              is called when as many as \ref TaskStage
+       *                              are completed by the \ref Task.
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       /**
        * @brief dtor
@@ -156,6 +184,22 @@ namespace com
        */
       virtual void complete(bool status);
 
+      /**
+       * @brief Function used by user of class of a \ref Task to check if
+       * a callback was set at construction time.
+       *
+       * @return true if \ref (*this) has a callback set.
+       */
+      virtual bool callback_is_set() const;
+
+      /**
+       * @brief Plugin used by user of class of a \ref Task to check if
+       * a \ref TaskCallbackPlugin was set at construction time.
+       *
+       * @return true if \ref (*this) has a callback plugin set.
+       */
+      virtual bool callback_plugin_is_set() const;
+
     public:
       /**
        * @brief Equality operator.
@@ -204,6 +248,7 @@ namespace com
       std::vector<std::unique_ptr<TaskStage>> stages_;
       std::string label_;
       std::function<void (bool)> complete_callback_;
+      std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin_;
       UUID uuid_;
     };
   }

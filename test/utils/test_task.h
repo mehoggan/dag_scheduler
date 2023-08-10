@@ -3,13 +3,12 @@
 
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
+#include "dag_scheduler/task_callback_plugin.h"
 
 #include <gtest/gtest_prod.h>
 
 #include <atomic>
 #include <functional>
-
-void default_task_callback(bool);
 
 namespace com
 {
@@ -28,6 +27,9 @@ namespace com
 
       TestTaskImpl(const std::string &label,
           std::function<void (bool)> complete_callback);
+
+      TestTaskImpl(const std::string &label,
+           std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       virtual ~TestTaskImpl();
 

@@ -1,10 +1,16 @@
 #include "dag_scheduler/dag_serialization.h"
-#include "boost/dll/shared_library.hpp"
+#include "boost/system/system_error.hpp"
 
+#include <boost/dll/import.hpp>
+#include <boost/dll/shared_library.hpp>
 #include <boost/dll.hpp>
+#include <boost/function.hpp>
 
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <memory>
+#include <stdexcept>
 
 namespace com
 {
@@ -20,7 +26,8 @@ namespace com
     const std::string YAMLDagDeserializer::UUID_KEY = "UUID";
     const std::string YAMLDagDeserializer::CALLBACK_KEY = "Callback";
     const std::string YAMLDagDeserializer::LIBRARY_NAME_KEY = "LibraryName";
-    const std::string YAMLDagDeserializer::METHOD_NAME_KEY = "MethodName";
+    const std::string YAMLDagDeserializer::SYMBOL_NAME_KEY = "SymbolName";
+    const std::string YAMLDagDeserializer::CALLBACK_TYPE_KEY = "Type";
 
     YAMLDagDeserializerError::YAMLDagDeserializerError(
       const std::string &what) :
@@ -33,11 +40,23 @@ namespace com
       return what_.c_str();
     }
 
+    YAMLDagDeserializerNonSupportedCallbackType::
+      YAMLDagDeserializerNonSupportedCallbackType(
+        const std::string &what) :
+        std::exception(),
+        what_(what)
+    {}
+
+    const char
+    *YAMLDagDeserializerNonSupportedCallbackType::what() const noexcept
+    {
+      return what_.c_str();
+    }
+
     YAMLDagWrongTypeError::YAMLDagWrongTypeError(
       const std::string &what) :
       YAMLDagDeserializerError(what)
     {}
-
 
     YAMLDagDeserializer::YAMLDagDeserializer() :
       LoggedClass<YAMLDagDeserializer>(*this)
@@ -76,14 +95,17 @@ namespace com
           std::string("        Name: <optional string>\n") +
           std::string("        Callback: <optional>\n") +
           std::string("            LibraryName: <string>\n") +
-          std::string("            MethodName: <string>\n") +
+          std::string("            SymbolName: <string>\n") +
+          std::string("            Type: <enum {Plugin, Function}>\n") +
           std::string("        ...");
       } else {
         ret = std::string("      Task:\n") +
           std::string("        Name: <optional string>\n") +
           std::string("        Callback: <optional>\n") +
           std::string("            LibraryName: <string>\n") +
-          std::string("            MethodName: <string>\n") + ret;
+          std::string("            SymbolName: <string>\n") +
+          std::string("            Type: <enum {Plugin, Function}>\n") +
+          ret;
       }
     }
 
@@ -219,6 +241,26 @@ namespace com
       return ret;
     }
 
+    YAMLDagDeserializer::CallbackType
+    YAMLDagDeserializer::callback_type_from_string(const std::string &enum_str)
+    {
+      std::string to_lower = enum_str;
+      std::transform(to_lower.begin(), to_lower.end(), to_lower.begin(),
+        [](unsigned char c) -> char
+        {
+          return static_cast<char>(std::tolower(static_cast<int>(c)));
+        }
+      );
+      YAMLDagDeserializer::CallbackType ret = CallbackType::DNE;
+      if (to_lower == "function") {
+        ret = CallbackType::FUNCTION;
+      } else if (to_lower == "plugin") {
+        ret = CallbackType::PLUGIN;
+      }
+      return ret;
+    }
+      
+
     void YAMLDagDeserializer::make_vertices(const YAML::Node &vertices_node,
       std::unique_ptr<DAG> &dag) const
     {
@@ -258,16 +300,11 @@ namespace com
       std::unique_ptr<Task> &task) const
     {
       std::string task_name;
-      std::vector<std::unique_ptr<TaskStage>> stages;
       if (task_node[NAME_KEY]) {
         task_name = task_node[NAME_KEY].as<std::string>();
       }
-      std::function<void (bool)> task_callback;
-      if (task_node[CALLBACK_KEY]) {
-        Logging::info(LOG_TAG, "Going to create task callback from",
-          task_node[CALLBACK_KEY], "...");
-        task_callback = make_task_callback(task_node[CALLBACK_KEY]);
-      }
+
+      std::vector<std::unique_ptr<TaskStage>> stages;
       if (task_node[STAGES_KEY]) {
         Logging::info(LOG_TAG, "Going to process stages in", task_node, "...");
         // TODO (mehoggan): Write code to actually process stages.
@@ -275,7 +312,12 @@ namespace com
         Logging::warn(LOG_TAG, "Just created a task from", task_node[TASK_KEY],
           "with no stages");
       }
-      task = std::make_unique<Task>(stages, task_name, task_callback);
+
+      if (task_node[CALLBACK_KEY]) {
+        make_task_callback(task_name, stages, task_node[CALLBACK_KEY], task);
+      } else {
+        task = std::make_unique<Task>(stages, task_name);
+      }
     }
 
     void YAMLDagDeserializer::throw_wrong_type(const UpTo &upto,
@@ -286,18 +328,104 @@ namespace com
       throw YAMLDagWrongTypeError(error_str);
     }
 
-    std::function<void (bool)>  YAMLDagDeserializer::make_task_callback(
-      const YAML::Node &callback_node) const
+    std::stringstream &operator<<(std::stringstream &ss,
+      std::vector<std::string> sym)
     {
+      std::copy(sym.begin(), sym.end(),
+        std::ostream_iterator<std::string>(ss, ","));
+      return ss;
+    }
+
+    void YAMLDagDeserializer::make_task_callback(
+      const std::string &task_name,
+      std::vector<std::unique_ptr<TaskStage>> &stages,
+      const YAML::Node &callback_node,
+      std::unique_ptr<Task> &task) const
+    {
+      std::function<void (bool)> task_callback;
+      Logging::info(LOG_TAG, "Going to create task callback from",
+        callback_node, "...");
       auto library_name = callback_node[LIBRARY_NAME_KEY].as<std::string>();
-      auto method_name = callback_node[METHOD_NAME_KEY].as<std::string>();
-      Logging::info(LOG_TAG, "Going to load", method_name, "from",
-        library_name, "...");
-      boost::dll::shared_library lib(library_name);
-      Logging::info(LOG_TAG, "Succesfully loaded library", library_name,
-        "with is_loaded =", (lib.is_loaded() ? "true" : "false"));
-      Logging::info(LOG_TAG, "Looking for", method_name, "in", library_name);
-      std::function<void (bool)> ret = lib.get<void (bool)>(method_name);
+      boost::dll::shared_library dynamic_library;
+       
+      try { 
+        dynamic_library = boost::dll::shared_library(library_name);
+      } catch (boost::system::system_error &system_error) {
+        std::stringstream error_builder;
+        error_builder << "Could not load library from ";
+        error_builder << library_name << " with " << system_error.what();
+        Logging::error(LOG_TAG, error_builder.str());
+        throw YAMLDagDeserializerError(error_builder.str());
+      }
+
+      if (callback_node[CALLBACK_TYPE_KEY]) {
+        CallbackType type = YAMLDagDeserializer::callback_type_from_string(
+         callback_node[CALLBACK_TYPE_KEY].as<std::string>());
+        if (type == CallbackType::FUNCTION) {
+          task_callback = make_task_function_callback(
+            dynamic_library,
+            library_name,
+            callback_node[SYMBOL_NAME_KEY].as<std::string>());
+          task = std::make_unique<Task>(stages, task_name, task_callback);
+        } else if (type == CallbackType::PLUGIN) {
+        } else {
+          throw YAMLDagDeserializerNonSupportedCallbackType(
+            std::string("Unspported callback type specified. Currently ") +
+            std::string("only \"FUNCTION\" or \"PLUGIN\" are accepted. ") +
+            std::string("Note these values are case insensitive."));
+
+        }
+      } else {
+        std::stringstream error_builder;
+        error_builder << std::string("If a callback is to be used in:\n");
+        error_builder << callback_node[CALLBACK_KEY];
+        error_builder << std::string(" it must contain a Callback Type.");
+        Logging::error(LOG_TAG, error_builder.str());
+        throw YAMLDagDeserializerError(error_builder.str());
+      }
+    }
+
+    std::function<void (bool)>
+    YAMLDagDeserializer::make_task_function_callback(
+      const boost::dll::shared_library &library,
+      const std::string &library_name,
+      const std::string &symbol_name) const
+    {
+      std::vector<std::string> task_cb_funcs;
+      try {
+        boost::dll::library_info inf(library_name);
+        task_cb_funcs = inf.symbols("TaskCb");
+      } catch (const std::runtime_error &rt_error) {
+        throw YAMLDagDeserializerError("Could not load symbol info from " +
+          library_name + " with " + rt_error.what());
+      } catch (const std::exception &error) {
+        throw YAMLDagDeserializerError("Could not load symbol info from " +
+          library_name + " with " + error.what());
+      }
+
+      std::stringstream cb_symbols;
+      cb_symbols << task_cb_funcs;
+      Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
+        library_name, "which contains the following symbols",
+        cb_symbols.str(), "and library load status is",
+        (library.is_loaded() ? "true" : "false"));
+
+      std::vector<std::string>::iterator find_if_it = std::find_if(
+        task_cb_funcs.begin(), task_cb_funcs.end(),
+        [&symbol_name](const std::string &exported)
+        {
+          return exported == symbol_name;
+        });
+
+      std::function<void (bool)> ret;
+      if (find_if_it != task_cb_funcs.end()) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
+        ret = library.get_alias<void (bool)>(*find_if_it);
+      } else {
+        throw YAMLDagDeserializerError("Failed to load " + symbol_name +
+          " from " + library_name + ". It could not be found in available " +
+          " symbols of " + cb_symbols.str());
+      }
       return ret;
     }
   }

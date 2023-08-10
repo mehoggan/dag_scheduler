@@ -1,7 +1,10 @@
-#include <exception>
+#include "dag_scheduler/dag.h"
+
 #include <yaml-cpp/yaml.h>
 
-#include "dag_scheduler/dag.h"
+#include <boost/dll.hpp>
+
+#include <exception>
 
 namespace com
 {
@@ -21,7 +24,8 @@ namespace com
      *           Name: <optional string>
      *           Callback: <optional>
      *             LibraryName: <string>
-     *             MethodName: <string>
+     *             SymbolName: <string>
+     *             Type: <enum {Plugin, Function}>
      *           Stages:
      *             - Stage:
      *               Name: <optional string>
@@ -38,6 +42,17 @@ namespace com
     {
     public:
       explicit YAMLDagDeserializerError(const std::string &what);
+
+      const char *what() const noexcept override;
+    private:
+      std::string what_;
+    };
+
+    class YAMLDagDeserializerNonSupportedCallbackType : public std::exception
+    {
+    public:
+      explicit YAMLDagDeserializerNonSupportedCallbackType(
+        const std::string &what);
 
       const char *what() const noexcept override;
     private:
@@ -63,7 +78,8 @@ namespace com
       const static std::string UUID_KEY;
       const static std::string CALLBACK_KEY;
       const static std::string LIBRARY_NAME_KEY;
-      const static std::string METHOD_NAME_KEY;
+      const static std::string SYMBOL_NAME_KEY;
+      const static std::string CALLBACK_TYPE_KEY;
 
     public:
       enum class UpTo
@@ -78,6 +94,13 @@ namespace com
         STAGE
       };
 
+      enum class CallbackType
+      {
+        FUNCTION,
+        PLUGIN,
+        DNE
+      };
+
     public:
       YAMLDagDeserializer();
 
@@ -89,12 +112,21 @@ namespace com
       void make_task(const YAML::Node &task_node,
         std::unique_ptr<Task> &task) const;
       void throw_wrong_type(const UpTo &upto, const std::string &error) const;
-      std::function<void (bool)> make_task_callback(
-        const YAML::Node &callback_node) const;
+      void make_task_callback(
+        const std::string &task_name,
+        std::vector<std::unique_ptr<TaskStage>> &stages,
+        const YAML::Node &callback_node,
+        std::unique_ptr<Task> &task) const;
+      std::function<void (bool)> make_task_function_callback(
+        const boost::dll::shared_library &library,
+        const std::string &library_name,
+        const std::string &symbol_name) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);
       static std::string full_sample_output();
+      static CallbackType callback_type_from_string(
+        const std::string &enum_str);
 
     private:
       static void stage_str(std::string &ret);

@@ -1,15 +1,25 @@
 #include "dag_scheduler/task.h"
 
 #include "dag_scheduler/logging.h"
+#include "dag_scheduler/task_callback_plugin.h"
 
-void default_task_callback(bool)
-{}
+#include <boost/dll/alias.hpp>
+
+#include <iostream>
+
+void default_task_callback(bool) noexcept
+{
+  std::cout << "Default task callback called." << std::endl;
+}
+
+BOOST_DLL_ALIAS_SECTIONED(default_task_callback, task_callback, TaskCb)
 
 namespace com
 {
   namespace dag_scheduler
   {
     Task::Task() :
+      LoggedClass<Task>(*this),
       iterating_(false),
       kill_(false)
     {
@@ -24,6 +34,7 @@ namespace com
 
     Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages,
       const std::string &label) :
+      LoggedClass<Task>(*this),
       iterating_(false),
       kill_(false),
       stages_(std::move(stages)),
@@ -33,6 +44,7 @@ namespace com
     Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages,
       const std::string &label,
       std::function<void (bool)> complete_callback) :
+      LoggedClass<Task>(*this),
       iterating_(false),
       kill_(false),
       stages_(std::move(stages)),
@@ -40,10 +52,22 @@ namespace com
       complete_callback_(complete_callback)
     {}
 
+    Task::Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+      const std::string &label,
+      std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin) :
+      LoggedClass<Task>(*this),
+      iterating_(false),
+      kill_(false),
+      stages_(std::move(stages)),
+      label_(label),
+      complete_callback_plugin_(std::move(complete_callback_plugin))
+    {}
+
     Task::~Task()
     {}
 
     Task::Task(Task &&other) :
+      LoggedClass<Task>(*this),
       iterating_(false),
       kill_(false),
       stages_(std::move(other.stages_)),
@@ -108,9 +132,30 @@ namespace com
 
     void Task::complete(bool status)
     {
-      if (complete_callback_) {
+      if (callback_is_set()) {
+        Logging::info(LOG_TAG, "Going to call user specified function...");
         complete_callback_(status);
       }
+
+      if (callback_plugin_is_set()) {
+        Logging::info(LOG_TAG, "Going to call user specified callback",
+          "plugin...");
+        complete_callback_plugin_->completed(status, (*this));
+      }
+    }
+
+    bool Task::callback_is_set() const
+    {
+      bool ret = false;
+      if (complete_callback_) {
+        ret = true;
+      }
+      return ret;
+    }
+
+    bool Task::callback_plugin_is_set() const
+    {
+      return complete_callback_plugin_ != nullptr;
     }
 
     bool operator==(const Task &lhs, const Task &rhs)

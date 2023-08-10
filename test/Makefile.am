@@ -15,7 +15,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     test_task_scheduler.cxx \
     test_task_stage.cxx \
     test_uuid.cxx \
-		utils/test_environment.cxx \
+    utils/test_environment.cxx \
     utils/test_task.cxx \
     utils/test_task_stage.cxx
 

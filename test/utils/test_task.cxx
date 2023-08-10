@@ -41,6 +41,20 @@ namespace com
       complete_callback_ = complete_callback;
     }
 
+
+    TestTaskImpl::TestTaskImpl(const std::string &label,
+      std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin)
+    {
+      label_ = label;
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("A")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("B")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("C")));
+      complete_callback_plugin_ = std::move(complete_callback_plugin);
+    }
+
     TestTaskImpl::~TestTaskImpl()
     {}
 
