@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include "boost/exception/exception.hpp"
 #include "utils/test_environment.h"
+#include "utils/test_task.h"
 
 #include "dag_scheduler/dag_serialization.h"
 
@@ -494,6 +496,118 @@ namespace com
       EXPECT_TRUE(test_vertex != nullptr);
       EXPECT_TRUE(test_vertex->get_task() != nullptr);
       EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
+      test_vertex->get_task()->complete(true);
+    }
+
+    TEST(TestYAMLDagDeserializer,
+      make_dag_via_vertices_with_task_callback_plugin)
+    {
+      YAML::Node yaml_node;
+      yaml_node[YAMLDagDeserializer::DAG_KEY] =
+        std::map<std::string, YAML::Node>({
+          {YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
+      YAML::Node first_vertex;
+      first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
+      first_vertex[YAMLDagDeserializer::TASK_KEY] = YAML::Node();
+      const std::string uuid1_task_label = "A named task";
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::NAME_KEY] = YAML::Node(uuid1_task_label);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY] = YAML::Node();
+      std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::CALLBACK_TYPE_KEY] = YAML::Node("Plugin");
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] =
+          YAML::Node("task_callback_plugin");
+      std::vector<YAML::Node> vertices = {first_vertex};
+      yaml_node[YAMLDagDeserializer::DAG_KEY]
+        [YAMLDagDeserializer::VERTICES_KEY] = vertices;
+      auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+      ASSERT_TRUE(test_dag != nullptr);
+      std::shared_ptr<DAGVertex> test_vertex =
+        test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+      EXPECT_TRUE(test_vertex != nullptr);
+      EXPECT_TRUE(test_vertex->get_task() != nullptr);
+      EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
+      test_vertex->get_task()->complete(true);
+    }
+
+    TEST(TestYAMLDagDeserializer,
+      make_dag_via_vertices_with_task_callback_plugin_symbol_dne)
+    {
+      YAML::Node yaml_node;
+      yaml_node[YAMLDagDeserializer::DAG_KEY] =
+        std::map<std::string, YAML::Node>({
+          {YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
+      YAML::Node first_vertex;
+      first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
+      first_vertex[YAMLDagDeserializer::TASK_KEY] = YAML::Node();
+      const std::string uuid1_task_label = "A named task";
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::NAME_KEY] = YAML::Node(uuid1_task_label);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY] = YAML::Node();
+      std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::CALLBACK_TYPE_KEY] = YAML::Node("Plugin");
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] =
+          YAML::Node("task_callback_plugin_dne");
+      std::vector<YAML::Node> vertices = {first_vertex};
+      yaml_node[YAMLDagDeserializer::DAG_KEY]
+        [YAMLDagDeserializer::VERTICES_KEY] = vertices;
+      try {
+        yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+        ASSERT_TRUE(false);
+      } catch (const YAMLDagDeserializerError &yaml_deserialization_error) {
+        auto expected_error_substr =
+          std::string("Failed to load task_callback_plugin_dne from");
+        auto actual_error_str = std::string(yaml_deserialization_error.what());
+        EXPECT_TRUE(actual_error_str.find(expected_error_substr) !=
+          std::string::npos);
+      }
+    }
+
+    TEST(TestYAMLDagDeserializer,
+      make_dag_via_vertices_with_task_stages_node_wrong_type)
+    {
+      YAML::Node yaml_node;
+      yaml_node[YAMLDagDeserializer::DAG_KEY] =
+        std::map<std::string, YAML::Node>({
+          {YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
+      YAML::Node first_vertex;
+      first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
+      first_vertex[YAMLDagDeserializer::TASK_KEY] = YAML::Node();
+      const std::string uuid1_task_label = "A named task";
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::NAME_KEY] = YAML::Node(uuid1_task_label);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::STAGES_KEY] = YAML::Node();
+      std::vector<YAML::Node> vertices = {first_vertex};
+      yaml_node[YAMLDagDeserializer::DAG_KEY]
+        [YAMLDagDeserializer::VERTICES_KEY] = vertices;
+
+      typedef YAML::TypedBadConversion<std::vector<YAML::Node>> YAMLExcep;
+      try {
+        yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+        ASSERT_TRUE(false);
+      } catch (const YAMLExcep &error) {
+        auto expected_error_str = std::string("bad conversion");
+        auto actual_error_str = std::string(error.what());
+        std::cout << error.what() << std::endl;
+        EXPECT_EQ(expected_error_str, actual_error_str);
+      }
     }
   }
 }

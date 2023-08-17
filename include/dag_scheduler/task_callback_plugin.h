@@ -1,7 +1,10 @@
 #ifndef TASK_CALLBACK_PLUGIN_H_INCLUDED
 #define TASK_CALLBACK_PLUGIN_H_INCLUDED
 
+#include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
+
+#include <boost/dll/alias.hpp>
 
 namespace com
 {

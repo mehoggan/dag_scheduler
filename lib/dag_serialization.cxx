@@ -1,10 +1,11 @@
 #include "dag_scheduler/dag_serialization.h"
-#include "boost/system/system_error.hpp"
 
 #include <boost/dll/import.hpp>
 #include <boost/dll/shared_library.hpp>
+#include <boost/dll/shared_library_load_mode.hpp>
 #include <boost/dll.hpp>
 #include <boost/function.hpp>
+#include <boost/system/system_error.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -306,8 +307,9 @@ namespace com
 
       std::vector<std::unique_ptr<TaskStage>> stages;
       if (task_node[STAGES_KEY]) {
-        Logging::info(LOG_TAG, "Going to process stages in", task_node, "...");
-        // TODO (mehoggan): Write code to actually process stages.
+        Logging::info(LOG_TAG, "Going to process stages in",
+          task_node[STAGES_KEY], "...");
+        load_stages(task_node[STAGES_KEY], stages);
       } else {
         Logging::warn(LOG_TAG, "Just created a task from", task_node[TASK_KEY],
           "with no stages");
@@ -368,12 +370,19 @@ namespace com
             callback_node[SYMBOL_NAME_KEY].as<std::string>());
           task = std::make_unique<Task>(stages, task_name, task_callback);
         } else if (type == CallbackType::PLUGIN) {
+          std::unique_ptr<TaskCallbackPlugin> task_callback_plugin;
+          make_task_function_callback_plugin(
+            dynamic_library,
+            library_name,
+            callback_node[SYMBOL_NAME_KEY].as<std::string>(),
+            task_callback_plugin);
+          task = std::make_unique<Task>(
+            stages, task_name, std::move(task_callback_plugin));
         } else {
           throw YAMLDagDeserializerNonSupportedCallbackType(
             std::string("Unspported callback type specified. Currently ") +
             std::string("only \"FUNCTION\" or \"PLUGIN\" are accepted. ") +
             std::string("Note these values are case insensitive."));
-
         }
       } else {
         std::stringstream error_builder;
@@ -391,6 +400,55 @@ namespace com
       const std::string &library_name,
       const std::string &symbol_name) const
     {
+      std::string cb_symbols;
+      std::function<void (bool)> ret;
+      bool symbol_present = verify_symbol_present(
+        library, library_name, symbol_name, cb_symbols);
+      if (symbol_present) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
+        ret = library.get_alias<void (bool)>(symbol_name);
+      } else {
+        throw YAMLDagDeserializerError("Failed to load " + symbol_name +
+          " from " + library_name + ". It could not be found in available " +
+          " symbols of " + cb_symbols);
+      }
+      return ret;
+    }
+ 
+    void YAMLDagDeserializer::make_task_function_callback_plugin(
+      const boost::dll::shared_library &library,
+      const std::string &library_name,
+      const std::string &symbol_name,
+      std::unique_ptr<TaskCallbackPlugin> &ret) const
+    {
+      std::string cb_symbols;
+      bool symbol_present = verify_symbol_present(
+        library, library_name, symbol_name, cb_symbols);
+      if (symbol_present) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
+        boost::shared_ptr<TaskCallbackPlugin> callback_plugin =
+          boost::dll::import_alias<TaskCallbackPlugin>(
+            library_name,
+            symbol_name,
+            boost::dll::load_mode::append_decorations);
+        ret = std::make_unique<TaskCallbackPlugin>(*(callback_plugin.get()));
+      } else {
+        throw YAMLDagDeserializerError("Failed to load " + symbol_name +
+          " from " + library_name + ". It could not be found in available " +
+          " symbols of " + cb_symbols);
+      }
+    }
+
+    bool YAMLDagDeserializer::verify_symbol_present(
+      const boost::dll::shared_library &library,
+      const std::string &library_name,
+      const std::string &symbol_name,
+      std::string &cb_symbols) const
+    {
+      Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
+        library_name, "and library load status is",
+        (library.is_loaded() ? "true" : "false"));
+
       std::vector<std::string> task_cb_funcs;
       try {
         boost::dll::library_info inf(library_name);
@@ -403,13 +461,6 @@ namespace com
           library_name + " with " + error.what());
       }
 
-      std::stringstream cb_symbols;
-      cb_symbols << task_cb_funcs;
-      Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
-        library_name, "which contains the following symbols",
-        cb_symbols.str(), "and library load status is",
-        (library.is_loaded() ? "true" : "false"));
-
       std::vector<std::string>::iterator find_if_it = std::find_if(
         task_cb_funcs.begin(), task_cb_funcs.end(),
         [&symbol_name](const std::string &exported)
@@ -417,16 +468,30 @@ namespace com
           return exported == symbol_name;
         });
 
-      std::function<void (bool)> ret;
-      if (find_if_it != task_cb_funcs.end()) {
-        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
-        ret = library.get_alias<void (bool)>(*find_if_it);
-      } else {
-        throw YAMLDagDeserializerError("Failed to load " + symbol_name +
-          " from " + library_name + ". It could not be found in available " +
-          " symbols of " + cb_symbols.str());
-      }
-      return ret;
+      std::stringstream cb_symbols_ss;
+      cb_symbols_ss << task_cb_funcs;
+      cb_symbols = cb_symbols_ss.str();
+      Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
+        library_name, "which contains the following symbols",
+        cb_symbols, "and library load status is",
+        (library.is_loaded() ? "true" : "false"));
+
+      return find_if_it != task_cb_funcs.end();
+    }
+
+    void YAMLDagDeserializer::load_stages(const YAML::Node &stages_node,
+      std::vector<std::unique_ptr<TaskStage>> &out_stages) const
+    {
+      auto stages_vector = stages_node.as<std::vector<YAML::Node>>();
+      std::copy(stages_vector.begin(), stages_vector.end(),
+        std::ostream_iterator<YAML::Node>(std::cout, ", "));
+
+      std::for_each(stages_vector.begin(), stages_vector.end(),
+        [&out_stages](const YAML::Node &)
+        {
+          // auto next_stage = std::make_unique<TestTa>();
+          out_stages.push_back(nullptr);
+        });
     }
   }
 }

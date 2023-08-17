@@ -13,6 +13,7 @@ libdag_scheduler_la_SOURCES = concurrent_task_queue.cxx \
 		dag_serialization.cxx \
     dag_vertex.cxx \
     endpoints.cxx \
+		examples/print_stage.cxx \
     https_session.cxx \
     interruptible_task_thread.cxx \
     logging.cxx \

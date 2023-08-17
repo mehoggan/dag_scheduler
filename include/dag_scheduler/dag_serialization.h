@@ -1,4 +1,6 @@
 #include "dag_scheduler/dag.h"
+#include "dag_scheduler/task_stage.h"
+#include "dag_scheduler/task_callback_plugin.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -72,6 +74,7 @@ namespace com
       const static std::string VERTICES_KEY;
       const static std::string TASK_KEY;
       const static std::string STAGES_KEY;
+      const static std::string STAGE_KEY;
 
       const static std::string TITLE_KEY;
       const static std::string NAME_KEY;
@@ -121,6 +124,17 @@ namespace com
         const boost::dll::shared_library &library,
         const std::string &library_name,
         const std::string &symbol_name) const;
+      void make_task_function_callback_plugin(
+        const boost::dll::shared_library &library,
+        const std::string &library_name,
+        const std::string &symbol_name,
+        std::unique_ptr<TaskCallbackPlugin> &ret) const;
+      bool verify_symbol_present(const boost::dll::shared_library &library,
+        const std::string &library_name,
+        const std::string &symbol_name,
+        std::string &cb_symbols) const;
+      void load_stages(const YAML::Node &stages_node,
+        std::vector<std::unique_ptr<TaskStage>> &out_stages) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);
