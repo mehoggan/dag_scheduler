@@ -1,5 +1,7 @@
 #include "dag_scheduler/task_callback_plugin.h"
 
+#include <boost/dll/alias.hpp>
+
 namespace com
 {
   namespace dag_scheduler

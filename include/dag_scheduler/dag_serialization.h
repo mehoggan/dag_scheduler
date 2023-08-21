@@ -29,9 +29,9 @@ namespace com
      *             SymbolName: <string>
      *             Type: <enum {Plugin, Function}>
      *           Stages:
-     *             - Stage:
-     *               Name: <optional string>
-     *               Type: <namespaced C++ class>
+     *             - Name: <optional string>
+     *               LibraryName: <string>
+     *               SymbolName: <string>
      *             ...
      *       ...
      *       Connections:
@@ -129,12 +129,20 @@ namespace com
         const std::string &library_name,
         const std::string &symbol_name,
         std::unique_ptr<TaskCallbackPlugin> &ret) const;
-      bool verify_symbol_present(const boost::dll::shared_library &library,
+      bool verify_symbol_present(
+        const boost::dll::shared_library &library,
         const std::string &library_name,
         const std::string &symbol_name,
+        const std::string &section_name,
         std::string &cb_symbols) const;
       void load_stages(const YAML::Node &stages_node,
         std::vector<std::unique_ptr<TaskStage>> &out_stages) const;
+      void dynamically_load_stage(
+        const boost::dll::shared_library &library,
+        const std::string &library_name,
+        const std::string &symbol_name,
+        const std::string &stage_name,
+        std::unique_ptr<TaskStage> &out_stage) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);

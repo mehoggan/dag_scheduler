@@ -124,9 +124,9 @@ namespace com
         std::string("            SymbolName: <string>\n") +
         std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        Stages:\n") +
-        std::string("          - Stage:\n") +
-        std::string("            Name: <optional string>\n") +
-        std::string("            Type: <namespaced C++ class>\n") +
+        std::string("            - Name: <optional string>\n") +
+        std::string("              LibraryName: <string>\n") +
+        std::string("              SymbolName: <string>\n") +
         std::string("          ...\n") +
         std::string("    ...\n");
       std::string actual = YAMLDagDeserializer::sample_dag_output(
@@ -163,9 +163,9 @@ namespace com
         std::string("            SymbolName: <string>\n") +
         std::string("            Type: <enum {Plugin, Function}>\n") +
         std::string("        Stages:\n") +
-        std::string("          - Stage:\n") +
-        std::string("            Name: <optional string>\n") +
-        std::string("            Type: <namespaced C++ class>\n") +
+        std::string("            - Name: <optional string>\n") +
+        std::string("              LibraryName: <string>\n") +
+        std::string("              SymbolName: <string>\n") +
         std::string("          ...\n") +
         std::string("    ...\n") +
         std::string("  Connections:\n") +
@@ -608,6 +608,64 @@ namespace com
         std::cout << error.what() << std::endl;
         EXPECT_EQ(expected_error_str, actual_error_str);
       }
+    }
+
+    TEST(TestYAMLDagDeserializer, make_dag_via_vertices_with_task_stages_valid)
+    {
+      std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+
+      YAML::Node yaml_node;
+      yaml_node[YAMLDagDeserializer::DAG_KEY] =
+        std::map<std::string, YAML::Node>({
+          {YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
+      YAML::Node first_vertex;
+      first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
+      first_vertex[YAMLDagDeserializer::TASK_KEY] = YAML::Node();
+      const std::string uuid1_task_label = "A named task";
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::NAME_KEY] = YAML::Node(uuid1_task_label);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY] = YAML::Node();
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::CALLBACK_TYPE_KEY] = YAML::Node("Plugin");
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::CALLBACK_KEY]
+        [YAMLDagDeserializer::SYMBOL_NAME_KEY] =
+          YAML::Node("task_callback_plugin");
+      std::cout << "Here!!!" << 1 << std::endl;
+      YAML::Node stage_node;
+      stage_node[YAMLDagDeserializer::NAME_KEY] = YAML::Node("PrintStage");
+      stage_node[YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
+      stage_node[YAMLDagDeserializer::SYMBOL_NAME_KEY] = "print_stage";
+      std::vector<YAML::Node> stage_nodes = {stage_node};
+      first_vertex[YAMLDagDeserializer::TASK_KEY]
+        [YAMLDagDeserializer::STAGES_KEY] = stage_nodes;
+      std::vector<YAML::Node> vertices = {first_vertex};
+      std::cout << "Here!!!" << 2 << std::endl;
+      yaml_node[YAMLDagDeserializer::DAG_KEY]
+        [YAMLDagDeserializer::VERTICES_KEY] = vertices;
+      auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+      ASSERT_TRUE(test_dag != nullptr);
+      std::shared_ptr<DAGVertex> test_vertex =
+        test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+      EXPECT_TRUE(test_vertex != nullptr);
+      EXPECT_TRUE(test_vertex->get_task() != nullptr);
+      std::size_t stage_count = 0;
+      test_vertex->get_task()->iterate_stages(
+        [&](TaskStage &stage) -> bool
+        {
+          std::string actual_type_str = typeid(stage).name();
+          auto expected_type_substr = "PrintStage";
+          EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
+            std::string::npos);
+          ++stage_count;
+          return stage.run();
+        });
+      EXPECT_EQ(1, stage_count); 
     }
   }
 }

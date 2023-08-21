@@ -4,8 +4,6 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
-#include <boost/dll/alias.hpp>
-
 namespace com
 {
   namespace dag_scheduler

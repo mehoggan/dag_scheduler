@@ -1,6 +1,7 @@
 #ifndef PRINT_STAGE_H_INCLUDED
 #define PRINT_STAGE_H_INCLUDED
 
+#include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
 
 #include <memory>
@@ -11,7 +12,8 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class PrintStage
+    class PrintStage :
+      public TaskStage
     {
     public:
       /**
@@ -64,28 +66,6 @@ namespace com
        * @return A reference to (this).
        */
       PrintStage &operator=(PrintStage &&other);
-
-      /**
-       * @brief Getter for the user friendly label that identifies a
-       *        \ref PrintStage.
-       *
-       * Each \ref PrintStage should be easily identifed by users. This is
-       * done by allowing users to assign a label to a PrintStage. This member
-       * function returns that label.
-       *
-       * @return The label specified by the user.
-       */
-      const std::string &label() const;
-
-      /**
-       * @brief Getter for the uuid that identifies a \ref task.
-       *
-       * Each \ref task should be easily identifed. The \ref uuid owned by
-       * a \ref task does exactly that, and this is how you get it.
-       *
-       * @return The \ref uuid owned by (this).
-       */
-      const UUID &get_uuid() const;
 
     public:
       /**
@@ -180,11 +160,12 @@ namespace com
       friend std::stringstream &operator<<(std::stringstream &out,
         const PrintStage &t);
 
-    protected:
-      std::string label_;
-      UUID uuid_;
+    public:
+      static std::unique_ptr<TaskStage> make_stage(const std::string &name);
+
+    private:
+      std::atomic_bool running_;
     };
   }
 }
-
 #endif
