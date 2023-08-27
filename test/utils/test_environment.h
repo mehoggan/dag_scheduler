@@ -23,6 +23,10 @@ namespace com
 
         std::filesystem::path get_lib_path() const;
 
+        std::filesystem::path get_stages_lib_dir_path() const;
+
+        std::filesystem::path get_stages_lib_path() const;
+
         const std::filesystem::path &executable_path() const;
 
       private:

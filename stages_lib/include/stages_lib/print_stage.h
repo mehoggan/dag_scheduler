@@ -10,10 +10,10 @@
 
 namespace com
 {
-  namespace dag_scheduler
+  namespace stages_lib
   {
     class PrintStage :
-      public TaskStage
+      public com::dag_scheduler::TaskStage
     {
     public:
       /**
@@ -161,7 +161,26 @@ namespace com
         const PrintStage &t);
 
     public:
-      static std::unique_ptr<TaskStage> make_stage(const std::string &name);
+      /**
+       * @brief A trait method needed by \ref TaskStage as a factory method.
+       *
+       * A trait method needed by \ref TaskStage as a factory method. When
+       * a YAML file defining a \ref DAG is deserialized this method is called
+       * to create the appropriate instance. It is used along with \ref
+       * BOOST_DLL_ALIAS_SECTIONED to define an alias used to load the method
+       * from the \ref Stages section of a dynamic library. See:
+       *
+       * <source root>/stages_lib/lib/print_stage.cxx
+       *
+       * for an example on how to use \ref BOOST_DLL_ALIAS_SECTIONED.
+       *
+       * @param[in] name The name to be assigned to the stage.
+       *
+       * @return A \ref std::unique_ptr<TaskStage> inserted into a \ref Task's
+       *         collection of stages to be executed within a \ref DAGVertex.
+       */
+      static std::unique_ptr<com::dag_scheduler::TaskStage> make_stage(
+        const std::string &name);
 
     private:
       std::atomic_bool running_;

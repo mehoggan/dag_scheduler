@@ -47,6 +47,7 @@ flags = [
     '-Dgtest_main_EXPORTS',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/lib/..',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/lib/../include',
+    '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/stages_lib/include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/tests/..',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/tests/../include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/tests/./utils',

@@ -1,4 +1,4 @@
-#include "dag_scheduler/examples/print_stage.h"
+#include "stages_lib/print_stage.h"
 #include "dag_scheduler/logging.h"
 
 #include <boost/dll/alias.hpp>
@@ -6,13 +6,13 @@
 #include <iostream>
 #include <memory>
 
-BOOST_DLL_ALIAS_SECTIONED(com::dag_scheduler::PrintStage::make_stage,
+BOOST_DLL_ALIAS_SECTIONED(com::stages_lib::PrintStage::make_stage,
     print_stage,
     Stages)
 
 namespace com
 {
-  namespace dag_scheduler
+  namespace stages_lib
   {
     PrintStage::PrintStage() :
       PrintStage("")
@@ -21,7 +21,7 @@ namespace com
     }
 
     PrintStage::PrintStage(const std::string &label) :
-      TaskStage(label)
+      com::dag_scheduler::TaskStage(label)
     {}
 
     PrintStage::~PrintStage()
@@ -98,7 +98,8 @@ namespace com
     }
 
 
-    std::unique_ptr<TaskStage> PrintStage::make_stage(const std::string &name)
+    std::unique_ptr<com::dag_scheduler::TaskStage> PrintStage::make_stage(
+      const std::string &name)
     {
       return std::make_unique<PrintStage>(name);
     }

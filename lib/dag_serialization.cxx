@@ -348,47 +348,51 @@ namespace com
       Logging::info(LOG_TAG, "Going to create task callback from",
         callback_node, "...");
       auto library_name = callback_node[LIBRARY_NAME_KEY].as<std::string>();
-      boost::dll::shared_library dynamic_library;
        
       try { 
-        dynamic_library = boost::dll::shared_library(library_name);
-      } catch (boost::system::system_error &system_error) {
+        const DynamicLibraryRegistry::RegistryItem &shared_library =
+          DynamicLibraryRegistry::register_dynamic_library(library_name);
+
+        if (callback_node[CALLBACK_TYPE_KEY]) {
+          CallbackType type = YAMLDagDeserializer::callback_type_from_string(
+           callback_node[CALLBACK_TYPE_KEY].as<std::string>());
+          if (type == CallbackType::FUNCTION) {
+            task_callback = make_task_function_callback(
+              shared_library,
+              callback_node[SYMBOL_NAME_KEY].as<std::string>());
+            task = std::make_unique<Task>(stages, task_name, task_callback);
+          } else if (type == CallbackType::PLUGIN) {
+            std::unique_ptr<TaskCallbackPlugin> task_callback_plugin;
+            make_task_function_callback_plugin(shared_library,
+               callback_node[SYMBOL_NAME_KEY].as<std::string>(),
+              task_callback_plugin);
+            if (not task_callback_plugin) {
+              std::stringstream error_stream;
+              error_stream << "Unable to properly deserialize"
+                << callback_node;
+              Logging::error(LOG_TAG, error_stream.str());
+              throw YAMLDagDeserializerError(error_stream.str());
+            }
+            task = std::make_unique<Task>(
+              stages, task_name, std::move(task_callback_plugin));
+          } else {
+            throw YAMLDagDeserializerNonSupportedCallbackType(
+              std::string("Unspported callback type specified. Currently ") +
+              std::string("only \"FUNCTION\" or \"PLUGIN\" are accepted. ") +
+              std::string("Note these values are case insensitive."));
+          }
+        } else {
+          std::stringstream error_builder;
+          error_builder << std::string("If a callback is to be used in:\n");
+          error_builder << callback_node[CALLBACK_KEY];
+          error_builder << std::string(" it must contain a Callback Type.");
+          Logging::error(LOG_TAG, error_builder.str());
+          throw YAMLDagDeserializerError(error_builder.str());
+        }
+      } catch (std::runtime_error &system_error) {
         std::stringstream error_builder;
         error_builder << "Could not load library from ";
         error_builder << library_name << " with " << system_error.what();
-        Logging::error(LOG_TAG, error_builder.str());
-        throw YAMLDagDeserializerError(error_builder.str());
-      }
-
-      if (callback_node[CALLBACK_TYPE_KEY]) {
-        CallbackType type = YAMLDagDeserializer::callback_type_from_string(
-         callback_node[CALLBACK_TYPE_KEY].as<std::string>());
-        if (type == CallbackType::FUNCTION) {
-          task_callback = make_task_function_callback(
-            dynamic_library,
-            library_name,
-            callback_node[SYMBOL_NAME_KEY].as<std::string>());
-          task = std::make_unique<Task>(stages, task_name, task_callback);
-        } else if (type == CallbackType::PLUGIN) {
-          std::unique_ptr<TaskCallbackPlugin> task_callback_plugin;
-          make_task_function_callback_plugin(
-            dynamic_library,
-            library_name,
-            callback_node[SYMBOL_NAME_KEY].as<std::string>(),
-            task_callback_plugin);
-          task = std::make_unique<Task>(
-            stages, task_name, std::move(task_callback_plugin));
-        } else {
-          throw YAMLDagDeserializerNonSupportedCallbackType(
-            std::string("Unspported callback type specified. Currently ") +
-            std::string("only \"FUNCTION\" or \"PLUGIN\" are accepted. ") +
-            std::string("Note these values are case insensitive."));
-        }
-      } else {
-        std::stringstream error_builder;
-        error_builder << std::string("If a callback is to be used in:\n");
-        error_builder << callback_node[CALLBACK_KEY];
-        error_builder << std::string(" it must contain a Callback Type.");
         Logging::error(LOG_TAG, error_builder.str());
         throw YAMLDagDeserializerError(error_builder.str());
       }
@@ -396,70 +400,72 @@ namespace com
 
     std::function<void (bool)>
     YAMLDagDeserializer::make_task_function_callback(
-      const boost::dll::shared_library &library,
-      const std::string &library_name,
+      const DynamicLibraryRegistry::RegistryItem &shared_library,
       const std::string &symbol_name) const
     {
       std::string cb_symbols;
       std::function<void (bool)> ret;
       bool symbol_present = verify_symbol_present(
-        library, library_name, symbol_name, "TaskCb", cb_symbols);
-      if (symbol_present) {
-        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
-        ret = library.get_alias<void (bool)>(symbol_name);
+        shared_library, symbol_name, "TaskCb", cb_symbols);
+      if (symbol_present && not cb_symbols.empty()) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in",
+          shared_library.get_name());
+        ret = shared_library
+          .get_shared_lib()
+          .get_alias<void (bool)>(symbol_name);
       } else {
         throw YAMLDagDeserializerError("Failed to load " + symbol_name +
-          " from " + library_name + ". It could not be found in available " +
-          " symbols of " + cb_symbols);
+          " from " + shared_library.get_name() +
+          ". It could not be found in available " + " symbols of " +
+          cb_symbols);
       }
       return ret;
     }
  
     void YAMLDagDeserializer::make_task_function_callback_plugin(
-      const boost::dll::shared_library &library,
-      const std::string &library_name,
+      const DynamicLibraryRegistry::RegistryItem &shared_library,
       const std::string &symbol_name,
       std::unique_ptr<TaskCallbackPlugin> &ret) const
     {
       std::string cb_symbols;
       bool symbol_present = verify_symbol_present(
-        library, library_name, symbol_name, "TaskCb", cb_symbols);
-      if (symbol_present) {
-        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
+        shared_library, symbol_name, "TaskCb", cb_symbols);
+      if (symbol_present && not cb_symbols.empty()) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in",
+          shared_library.get_name());
         boost::shared_ptr<TaskCallbackPlugin> callback_plugin =
           boost::dll::import_alias<TaskCallbackPlugin>(
-            library_name,
+            shared_library.get_name(),
             symbol_name,
             boost::dll::load_mode::append_decorations);
         ret = std::make_unique<TaskCallbackPlugin>(*(callback_plugin.get()));
       } else {
         throw YAMLDagDeserializerError("Failed to load " + symbol_name +
-          " from " + library_name + ". It could not be found in available " +
-          " symbols of " + cb_symbols);
+          " from " + shared_library.get_name() + ". It could not be found " +
+          " in available symbols of " + cb_symbols);
       }
     }
 
     bool YAMLDagDeserializer::verify_symbol_present(
-      const boost::dll::shared_library &library,
-      const std::string &library_name,
+      const DynamicLibraryRegistry::RegistryItem &shared_library,
       const std::string &symbol_name,
       const std::string &section_name,
       std::string &cb_symbols) const
     {
       Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
-        library_name, "and library load status is",
-        (library.is_loaded() ? "true" : "false"));
+        shared_library.get_name(), "and library load status is",
+        (shared_library.get_shared_lib().is_loaded() ? "true" : "false"));
 
       std::vector<std::string> task_cb_funcs;
       try {
-        boost::dll::library_info inf(library_name);
+        boost::dll::library_info inf(shared_library.get_name());
         task_cb_funcs = inf.symbols(section_name);
       } catch (const std::runtime_error &rt_error) {
         throw YAMLDagDeserializerError("Could not load symbol info from " +
-          library_name + " with " + rt_error.what());
+          shared_library.get_name() + " with " + rt_error.what());
       } catch (const std::exception &error) {
         throw YAMLDagDeserializerError("Could not load symbol info from " +
-          library_name + " with " + error.what());
+          shared_library.get_name() + " with " + error.what());
       }
 
       std::vector<std::string>::iterator find_if_it = std::find_if(
@@ -473,9 +479,9 @@ namespace com
       cb_symbols_ss << task_cb_funcs;
       cb_symbols = cb_symbols_ss.str();
       Logging::info(LOG_TAG, "Going to load", symbol_name, "from",
-        library_name, "which contains the following symbols",
+        shared_library.get_name(), "which contains the following symbols",
         cb_symbols, "and library load status is",
-        (library.is_loaded() ? "true" : "false"));
+        (shared_library.get_shared_lib().is_loaded() ? "true" : "false"));
 
       return find_if_it != task_cb_funcs.end();
     }
@@ -516,14 +522,20 @@ namespace com
             throw YAMLDagDeserializerError(error_stream.str());
           }
 
-          Logging::info(LOG_TAG, "stage_name =", stage_name);
-          boost::dll::shared_library dynamic_library;
-           
           try { 
-            std::unique_ptr<TaskStage> next_stage;
-            dynamic_library = boost::dll::shared_library(library_name);
-            dynamically_load_stage(dynamic_library, library_name, symbol_name,
-              stage_name, next_stage);
+            const DynamicLibraryRegistry::RegistryItem &shared_library =
+              DynamicLibraryRegistry::register_dynamic_library(library_name);
+            std::unique_ptr<TaskStage> next_stage = dynamically_load_stage(
+              shared_library, symbol_name, stage_name);
+            if (next_stage) {
+              Logging::info(LOG_TAG, "next_stage: ", (*next_stage));
+            } else {
+              std::stringstream error_builder;
+              error_builder << "Could not load library from ";
+              error_builder << library_name << " with unknown error";
+              Logging::error(LOG_TAG, error_builder.str());
+              throw YAMLDagDeserializerError(error_builder.str());
+            }
             out_stages.push_back(std::move(next_stage));
           } catch (boost::system::system_error &system_error) {
             std::stringstream error_builder;
@@ -532,34 +544,33 @@ namespace com
             Logging::error(LOG_TAG, error_builder.str());
             throw YAMLDagDeserializerError(error_builder.str());
           }
-        });
+        }); 
     }
 
-    void YAMLDagDeserializer::dynamically_load_stage(
-      const boost::dll::shared_library &library,
-      const std::string &library_name,
+    std::unique_ptr<TaskStage> YAMLDagDeserializer::dynamically_load_stage(
+      const DynamicLibraryRegistry::RegistryItem &shared_library,
       const std::string &symbol_name,
-      const std::string &stage_name,
-      std::unique_ptr<TaskStage> &out_stage) const
+      const std::string &stage_name) const
     {
-      (void) out_stage;
       std::string cb_symbols;
       bool symbol_present = verify_symbol_present(
-        library, library_name, symbol_name, "Stages", cb_symbols);
-      if (symbol_present) {
-        Logging::info(LOG_TAG, "Found", symbol_name, "in", library_name);
+        shared_library, symbol_name, "Stages", cb_symbols);
+      if (symbol_present && not cb_symbols.empty()) {
+        Logging::info(LOG_TAG, "Found", symbol_name, "in",
+          shared_library.get_name());
         typedef std::unique_ptr<TaskStage> (task_stage_creator_t)(
           const std::string &);
         std::function<task_stage_creator_t> stage_creator =
           boost::dll::import_alias<task_stage_creator_t>(
-            library_name,
+            shared_library.get_name(),
             symbol_name,
             boost::dll::load_mode::append_decorations);
-        out_stage = stage_creator(stage_name);
+        std::unique_ptr<TaskStage> ret = stage_creator(stage_name);
+        return ret;
       } else {
         throw YAMLDagDeserializerError("Failed to load " + symbol_name +
-          " from " + library_name + ". It could not be found in available " +
-          " symbols of " + cb_symbols);
+          " from " + shared_library.get_name() + ". It could not be found" +
+          " in available symbols of --" + cb_symbols + "--.");
       }
     }
   }

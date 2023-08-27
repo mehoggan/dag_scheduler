@@ -21,6 +21,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
 
 gtest_libdag_scheduler_CPPFLAGS = -Werror -Wall -pedantic \
 	  -I$(abs_top_srcdir)/include \
+	  -I$(abs_top_srcdir)/stages_lib/include \
 	  -I$(abs_top_srcdir)/test/include \
 	  -I$(abs_top_srcdir)/deps/build/boost/include \
 	  -I$(abs_top_srcdir)/deps/build/openssl/include

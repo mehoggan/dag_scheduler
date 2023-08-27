@@ -23,17 +23,30 @@ namespace com
 
       std::filesystem::path Pathing::get_lib_path() const
       {
-        return executable_path_
+        return executable_path()
           .parent_path()
           .parent_path()
           .parent_path() / "lib" / ".libs" / "libdag_scheduler.dylib";
+      }
+
+      std::filesystem::path Pathing::get_stages_lib_dir_path() const
+      {
+        return get_stages_lib_path().parent_path();
+      }
+
+      std::filesystem::path Pathing::get_stages_lib_path() const
+      {
+        return executable_path()
+          .parent_path()
+          .parent_path()
+          .parent_path() /
+          "stages_lib" / "lib" / ".libs" / "libstages_lib.dylib";
       }
 
       const std::filesystem::path &Pathing::executable_path() const
       {
         return executable_path_;
       }
-
 
       std::string TestEnvironment::EXE_PATH;
       com::dag_scheduler::LogTag TestEnvironment::TEST_TAG("Testing");

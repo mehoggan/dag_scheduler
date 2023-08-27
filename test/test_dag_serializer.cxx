@@ -612,7 +612,10 @@ namespace com
 
     TEST(TestYAMLDagDeserializer, make_dag_via_vertices_with_task_stages_valid)
     {
-      std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+      std::string lib_path =
+        testing::TestEnvironment::PATHING.get_lib_path();
+      std::string stages_lib_path =
+        testing::TestEnvironment::PATHING.get_stages_lib_path();
 
       YAML::Node yaml_node;
       yaml_node[YAMLDagDeserializer::DAG_KEY] =
@@ -636,16 +639,15 @@ namespace com
         [YAMLDagDeserializer::CALLBACK_KEY]
         [YAMLDagDeserializer::SYMBOL_NAME_KEY] =
           YAML::Node("task_callback_plugin");
-      std::cout << "Here!!!" << 1 << std::endl;
       YAML::Node stage_node;
       stage_node[YAMLDagDeserializer::NAME_KEY] = YAML::Node("PrintStage");
-      stage_node[YAMLDagDeserializer::LIBRARY_NAME_KEY] = YAML::Node(lib_path);
+      stage_node[YAMLDagDeserializer::LIBRARY_NAME_KEY] =
+        YAML::Node(stages_lib_path);
       stage_node[YAMLDagDeserializer::SYMBOL_NAME_KEY] = "print_stage";
       std::vector<YAML::Node> stage_nodes = {stage_node};
       first_vertex[YAMLDagDeserializer::TASK_KEY]
         [YAMLDagDeserializer::STAGES_KEY] = stage_nodes;
       std::vector<YAML::Node> vertices = {first_vertex};
-      std::cout << "Here!!!" << 2 << std::endl;
       yaml_node[YAMLDagDeserializer::DAG_KEY]
         [YAMLDagDeserializer::VERTICES_KEY] = vertices;
       auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
@@ -663,7 +665,8 @@ namespace com
           EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
             std::string::npos);
           ++stage_count;
-          return stage.run();
+          bool status = stage.run();
+          return status;
         });
       EXPECT_EQ(1, stage_count); 
     }

@@ -39,6 +39,13 @@ LT_INIT()
 AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 AC_CONFIG_SRCDIR([lib/dag.cxx])
 
-AC_CONFIG_FILES([Makefile lib/Makefile test/Makefile bin/Makefile])
+AC_CONFIG_FILES([
+  Makefile
+  lib/Makefile
+  test/Makefile
+  bin/Makefile
+  stages_lib/Makefile
+  stages_lib/lib/Makefile
+])
 
 AC_OUTPUT

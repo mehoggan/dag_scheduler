@@ -1,4 +1,8 @@
+#ifndef DAG_SERIALIZATION_H_INCLUDED
+#define DAG_SERIALIZATION_H_INCLUDED
+
 #include "dag_scheduler/dag.h"
+#include "dag_scheduler/dynamic_library_registry.h"
 #include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/task_callback_plugin.h"
 
@@ -121,28 +125,23 @@ namespace com
         const YAML::Node &callback_node,
         std::unique_ptr<Task> &task) const;
       std::function<void (bool)> make_task_function_callback(
-        const boost::dll::shared_library &library,
-        const std::string &library_name,
+        const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name) const;
       void make_task_function_callback_plugin(
-        const boost::dll::shared_library &library,
-        const std::string &library_name,
+        const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name,
         std::unique_ptr<TaskCallbackPlugin> &ret) const;
       bool verify_symbol_present(
-        const boost::dll::shared_library &library,
-        const std::string &library_name,
+        const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name,
         const std::string &section_name,
         std::string &cb_symbols) const;
       void load_stages(const YAML::Node &stages_node,
         std::vector<std::unique_ptr<TaskStage>> &out_stages) const;
-      void dynamically_load_stage(
-        const boost::dll::shared_library &library,
-        const std::string &library_name,
+      std::unique_ptr<TaskStage> dynamically_load_stage(
+        const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name,
-        const std::string &stage_name,
-        std::unique_ptr<TaskStage> &out_stage) const;
+        const std::string &stage_name) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);
@@ -177,3 +176,4 @@ namespace YAML
     }
   };
 }
+#endif
