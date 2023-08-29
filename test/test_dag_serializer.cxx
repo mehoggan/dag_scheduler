@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "boost/exception/exception.hpp"
 #include "utils/test_environment.h"
 #include "utils/test_task.h"
 
 #include "dag_scheduler/dag_serialization.h"
+
+#include <boost/exception/exception.hpp>
 
 #include <atomic>
 #include <exception>

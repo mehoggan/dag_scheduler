@@ -1,6 +1,7 @@
 lib_LTLIBRARIES = libdag_scheduler.la
 
 libdag_scheduler_la_CPPFLAGS = -Werror -Wall -pedantic \
+	  -Wno-deprecated-declarations \
     -I$(abs_top_srcdir)/include/ \
     -I$(abs_top_srcdir)/deps/build/boost/include \
     -I$(abs_top_srcdir)/deps/build/openssl/include

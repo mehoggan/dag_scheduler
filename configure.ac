@@ -38,14 +38,15 @@ LT_INIT()
 
 AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 AC_CONFIG_SRCDIR([lib/dag.cxx])
+PKG_CHECK_MODULES([rapidjson], [RapidJSON >= 1.1])
 
 AC_CONFIG_FILES([
   Makefile
   lib/Makefile
-  test/Makefile
-  bin/Makefile
   stages_lib/Makefile
   stages_lib/lib/Makefile
+  test/Makefile
+  bin/Makefile
 ])
 
 AC_OUTPUT

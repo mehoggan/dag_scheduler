@@ -3,6 +3,9 @@
 #include "dag_scheduler/dag.h"
 #include "dag_scheduler/dag_algorithms.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <iostream>
 
 namespace com
@@ -60,6 +63,33 @@ namespace com
         return vertices_cloned;
       }
 
+      static void get_generic_config(rapidjson::Document &config_doc)
+      {
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        writer.StartObject();
+          writer.String("test_value_int");
+          writer.Int(-1);
+          writer.String("test_value_str");
+          writer.String("test_string");
+          writer.String("test_value_bool");
+          writer.Bool(true);
+          writer.String("test_value_double");
+          writer.Double(-1.0);
+        writer.EndObject();
+        config_doc.Parse(buffer.GetString());
+      }
+
+      static std::string get_expected_config_str()
+      {
+        return std::string("{") +
+          std::string("\"test_value_int\":-1,") +
+          std::string("\"test_value_str\":\"test_string\",") +
+          std::string("\"test_value_bool\":true,") +
+          std::string("\"test_value_double\":-1.0") +
+          std::string("}");
+      }
+
     private:
       DAG d_;
     };
@@ -68,6 +98,9 @@ namespace com
     {
       EXPECT_EQ(0ul, get_dag().edge_count());
       EXPECT_EQ(0ul, get_dag().vertex_count());
+      std::string actual_config;
+      get_dag().json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
     }
 
     TEST_F(TestDag, ctor_with_title)
@@ -77,6 +110,23 @@ namespace com
       EXPECT_EQ(0ul, test_dag.edge_count());
       EXPECT_EQ(0ul, test_dag.vertex_count());
       EXPECT_EQ(std::string("test_dag"), test_dag.title());
+      std::string actual_config;
+      get_dag().json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
+    }
+
+    TEST_F(TestDag, ctor_with_title_and_config)
+    {
+      rapidjson::Document json_config;
+      TestDag::get_generic_config(json_config);
+      DAG test_dag("test_dag", json_config);
+
+      EXPECT_EQ(0ul, test_dag.edge_count());
+      EXPECT_EQ(0ul, test_dag.vertex_count());
+      EXPECT_EQ(std::string("test_dag"), test_dag.title());
+      std::string actual_config;
+      test_dag.json_config_str(actual_config);
+      EXPECT_EQ(TestDag::get_expected_config_str(), actual_config);
     }
 
     TEST_F(TestDag, move_ctor_no_edges_no_vertices)
@@ -86,6 +136,27 @@ namespace com
       DAG d_moved(std::move(d));
       EXPECT_EQ(0ul, d_moved.edge_count());
       EXPECT_EQ(0ul, d_moved.vertex_count());
+      std::string actual_config;
+      get_dag().json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
+    }
+
+    TEST_F(TestDag, move_ctor_no_edges_no_vertices_title_and_config)
+    {
+      rapidjson::Document json_config;
+      TestDag::get_generic_config(json_config);
+      DAG d("test_dag", json_config);
+
+      DAG d_moved(std::move(d));
+      EXPECT_EQ(0ul, d_moved.edge_count());
+      EXPECT_EQ(0ul, d_moved.vertex_count());
+      std::string actual_moved_config;
+      d_moved.json_config_str(actual_moved_config);
+      EXPECT_EQ(TestDag::get_expected_config_str(), actual_moved_config);
+
+      std::string actual_config;
+      d.json_config_str(actual_config);
+      EXPECT_EQ("", actual_config) << "Empty because we moved it.";
     }
 
     TEST_F(TestDag, assignment_move_operator_no_edges_no_vertices)
@@ -96,6 +167,29 @@ namespace com
       d_moved = std::move(d);
       EXPECT_EQ(0ul, d_moved.edge_count());
       EXPECT_EQ(0ul, d_moved.vertex_count());
+      std::string actual_config;
+      get_dag().json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
+    }
+
+    TEST_F(TestDag,
+      assignment_move_operator_no_edges_no_vertices_title_and_config)
+    {
+      rapidjson::Document json_config;
+      TestDag::get_generic_config(json_config);
+      DAG d("test_dag", json_config);
+
+      DAG d_moved;
+      d_moved = std::move(d);
+      EXPECT_EQ(0ul, d_moved.edge_count());
+      EXPECT_EQ(0ul, d_moved.vertex_count());
+      std::string actual_moved_config;
+      d_moved.json_config_str(actual_moved_config);
+      EXPECT_EQ(TestDag::get_expected_config_str(), actual_moved_config);
+
+      std::string actual_config;
+      d.json_config_str(actual_config);
+      EXPECT_EQ("", actual_config) << "Empty because we moved it.";
     }
 
     TEST_F(TestDag, clone_no_edges_no_vertices)
@@ -105,6 +199,30 @@ namespace com
       DAG d_cloned = d.clone();
       EXPECT_EQ(0ul, d_cloned.edge_count());
       EXPECT_EQ(0ul, d_cloned.vertex_count());
+      std::string actual_config;
+      d.json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
+      d_cloned.json_config_str(actual_config);
+      EXPECT_EQ("{}", actual_config);
+    }
+
+    TEST_F(TestDag, clone_no_edges_no_vertices_title_and_config)
+    {
+      rapidjson::Document json_config;
+      TestDag::get_generic_config(json_config);
+      DAG d("test_dag", json_config);
+
+      DAG d_cloned = d.clone();
+      EXPECT_EQ(0ul, d_cloned.edge_count());
+      EXPECT_EQ(0ul, d_cloned.vertex_count());
+
+      std::string actual_config;
+      d.json_config_str(actual_config);
+      EXPECT_EQ(TestDag::get_expected_config_str(), actual_config);
+
+      std::string actual_cloned_config;
+      d.json_config_str(actual_cloned_config);
+      EXPECT_EQ(TestDag::get_expected_config_str(), actual_cloned_config);
     }
 
     TEST_F(TestDag, add_vertex_and_reset)

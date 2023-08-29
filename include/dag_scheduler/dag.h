@@ -5,6 +5,8 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/uuid.h"
 
+#include <rapidjson/document.h>
+
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -95,6 +97,17 @@ namespace com
        * @param[in] title The title of the DAG.
        */
       explicit DAG(const std::string &title);
+
+      /**
+       * @brief A constructor for a \ref DAG.
+       *
+       * A constructor for a \ref DAG which initializes its title to the
+       * \ref title parameter.
+       *
+       * @param[in] title The title of the DAG.
+       * @param[in] json_doc The json document to be used for configuration.
+       */
+      DAG(const std::string &title, const rapidjson::Document &json_config);
 
       /**
        * @brief dtor
@@ -513,6 +526,28 @@ namespace com
        */
       void reset();
 
+      /**
+       * @brief A getter for the json configuration passed into the \ref ctor.
+       *
+       * A member function of \ref DAG that returns a const reference of the
+       * \ref json_config passed into the \ref ctor.
+       *
+       * @return A const reference to the member \ref json_config_.
+       */
+      const rapidjson::Document &json_config() const;
+
+      /**
+       * @brief A helper method to visualize the configuration owned by \ref
+       * this.
+       *
+       * A member function of \ref DAG that assists in visualizing the
+       * configuration document passed in at construction time.
+       *
+       * @param[out] out_str A \ref std::string that represests the \ref
+       *                     rapidjson::Document owned by this.
+       */
+      void json_config_str(std::string &out_str) const;
+
     public:
       friend std::ostream &operator<<(std::ostream &out, const DAG &g);
       friend bool operator==(const DAG &lhs, const DAG &rhs);
@@ -529,6 +564,7 @@ namespace com
       typedef std::vector<std::shared_ptr<DAGVertex>> DAG_t;
       DAG_t graph_;
       std::string title_;
+      std::unique_ptr<rapidjson::Document> json_config_;
 
     private:
       FRIEND_TEST(TestDag, get_vertex_at);

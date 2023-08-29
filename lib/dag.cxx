@@ -3,10 +3,14 @@
 #include "dag_scheduler/dag_algorithms.h"
 #include "dag_scheduler/dag_edge.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <algorithm>
 #include <cassert>
 #include <list>
 #include <iostream>
+#include <memory>
 #include <sstream>
 
 namespace com
@@ -29,9 +33,21 @@ namespace com
 
     DAG::DAG(const std::string &title) :
       LoggedClass(*this),
-      title_(title)
+      title_(title),
+      json_config_(std::make_unique<rapidjson::Document>())
     {
       Logging::info(LOG_TAG, "Created DAG with title=--", title_, "--");
+    }
+
+    DAG::DAG(
+      const std::string &title,
+      const rapidjson::Document &json_config) :
+      LoggedClass(*this),
+      title_(title),
+      json_config_(std::make_unique<rapidjson::Document>())
+    {
+      Logging::info(LOG_TAG, "Created DAG with title=--", title_, "--");
+      json_config_->CopyFrom(json_config, json_config_->GetAllocator());
     }
 
     DAG::~DAG()
@@ -40,7 +56,8 @@ namespace com
     DAG::DAG(DAG &&other) :
       LoggedClass(*this),
       graph_(std::move(other.graph_)),
-      title_(other.title_)
+      title_(other.title_),
+      json_config_(std::move(other.json_config_))
     {
       Logging::info(LOG_TAG, "Moved DAG with title=", title_);
     }
@@ -49,12 +66,14 @@ namespace com
     {
       graph_ = std::move(other.graph_);
       title_ = other.title_;
+      json_config_ = std::move(other.json_config_);
       Logging::info(LOG_TAG, "Moved Assigned DAG with title=", title_);
       return (*this);
     }
 
     DAG DAG::clone()
     {
+      Logging::info(LOG_TAG, "Here");
       return (*this);
     }
 
@@ -453,6 +472,24 @@ namespace com
       graph_.clear();
     }
 
+    const rapidjson::Document &DAG::json_config() const
+    {
+      return (*json_config_);
+    }
+    
+    void DAG::json_config_str(std::string &out_str) const
+    {
+      if (json_config_) {
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        json_config_->Accept(writer);
+        out_str = buffer.GetString();
+        if (out_str == "null") {
+          out_str = "{}";
+        }
+      }
+    }
+
     std::shared_ptr<DAGVertex> DAG::get_vertex_at(std::size_t i)
     {
       assert(i < graph_.size() && "Index out of bounds.");
@@ -476,7 +513,8 @@ namespace com
     }
 
     DAG::DAG(const DAG &other) :
-      LoggedClass(*this)
+      LoggedClass(*this),
+      json_config_(std::make_unique<rapidjson::Document>())
     {
       DAG *o = (const_cast<DAG *>(&other));
       o->linear_traversal([&](std::shared_ptr<DAGVertex> v) {
@@ -489,6 +527,10 @@ namespace com
         clone_connections(*other.graph_[i], *graph_[i]);
       }
       title_ = other.title_;
+      Logging::info(LOG_TAG, "Here 0");
+      json_config_->CopyFrom((*other.json_config_),
+        json_config_->GetAllocator());
+      Logging::info(LOG_TAG, "Here 1");
       Logging::info(LOG_TAG, "Copied DAG with title=", title_);
     }
 
@@ -506,6 +548,8 @@ namespace com
       }
 
       title_ = rhs.title_;
+      json_config_->CopyFrom((*rhs.json_config_),
+        json_config_->GetAllocator());
       Logging::info(LOG_TAG, "Assigned DAG with title=", title_);
 
       return (*this);
@@ -520,6 +564,9 @@ namespace com
       for (std::shared_ptr<DAGVertex> v : g.graph_) {
         out << (*v) << std::endl;
       }
+      std::string json_config_string;
+      g.json_config_str(json_config_string);
+      out << "Configuration:" << json_config_string;
 
       return out;
     }
@@ -558,6 +605,7 @@ namespace com
       }
       ret &= (lhs.vertex_count() == rhs.vertex_count());
       ret &= (lhs.edge_count() == rhs.edge_count());
+      ret &= (lhs.json_config() == rhs.json_config());
 
       return ret;
     }

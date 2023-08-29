@@ -8,6 +8,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     test_dag_edge.cxx \
 		test_dag_serializer.cxx \
     test_dag_vertex.cxx \
+		test_dynamic_library_registery.cxx \
     test_interruptible_task_thread.cxx \
     test_logging.cxx \
     test_stop_watch.cxx \
@@ -20,6 +21,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     utils/test_task_stage.cxx
 
 gtest_libdag_scheduler_CPPFLAGS = -Werror -Wall -pedantic \
+		-Wno-deprecated-declarations \
 	  -I$(abs_top_srcdir)/include \
 	  -I$(abs_top_srcdir)/stages_lib/include \
 	  -I$(abs_top_srcdir)/test/include \
