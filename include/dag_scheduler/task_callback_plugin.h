@@ -29,6 +29,17 @@ namespace com
        * @param[in] completed_task The task that was completed.
        */
       virtual void completed(bool status, Task &completed_task);
+
+      /**
+       * @brief Needed by the cloning of a \ref DAG. Your task callback plugin
+       * must implement this method.
+       *
+       * Needed by the cloning of a \ref DAG. Your task callback plugin
+       * must implement this method.
+       *
+       * @return A cloned version of (*this).
+       */
+      virtual std::unique_ptr<TaskCallbackPlugin> clone() const;
     };
   }
 }

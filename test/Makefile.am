@@ -1,6 +1,15 @@
 TESTS = gtest_libdag_scheduler
 check_PROGRAMS = gtest_libdag_scheduler
 
+gtest_libdag_scheduler_CPPFLAGS = -Werror -Wall -pedantic \
+		-Wno-deprecated-declarations \
+		-Wno-enum-constexpr-conversion \
+	  -I$(abs_top_srcdir)/include \
+	  -I$(abs_top_srcdir)/stages_lib/include \
+	  -I$(abs_top_srcdir)/test/include \
+	  -I$(abs_top_srcdir)/deps/build/boost/include \
+	  -I$(abs_top_srcdir)/deps/build/openssl/include
+
 gtest_libdag_scheduler_SOURCES = main.cxx \
     test_concurrent_task_queue.cxx \
     test_dag.cxx \
@@ -19,14 +28,6 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     utils/test_environment.cxx \
     utils/test_task.cxx \
     utils/test_task_stage.cxx
-
-gtest_libdag_scheduler_CPPFLAGS = -Werror -Wall -pedantic \
-		-Wno-deprecated-declarations \
-	  -I$(abs_top_srcdir)/include \
-	  -I$(abs_top_srcdir)/stages_lib/include \
-	  -I$(abs_top_srcdir)/test/include \
-	  -I$(abs_top_srcdir)/deps/build/boost/include \
-	  -I$(abs_top_srcdir)/deps/build/openssl/include
 
 gtest_libdag_scheduler_LDADD = \
 		$(abs_top_builddir)/lib/libdag_scheduler.la \

@@ -77,5 +77,10 @@ namespace com
 
       return out;
     }
+
+    TaskStage::TaskStage(const std::string &label, const UUID &uuid) :
+      label_(label),
+      uuid_(uuid.as_string())
+    {}
   }
 }

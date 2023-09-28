@@ -55,6 +55,49 @@ namespace com
       complete_callback_plugin_ = std::move(complete_callback_plugin);
     }
 
+    TestTaskImpl::TestTaskImpl(const std::string &label,
+      const rapidjson::Document &json_config)
+    {
+      label_ = label;
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("A")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("B")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("C")));
+      Task::set_json_config(json_config);
+    }
+
+    TestTaskImpl::TestTaskImpl(const std::string &label,
+      const rapidjson::Document &json_config,
+      std::function<void (bool)> complete_callback)
+    {
+      label_ = label;
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("A")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("B")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("C")));
+      Task::set_json_config(json_config);
+      complete_callback_ = complete_callback;
+    }
+
+    TestTaskImpl::TestTaskImpl(const std::string &label,
+      const rapidjson::Document &json_config,
+      std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin)
+    {
+      label_ = label;
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("A")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("B")));
+      Task::stages_.push_back(std::unique_ptr<TaskStage>(
+        new TestTaskStageImpl("C")));
+      Task::set_json_config(json_config);
+      complete_callback_plugin_ = std::move(complete_callback_plugin);
+    }
+
     TestTaskImpl::~TestTaskImpl()
     {}
 

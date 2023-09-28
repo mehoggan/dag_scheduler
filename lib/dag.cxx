@@ -12,6 +12,7 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <utility>
 
 namespace com
 {
@@ -50,6 +51,28 @@ namespace com
       json_config_->CopyFrom(json_config, json_config_->GetAllocator());
     }
 
+    DAG::DAG(const rapidjson::Document &json_config,
+      const InitialInputs_t &initial_inputs) :
+      LoggedClass(*this),
+      json_config_(std::make_unique<rapidjson::Document>())
+    {
+      Logging::info(LOG_TAG, "Created DAG with title=--", title_, "--");
+      json_config_->CopyFrom(json_config, json_config_->GetAllocator());
+      clone_initial_inputs(initial_inputs);
+    }
+
+    DAG::DAG(const std::string &title,
+      const rapidjson::Document &json_config,
+      const InitialInputs_t &initial_inputs) :
+      LoggedClass(*this),
+      title_(title),
+      json_config_(std::make_unique<rapidjson::Document>())
+    {
+      Logging::info(LOG_TAG, "Created DAG with title=--", title_, "--");
+      json_config_->CopyFrom(json_config, json_config_->GetAllocator());
+      clone_initial_inputs(initial_inputs);
+    }
+
     DAG::~DAG()
     {}
 
@@ -57,7 +80,8 @@ namespace com
       LoggedClass(*this),
       graph_(std::move(other.graph_)),
       title_(other.title_),
-      json_config_(std::move(other.json_config_))
+      json_config_(std::move(other.json_config_)),
+      initial_inputs_(std::move(other.initial_inputs_))
     {
       Logging::info(LOG_TAG, "Moved DAG with title=", title_);
     }
@@ -67,13 +91,13 @@ namespace com
       graph_ = std::move(other.graph_);
       title_ = other.title_;
       json_config_ = std::move(other.json_config_);
+      initial_inputs_ = std::move(other.initial_inputs_);
       Logging::info(LOG_TAG, "Moved Assigned DAG with title=", title_);
       return (*this);
     }
 
     DAG DAG::clone()
     {
-      Logging::info(LOG_TAG, "Here");
       return (*this);
     }
 
@@ -81,9 +105,18 @@ namespace com
     {
       bool ret = false;
 
+      if (v.get_task() == nullptr) {
+        Logging::warn(LOG_TAG, "Adding vertex with no task!!!");
+      }
+
       if (!contains_vertex(v)) {
         auto graph_vertex = std::make_shared<DAGVertex>(std::move(v));
         graph_.push_back(graph_vertex);
+
+        if (graph_.back()->get_task() == nullptr) {
+          Logging::warn(LOG_TAG, "Vertex at end of vertices has no task!!!");
+        }
+
         ret = true;
       }
 
@@ -490,69 +523,73 @@ namespace com
       }
     }
 
-    std::shared_ptr<DAGVertex> DAG::get_vertex_at(std::size_t i)
+    const DAG::InitialInputs_t &DAG::get_initial_inputs() const
     {
-      assert(i < graph_.size() && "Index out of bounds.");
-      return graph_[i];
+      return initial_inputs_;
     }
 
-    void DAG::clone_connections(DAGVertex &from, DAGVertex &to)
+    void DAG::get_initial_input_for_vertex(const UUID &vertex_uuid,
+      rapidjson::Document &out_json_input)
     {
-      assert(from.get_uuid() == to.get_uuid() &&
-        "Cloning connections on dag_vertices that are not the same is not "
-        "permitted.");
+      std::shared_ptr<DAGVertex> vertex_lookup =
+        find_vertex_by_uuid(vertex_uuid).lock();
 
-      std::vector<DAGVertex::DAGVertex_connection> from_connections =
-        from.clone_all_connections();
-
-      for (auto &connection : from_connections) {
-        std::weak_ptr<DAGVertex> find = find_vertex(connection.vertex());
-        assert(!find.expired() && "This should never happen.");
-        to.connect(find.lock());
-      }
-    }
-
-    DAG::DAG(const DAG &other) :
-      LoggedClass(*this),
-      json_config_(std::make_unique<rapidjson::Document>())
-    {
-      DAG *o = (const_cast<DAG *>(&other));
-      o->linear_traversal([&](std::shared_ptr<DAGVertex> v) {
-          DAGVertex tmp = v->clone();
-          add_vertex(std::move(tmp));
+      if (vertex_lookup) {
+        if (vertex_lookup->get_task()) {
+          auto task_uuid_lookup = std::make_unique<UUID>(
+            vertex_lookup->get_task()->get_uuid().as_string());
+          const InitialInputs_t::iterator it = initial_inputs_.find(
+            task_uuid_lookup);
+          if (it != initial_inputs_.end()) {
+            out_json_input.CopyFrom(*(it->second.get()),
+              out_json_input.GetAllocator());
+          }
+        } else {
+          Logging::warn(LOG_TAG, (*vertex_lookup), "has no task!");
         }
-      );
-
-      for (std::size_t i = 0; i < graph_.size(); ++i) {
-        clone_connections(*other.graph_[i], *graph_[i]);
+      } else {
+        Logging::warn(LOG_TAG, "No vertex found for", vertex_uuid);
       }
-      title_ = other.title_;
-      Logging::info(LOG_TAG, "Here 0");
-      json_config_->CopyFrom((*other.json_config_),
-        json_config_->GetAllocator());
-      Logging::info(LOG_TAG, "Here 1");
-      Logging::info(LOG_TAG, "Copied DAG with title=", title_);
     }
 
-    DAG &DAG::operator=(const DAG &rhs)
+    void DAG::initial_input_str(std::string &out_str) const
     {
-      DAG &o = *(const_cast<DAG *>(&rhs));
-      o.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
-          DAGVertex tmp = v->clone();
-          add_vertex(std::move(tmp));
-        }
-      );
-
-      for (std::size_t i = 0; i < graph_.size(); ++i) {
-        clone_connections(*rhs.graph_[i], *graph_[i]);
+      out_str.clear();
+      out_str = "{";
+      for (const InitialInputs_t::value_type &input : initial_inputs_) {
+        out_str += (std::string("\"\"") + input.first->as_string() +
+          std::string("\":"));
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        input.second->Accept(writer);
+        out_str += buffer.GetString();
       }
+      out_str += "}";
+    }
 
-      title_ = rhs.title_;
-      json_config_->CopyFrom((*rhs.json_config_),
-        json_config_->GetAllocator());
-      Logging::info(LOG_TAG, "Assigned DAG with title=", title_);
+    void DAG::override_initial_input_for_vertex_task(const UUID &vertex_uuid,
+      const rapidjson::Document &initial_input)
+    {
+      std::shared_ptr<DAGVertex> vertex_to_update =
+        find_vertex_by_uuid(vertex_uuid).lock();
+      if (vertex_to_update->get_task()) {
+        Logging::info(LOG_TAG, "Going to update inputs for",
+            *(vertex_to_update->get_task().get()), "...");
+        const UUID &task_uuid = vertex_to_update->get_task()->get_uuid();
+        UUID clone(task_uuid.as_string());
+        auto uuid_ptr = std::make_unique<UUID>(task_uuid.as_string());
 
-      return (*this);
+        auto json_input = std::make_unique<rapidjson::Document>();
+        json_input->CopyFrom(initial_input, json_input->GetAllocator());
+
+        InitialInputs_t::iterator it = initial_inputs_.find(uuid_ptr);
+        if (it == initial_inputs_.end()) {
+          initial_inputs_.insert(
+            std::make_pair(std::move(uuid_ptr), std::move(json_input)));
+        } else {
+          it->second = std::move(json_input);
+        }
+      }
     }
 
     std::ostream &operator<<(std::ostream &out, const DAG &g)
@@ -566,7 +603,10 @@ namespace com
       }
       std::string json_config_string;
       g.json_config_str(json_config_string);
-      out << "Configuration:" << json_config_string;
+      out << std::endl << "Configuration: " << json_config_string << std::endl;
+      std::string initial_input_string;
+      g.initial_input_str(initial_input_string);
+      out << "Initial Inputs: " << initial_input_string << std::endl;
 
       return out;
     }
@@ -606,6 +646,7 @@ namespace com
       ret &= (lhs.vertex_count() == rhs.vertex_count());
       ret &= (lhs.edge_count() == rhs.edge_count());
       ret &= (lhs.json_config() == rhs.json_config());
+      ret &= (lhs.get_initial_inputs() == rhs.get_initial_inputs());
 
       return ret;
     }
@@ -613,6 +654,86 @@ namespace com
     bool operator!=(const DAG &lhs, const DAG &rhs)
     {
       return !(lhs == rhs);
+    }
+
+    std::shared_ptr<DAGVertex> DAG::get_vertex_at(std::size_t i)
+    {
+      assert(i < graph_.size() && "Index out of bounds.");
+      return graph_[i];
+    }
+
+    void DAG::clone_connections(DAGVertex &from, DAGVertex &to)
+    {
+      assert(from.get_uuid() == to.get_uuid() &&
+        "Cloning connections on dag_vertices that are not the same is not "
+        "permitted.");
+
+      std::vector<DAGVertex::DAGVertex_connection> from_connections =
+        from.clone_all_connections();
+
+      for (auto &connection : from_connections) {
+        std::weak_ptr<DAGVertex> find = find_vertex(connection.vertex());
+        assert(!find.expired() && "This should never happen.");
+        to.connect(find.lock());
+      }
+    }
+
+    DAG::DAG(const DAG &other) :
+      LoggedClass(*this),
+      json_config_(std::make_unique<rapidjson::Document>())
+    {
+      DAG *o = (const_cast<DAG *>(&other));
+      o->linear_traversal([&](std::shared_ptr<DAGVertex> v) {
+          DAGVertex tmp = v->clone();
+          add_vertex(std::move(tmp));
+        }
+      );
+
+      for (std::size_t i = 0; i < graph_.size(); ++i) {
+        clone_connections(*other.graph_[i], *graph_[i]);
+      }
+      title_ = other.title_;
+      json_config_->CopyFrom((*other.json_config_),
+        json_config_->GetAllocator());
+      clone_initial_inputs(other.initial_inputs_);
+    }
+
+    DAG &DAG::operator=(const DAG &rhs)
+    {
+      DAG &o = *(const_cast<DAG *>(&rhs));
+      o.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
+          DAGVertex tmp = v->clone();
+          add_vertex(std::move(tmp));
+        }
+      );
+
+      for (std::size_t i = 0; i < graph_.size(); ++i) {
+        clone_connections(*rhs.graph_[i], *graph_[i]);
+      }
+
+      title_ = rhs.title_;
+      json_config_->CopyFrom((*rhs.json_config_),
+        json_config_->GetAllocator());
+      clone_initial_inputs(rhs.initial_inputs_);
+      Logging::info(LOG_TAG, "Assigned DAG with title=", title_);
+
+      return (*this);
+    }
+
+    void DAG::clone_initial_inputs(const InitialInputs_t &inputs)
+    {
+      for (const InitialInputs_t::value_type &initial_input : inputs) {
+        std::unique_ptr<rapidjson::Document> stored_initial_input_ptr =
+          std::make_unique<rapidjson::Document>();
+        stored_initial_input_ptr->CopyFrom(*(initial_input.second.get()),
+          stored_initial_input_ptr->GetAllocator());
+
+        std::unique_ptr<UUID> uuid_ptr = std::make_unique<UUID>(
+          initial_input.first->as_string());
+        initial_inputs_.insert(std::make_pair(
+          std::move(uuid_ptr),
+          std::move(stored_initial_input_ptr)));
+      }
     }
   }
 }

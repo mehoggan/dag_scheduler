@@ -297,8 +297,8 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
-      std::cout << "Here 1" << std::endl;
-      EXPECT_EQ(nullptr, v_cloned.get_task());
+      EXPECT_NE(nullptr, v_cloned.get_task());
+      EXPECT_EQ(v_cloned, v);
     }
 
     TEST_F(TestDagVertex, copy_ctor_no_edges_with_task)
@@ -323,7 +323,8 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
-      EXPECT_EQ(nullptr, v_copied.get_task());
+      EXPECT_NE(nullptr, v_copied.get_task());
+      EXPECT_EQ(v_copied, v);
     }
 
     TEST_F(TestDagVertex, assignment_operator_no_edges_with_task)
@@ -349,7 +350,8 @@ namespace com
       EXPECT_EQ(0ul, v.edge_count());
       EXPECT_FALSE(v.get_uuid().as_string().empty());
       EXPECT_EQ(0ul, v.incomming_edge_count());
-      EXPECT_EQ(nullptr, v_copied.get_task());
+      EXPECT_NE(nullptr, v_copied.get_task());
+      EXPECT_EQ(v_copied, v);
     }
 
     TEST_F(TestDagVertex, connect_and_contains_connection)

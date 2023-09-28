@@ -6,6 +6,9 @@
 
 #include "utils/test_task.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <atomic>
 
 namespace com
@@ -20,6 +23,33 @@ namespace com
       TestTask() :
         LoggedClass<TestTask>(*this)
       {}
+
+    static void get_generic_config(rapidjson::Document &config_doc)
+    {
+      rapidjson::StringBuffer buffer;
+      rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+      writer.StartObject();
+        writer.String("test_value_int");
+        writer.Int(-1);
+        writer.String("test_value_str");
+        writer.String("test_string");
+        writer.String("test_value_bool");
+        writer.Bool(true);
+        writer.String("test_value_double");
+        writer.Double(-1.0);
+      writer.EndObject();
+      config_doc.Parse(buffer.GetString());
+    }
+
+    static std::string get_expected_config_str()
+    {
+      return std::string("{") +
+        std::string("\"test_value_int\":-1,") +
+        std::string("\"test_value_str\":\"test_string\",") +
+        std::string("\"test_value_bool\":true,") +
+        std::string("\"test_value_double\":-1.0") +
+        std::string("}");
+    }
 
     protected:
       virtual void SetUp() {}
@@ -39,13 +69,19 @@ namespace com
       virtual ~TestTaskCallbackPlugin()
       {}
 
-      virtual void completed(bool completed, Task &task)
+      virtual void completed(bool completed, Task &task) override
       {
         Logging::info(LOG_TAG, "completed called with", (completed ? "true" :
           "false"), "and", task);
       }
 
-      virtual void TestBody()
+      virtual std::unique_ptr<TaskCallbackPlugin> clone() const override
+      {
+        auto cloned_callback = std::make_unique<TestTaskCallbackPlugin>();
+        return cloned_callback;
+      }
+
+      virtual void TestBody() override
       {}
     };
 
@@ -54,6 +90,21 @@ namespace com
       std::unique_ptr<Task> test(new TestTaskImpl);
       EXPECT_NE(nullptr, test);
       EXPECT_EQ(test->get_uuid().as_string(), test->label());
+      std::string empty_config;
+      test->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
+    }
+
+    TEST_F(TestTask, default_ctor_clone)
+    {
+      std::unique_ptr<Task> test(new TestTaskImpl);
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      std::string empty_config;
+      test_clone->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
     }
 
     TEST_F(TestTask, label_ctor)
@@ -62,6 +113,22 @@ namespace com
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
+      std::string empty_config;
+      test->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
+    }
+
+    TEST_F(TestTask, label_ctor_clone)
+    {
+      std::unique_ptr<Task> test(new TestTaskImpl("test_label"));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      std::string empty_config;
+      test_clone->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
     }
 
     TEST_F(TestTask, call_back_ctor_sets_appropiate_callback)
@@ -75,6 +142,27 @@ namespace com
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
       test->complete(true);
+      std::string empty_config;
+      test->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
+    }
+
+    TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_clone)
+    {
+      std::function<void (bool)> complete_callback = [](bool status) {
+        EXPECT_TRUE(status);
+      };
+      std::unique_ptr<Task> test(
+          new TestTaskImpl("test_label", complete_callback));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      test_clone->complete(true);
+      std::string empty_config;
+      test_clone->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
     }
 
     TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin)
@@ -88,6 +176,141 @@ namespace com
       EXPECT_EQ("test_label", test->label());
       EXPECT_TRUE(test->callback_plugin_is_set());
       test->complete(true);
+      std::string empty_config;
+      test->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
+    }
+
+    TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin_clone)
+    {
+      std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
+        std::make_unique<TestTaskCallbackPlugin>();
+      std::unique_ptr<Task> test(
+        new TestTaskImpl("test_label", std::move(complete_callback_plugin)));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      EXPECT_TRUE(test_clone->callback_plugin_is_set());
+      test_clone->complete(true);
+      std::string empty_config;
+      test_clone->json_config_str(empty_config);
+      EXPECT_EQ("{}", empty_config);
+    }
+
+    TEST_F(TestTask, label_ctor_with_config)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::unique_ptr<Task> test(new TestTaskImpl("test_label", json_config));
+      EXPECT_NE(nullptr, test);
+      EXPECT_NE(test->get_uuid().as_string(), test->label());
+      EXPECT_EQ("test_label", test->label());
+      std::string actual_config;
+      test->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
+    }
+
+    TEST_F(TestTask, label_ctor_with_config_clone)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::unique_ptr<Task> test(new TestTaskImpl("test_label", json_config));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      std::string actual_config;
+      test_clone->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
+    }
+
+    TEST_F(TestTask,
+      call_back_ctor_sets_appropiate_callback_with_config_empty_stages)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::function<void (bool)> complete_callback = [](bool status) {
+        EXPECT_TRUE(status);
+      };
+      std::unique_ptr<Task> test(
+          new TestTaskImpl("test_label", json_config, complete_callback));
+      EXPECT_NE(nullptr, test);
+      EXPECT_NE(test->get_uuid().as_string(), test->label());
+      EXPECT_EQ("test_label", test->label());
+      test->complete(true);
+      std::string actual_config;
+      test->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
+    }
+
+    TEST_F(TestTask,
+      call_back_ctor_sets_appropiate_callback_with_config_empty_stages_clone)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::function<void (bool)> complete_callback = [](bool status) {
+        EXPECT_TRUE(status);
+      };
+      std::unique_ptr<Task> test(
+          new TestTaskImpl("test_label", json_config, complete_callback));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      test_clone->complete(true);
+      std::string actual_config;
+      test_clone->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
+    }
+
+    TEST_F(TestTask,
+      call_back_ctor_sets_appropiate_callback_plugin_with_config_empty_stages)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
+        std::make_unique<TestTaskCallbackPlugin>();
+      std::unique_ptr<Task> test(new TestTaskImpl(
+          "test_label", json_config, std::move(complete_callback_plugin)));
+      EXPECT_NE(nullptr, test);
+      EXPECT_NE(test->get_uuid().as_string(), test->label());
+      EXPECT_EQ("test_label", test->label());
+      EXPECT_TRUE(test->callback_plugin_is_set());
+      test->complete(true);
+      std::string actual_config;
+      test->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
+    }
+
+    TEST_F(TestTask,
+      call_back_ctor_sets_appropiate_callback_plugin_with_config_clone)
+    {
+      rapidjson::Document json_config;
+      TestTask::get_generic_config(json_config);
+      std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
+        std::make_unique<TestTaskCallbackPlugin>();
+      std::unique_ptr<Task> test(new TestTaskImpl(
+          "test_label", json_config, std::move(complete_callback_plugin)));
+      std::unique_ptr<Task> &&test_clone = test->clone();
+      EXPECT_NE(nullptr, test_clone);
+      EXPECT_EQ(test_clone->get_uuid().as_string(),
+        test->get_uuid().as_string());
+      EXPECT_EQ("test_label", test_clone->label());
+      EXPECT_TRUE(test_clone->callback_plugin_is_set());
+      test_clone->complete(true);
+      std::string actual_config;
+      test_clone->json_config_str(actual_config);
+      std::string expected_config = TestTask::get_expected_config_str();
+      EXPECT_EQ(actual_config, expected_config);
     }
 
     TEST_F(TestTask, iterate_stages_succeeds_if_all_stages_ran_no_kill_task)

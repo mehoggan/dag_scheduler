@@ -20,6 +20,14 @@ namespace com
       run_sleep_time_(run_sleep_time)
     {}
 
+    TestTaskStageImpl::TestTaskStageImpl(const std::string &label,
+      const UUID &uuid,
+      const std::chrono::nanoseconds &run_sleep_time) :
+      TaskStage(label, uuid),
+      nasty_user_defined_pointer_(new int(10)),
+      run_sleep_time_(run_sleep_time)
+    {}
+
     TestTaskStageImpl::~TestTaskStageImpl()
     {
       cleanup();
@@ -80,6 +88,13 @@ namespace com
         delete nasty_user_defined_pointer_;
       }
       nasty_user_defined_pointer_ = nullptr;
+    }
+
+    std::unique_ptr<TaskStage> TestTaskStageImpl::clone() const
+    {
+      std::unique_ptr<TaskStage> test_task_stage_impl_ptr =
+        std::make_unique<TestTaskStageImpl>(label_, uuid_);
+      return test_task_stage_impl_ptr;
     }
   }
 }

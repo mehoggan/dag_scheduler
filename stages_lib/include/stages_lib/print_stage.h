@@ -33,6 +33,20 @@ namespace com
       explicit PrintStage(const std::string &label);
 
       /**
+       * @brief A constructor for a PrintStage that assigns a user defined
+       *        label and a UUID.
+       *
+       * The \p label is used only to describe what the task is for. It
+       * does not impact what the task does or how it operates. \p uuid is
+       * a user defined \ref UUID which was added primarily to facilitate
+       * clone.
+       *
+       * @param[in] label The user defined label.
+       * @param[in] uuid The user defined \ref UUID.
+       */
+      PrintStage(const std::string &label, const dag_scheduler::UUID &uuid);
+
+      /**
        * @brief dtor
        */
       virtual ~PrintStage();
@@ -108,6 +122,15 @@ namespace com
        *        \ref PrintStage::run.
        */
       virtual void cleanup();
+
+      /**
+       * @brief A utility method for cloning a \ref TaskStage.
+       *
+       * A utility method for cloning a TaskStage.
+       *
+       * @return A cloned \ref std::unique_ptr<Stage> of \ref (*this).
+       */
+      virtual std::unique_ptr<TaskStage> clone() const;
 
     public:
       /**

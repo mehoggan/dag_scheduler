@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include <gtest/gtest_prod.h>
@@ -48,6 +48,33 @@ namespace com
      */
     class DAG : public LoggedClass<DAG>
     {
+    private:
+      struct InitialInputsCompare
+      {
+      public:
+        bool operator()(const std::unique_ptr<UUID> &lhs,
+          const std::unique_ptr<UUID> &rhs) const
+        {
+          bool ret = true;
+          if (not lhs && not rhs) {
+            ret = true;
+          } else if (not lhs && rhs) {
+            ret = false;
+          } else if (lhs && not rhs) {
+            ret = false;
+          } else {
+            ret = lhs->as_string() < rhs->as_string();
+          }
+          return ret;
+        }
+      };
+
+    public:
+      typedef std::map<
+        std::unique_ptr<UUID>,
+        std::unique_ptr<rapidjson::Document>,
+        InitialInputsCompare> InitialInputs_t;
+
     public:
       /**
        * @brief An class used to indicate an exception in an operation on a
@@ -105,9 +132,42 @@ namespace com
        * \ref title parameter.
        *
        * @param[in] title The title of the DAG.
-       * @param[in] json_doc The json document to be used for configuration.
+       * @param[in] json_config The json document to be used for configuration.
        */
       DAG(const std::string &title, const rapidjson::Document &json_config);
+
+      /**
+       * @brief A constructor for a \ref DAG.
+       *
+       * A constructor for a \ref DAG which initializes its title to the
+       * \ref title parameter.
+       *
+       * @param[in] json_config The json document to be used for configuration.
+       * @param[in] initial_inputs Before each task is executed it's initial
+       *                           \ref TaskStage needs will perhaps need some
+       *                           initial inputs. This map takes in a cloned
+       *                           \ref UUID for a \ref Task and stores its
+       *                           initial inputs for later execution.
+       */
+      DAG(const rapidjson::Document &json_config,
+        const InitialInputs_t &initial_inputs);
+
+      /**
+       * @brief A constructor for a \ref DAG.
+       *
+       * A constructor for a \ref DAG which initializes its title to the
+       * \ref title parameter.
+       *
+       * @param[in] title The title of the DAG.
+       * @param[in] json_config The json document to be used for configuration.
+       * @param[in] initial_inputs Before each task is executed it's initial
+       *                           \ref TaskStage needs will perhaps need some
+       *                           initial inputs. This map takes in a cloned
+       *                           \ref UUID for a \ref Task and stores its
+       *                           initial inputs for later execution.
+       */
+      DAG(const std::string &title, const rapidjson::Document &json_config,
+        const InitialInputs_t &initial_inputs);
 
       /**
        * @brief dtor
@@ -548,6 +608,46 @@ namespace com
        */
       void json_config_str(std::string &out_str) const;
 
+      /**
+       * @brief A getter for the initial inputs map.
+       *
+       * @return A const reference to the member variable \ref initial_inputs_.
+       */
+      const InitialInputs_t &get_initial_inputs() const;
+
+      /**
+       * @brief A getter for the initial input of a vertex.
+       *
+       * If \ref vertex_uuid is a valid \ref UUID in \ref this, then the
+       * the \ref DAGVertex will be found and the json input will be found.
+       * If there is no json input for the \ref DAGVertex then an empty json
+       * config will be returned.
+       *
+       * @param[in] vertex_uuid The \ref DAGVertex's \ref UUID.
+       * @param[out] out_json_input A \ref rapidjson::Document to be filled in
+       *                            if a json input exists for \ref
+       *                            vertex_uuid.
+       */
+      void get_initial_input_for_vertex(const UUID &vertex_uuid,
+          rapidjson::Document &out_json_input);
+
+      /*
+       * @brief A helper method to visualize the initial inputs per \ref
+       * Task owned by a \ref DAGVertex by \ref UUID.
+       *
+       * @param[out] out_str A \ref std::string that represents the \ref
+       *                     rapidjson::Document owned by this.
+       */
+      void initial_input_str(std::string &out_str) const;
+
+      /*
+       * @brief As a \ref DAG is built the user might not know all of the
+       * initial inputs of a task. To enable flexibility this member method
+       * allows users to override any initial config specified at construction.
+       */
+      void override_initial_input_for_vertex_task(const UUID &vertex_uuid,
+        const rapidjson::Document &initial_input);
+
     public:
       friend std::ostream &operator<<(std::ostream &out, const DAG &g);
       friend bool operator==(const DAG &lhs, const DAG &rhs);
@@ -561,10 +661,14 @@ namespace com
       DAG &operator=(const DAG &rhs);
 
     private:
+      void clone_initial_inputs(const InitialInputs_t &inputs);
+
+    private:
       typedef std::vector<std::shared_ptr<DAGVertex>> DAG_t;
       DAG_t graph_;
       std::string title_;
       std::unique_ptr<rapidjson::Document> json_config_;
+      InitialInputs_t initial_inputs_;
 
     private:
       FRIEND_TEST(TestDag, get_vertex_at);

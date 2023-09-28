@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
+#include "utils/test_task.h"
+
 #include "dag_scheduler/dag.h"
 #include "dag_scheduler/dag_algorithms.h"
+#include "dag_scheduler/logged_class.hpp"
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -12,8 +15,15 @@ namespace com
 {
   namespace dag_scheduler
   {
-    class TestDag : public ::testing::Test
+    class TestDag :
+      public ::testing::Test,
+      public LoggedClass<TestDag>
     {
+    public:
+      TestDag() :
+        LoggedClass<TestDag>(*this)
+      {}
+
     protected:
       virtual void SetUp() {}
 
@@ -22,6 +32,70 @@ namespace com
       DAG &get_dag()
       {
         return d_;
+      }
+
+      std::vector<UUID> fill_dag_default_with_tasks()
+      {
+        std::vector<DAGVertex> vertices_to_add;
+        auto v0_task = std::make_unique<TestTaskImpl>("V0 Task");
+        DAGVertex v0("1", std::move(v0_task));
+        vertices_to_add.push_back(std::move(v0));
+        auto v1_task = std::make_unique<TestTaskImpl>("V1 Task");
+        DAGVertex v1("1", std::move(v1_task));
+        vertices_to_add.push_back(std::move(v1));
+        auto v2_task = std::make_unique<TestTaskImpl>("V2 Task");
+        DAGVertex v2("1a", std::move(v2_task));
+        vertices_to_add.push_back(std::move(v2));
+        auto v3_task = std::make_unique<TestTaskImpl>("V3 Task");
+        DAGVertex v3("1b", std::move(v3_task));
+        vertices_to_add.push_back(std::move(v3));
+        auto v4_task = std::make_unique<TestTaskImpl>("V4 Task");
+        DAGVertex v4("2", std::move(v4_task));
+        vertices_to_add.push_back(std::move(v4));
+        auto v5_task = std::make_unique<TestTaskImpl>("V5 Task");
+        DAGVertex v5("2", std::move(v5_task));
+        vertices_to_add.push_back(std::move(v5));
+        auto v6_task = std::make_unique<TestTaskImpl>("V6 Task");
+        DAGVertex v6("2", std::move(v6_task));
+        vertices_to_add.push_back(std::move(v6));
+        auto v7_task = std::make_unique<TestTaskImpl>("V7 Task");
+        DAGVertex v7("3", std::move(v7_task));
+        vertices_to_add.push_back(std::move(v7));
+        auto v8_task = std::make_unique<TestTaskImpl>("V8 Task");
+        DAGVertex v8("3", std::move(v8_task));
+        vertices_to_add.push_back(std::move(v8));
+        auto v9_task = std::make_unique<TestTaskImpl>("V9 Task");
+        DAGVertex v9("4", std::move(v9_task));
+        vertices_to_add.push_back(std::move(v9));
+        auto v10_task = std::make_unique<TestTaskImpl>("V10 Task");
+        DAGVertex v10("5", std::move(v10_task));
+        vertices_to_add.push_back(std::move(v10));
+
+        std::vector<UUID> vertices_uuids;
+        vertices_uuids.reserve(vertices_to_add.size());
+        std::for_each(vertices_to_add.begin(), vertices_to_add.end(),
+          [&](DAGVertex &v) {
+            UUID uuid_cloned(v.get_uuid().as_string());
+            get_dag().add_vertex(std::move(v));
+            rapidjson::Document initial_input;
+            get_generic_input(initial_input);
+            get_dag().override_initial_input_for_vertex_task(
+              uuid_cloned, initial_input);
+            std::weak_ptr<DAGVertex> v_weak =
+              get_dag().find_vertex_by_uuid(uuid_cloned);
+            EXPECT_FALSE(v_weak.expired());
+            ASSERT_TRUE(v_weak.lock()->get_task() != nullptr);
+            vertices_uuids.push_back(std::move(uuid_cloned));
+          }
+        );
+        get_dag().linear_traversal([&](std::shared_ptr<DAGVertex> vertex)
+          {
+            ASSERT_NE(nullptr, vertex->get_task());
+          });
+        EXPECT_EQ(vertices_to_add.size(), get_dag().vertex_count());
+        vertices_to_add.clear();
+
+        return vertices_uuids;
       }
 
       std::vector<DAGVertex> fill_dag_default()
@@ -63,6 +137,21 @@ namespace com
         return vertices_cloned;
       }
 
+      void verify_input_for_all_vertices()
+      {
+        get_dag().linear_traversal([&](std::shared_ptr<DAGVertex> vertex)
+          {
+            rapidjson::Document input_for_vertex;
+            get_dag().get_initial_input_for_vertex(
+              vertex->get_uuid(), input_for_vertex);
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            input_for_vertex.Accept(writer);
+            std::string actual_input = buffer.GetString();
+            EXPECT_EQ(get_expected_input_str(), actual_input);
+          });
+      }
+
       static void get_generic_config(rapidjson::Document &config_doc)
       {
         rapidjson::StringBuffer buffer;
@@ -88,6 +177,16 @@ namespace com
           std::string("\"test_value_bool\":true,") +
           std::string("\"test_value_double\":-1.0") +
           std::string("}");
+      }
+
+      static void get_generic_input(rapidjson::Document &input_doc)
+      {
+        get_generic_config(input_doc);
+      }
+
+      static std::string get_expected_input_str()
+      {
+        return get_expected_config_str(); 
       }
 
     private:
@@ -724,7 +823,8 @@ namespace com
 
     TEST_F(TestDag, remove_vertices_with_label)
     {
-      fill_dag_default();
+      fill_dag_default_with_tasks();
+      verify_input_for_all_vertices();
       DAG g_clone = get_dag().clone();
 
       auto find_v_1a = g_clone.find_all_verticies_with_label("1a");

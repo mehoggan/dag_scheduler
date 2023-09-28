@@ -129,6 +129,15 @@ namespace com
        */
       virtual void cleanup() = 0;
 
+      /**
+       * @brief A utility method for cloning a \ref TaskStage.
+       *
+       * A utility method for cloning a TaskStage.
+       *
+       * @return A cloned \ref std::unique_ptr<Stage> of \ref (*this).
+       */
+      virtual std::unique_ptr<TaskStage> clone() const = 0;
+
     public:
       /**
        * @brief Equality operator for a \ref TaskStage.
@@ -179,6 +188,9 @@ namespace com
        */
       friend std::stringstream &operator<<(std::stringstream &out,
         const TaskStage &t);
+
+    protected:
+      TaskStage(const std::string &label, const UUID &uuid);
 
     protected:
       std::string label_;

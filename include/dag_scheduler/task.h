@@ -5,6 +5,8 @@
 #include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/uuid.h"
 
+#include <rapidjson/document.h>
+
 #include <boost/config.hpp>
 
 #include <atomic>
@@ -13,7 +15,6 @@
 #include <sstream>
 #include <ostream>
 #include <vector>
-
 
 #define API extern "C" BOOST_SYMBOL_EXPORT
 API void default_task_callback(bool) noexcept;
@@ -93,6 +94,75 @@ namespace com
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
         std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
+
+      /**
+       * @brief ctor that assisgns stages to Tasks.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStages to be run when
+       *                   Task is run. Its purpose is to make interrupting the
+       *                   Task easier at well defined user boundaries.
+       * @param[in] json_config The json document to be used for configuration.
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const rapidjson::Document &json_config);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] json_config The json document to be used for configuration.
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        const rapidjson::Document &json_config);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional function to call at the end
+       * of a Task.
+       * @param[in] json_config The json document to be used for configuration.
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        std::function<void (bool)> complete_callback,
+        const rapidjson::Document &json_config);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional \ref TaskCallbackPlugin that
+       *                              is called when as many as \ref TaskStage
+       *                              are completed by the \ref Task.
+       * @param[in] json_config The json document to be used for configuration.
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin,
+        const rapidjson::Document &json_config);
 
       /**
        * @brief dtor
@@ -200,6 +270,38 @@ namespace com
        */
       virtual bool callback_plugin_is_set() const;
 
+      /**
+       * @brief A getter for the json configuration passed into the \ref ctor.
+       *
+       * A member function of \ref Vertex that returns a const reference of the
+       * \ref json_config passed into the \ref ctor.
+       *
+       * @return A const reference to the member \ref json_config_.
+       */
+      virtual const rapidjson::Document &json_config() const;
+
+      /**
+       * @brief A helper method to visualize the configuration owned by \ref
+       * this.
+       *
+       * A member function of \ref Vertex that assists in visualizing the
+       * configuration document passed in at construction time.
+       *
+       * @param[out] out_str A \ref std::string that represests the \ref
+       *                     rapidjson::Document owned by this.
+       */
+      virtual void json_config_str(std::string &out_str) const;
+
+      /**
+       * @brief A clone method to acquire a copy of the internal task.
+       *
+       * A clone method to acquire a copy of the internal task.
+       *
+       * @return A \ref std::unique_ptr<Task> that is a clone of the \ref
+       * (*this).
+       */
+      virtual std::unique_ptr<Task> clone() const;
+
     public:
       /**
        * @brief Equality operator.
@@ -243,6 +345,12 @@ namespace com
         const Task &t);
 
     protected:
+      void set_json_config(const rapidjson::Document &json_config);
+
+    private:
+      void update_uuid(const UUID &uuid);
+
+    protected:
       std::atomic_bool iterating_;
       std::atomic_bool kill_;
       std::vector<std::unique_ptr<TaskStage>> stages_;
@@ -250,6 +358,7 @@ namespace com
       std::function<void (bool)> complete_callback_;
       std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin_;
       UUID uuid_;
+      std::unique_ptr<rapidjson::Document> json_config_;
     };
   }
 }

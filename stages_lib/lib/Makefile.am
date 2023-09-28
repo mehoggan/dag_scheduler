@@ -1,6 +1,7 @@
 lib_LTLIBRARIES = libstages_lib.la
 
 libstages_lib_la_CPPFLAGS = -Werror -Wall -pedantic \
+		-Wno-enum-constexpr-conversion \
     -I$(abs_top_srcdir)/include/ \
     -I$(abs_top_srcdir)/stages_lib/include \
     -I$(abs_top_srcdir)/deps/build/boost/include

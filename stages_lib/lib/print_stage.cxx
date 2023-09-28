@@ -24,6 +24,12 @@ namespace com
       com::dag_scheduler::TaskStage(label)
     {}
 
+    PrintStage::PrintStage(
+      const std::string &label,
+      const dag_scheduler::UUID &uuid) :
+      TaskStage(label, uuid)
+    {}
+
     PrintStage::~PrintStage()
     {}
 
@@ -66,6 +72,13 @@ namespace com
 
     void PrintStage::cleanup()
     {}
+
+    std::unique_ptr<dag_scheduler::TaskStage> PrintStage::clone() const
+    {
+      std::unique_ptr<dag_scheduler::TaskStage> print_stage_ptr =
+        std::make_unique<PrintStage>(label_, uuid_);
+      return print_stage_ptr;
+    }
 
     bool operator==(const PrintStage &lhs, const PrintStage &rhs)
     {

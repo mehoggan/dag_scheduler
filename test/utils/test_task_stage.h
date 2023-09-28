@@ -20,6 +20,11 @@ namespace com
         const std::chrono::nanoseconds &run_sleep_time =
           std::chrono::nanoseconds(100000000));
 
+      TestTaskStageImpl(const std::string &label,
+        const UUID &uuid,
+        const std::chrono::nanoseconds &run_sleep_time =
+          std::chrono::nanoseconds(100000000));
+
       virtual ~TestTaskStageImpl();
 
       TestTaskStageImpl(const TestTaskStageImpl &) = delete;
@@ -37,6 +42,8 @@ namespace com
       virtual bool end() override;
 
       virtual void cleanup() override;
+
+      virtual std::unique_ptr<TaskStage> clone() const override;
 
     private:
       std::atomic_bool running_;

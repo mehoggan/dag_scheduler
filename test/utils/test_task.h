@@ -7,6 +7,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <rapidjson/document.h>
+
 #include <atomic>
 #include <functional>
 
@@ -26,10 +28,21 @@ namespace com
       TestTaskImpl(const std::string &label);
 
       TestTaskImpl(const std::string &label,
+        std::function<void (bool)> complete_callback);
+
+      TestTaskImpl(const std::string &label,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
+
+      TestTaskImpl(const std::string &label,
+        const rapidjson::Document &json_config);
+
+      TestTaskImpl(const std::string &label,
+        const rapidjson::Document &json_config,
           std::function<void (bool)> complete_callback);
 
       TestTaskImpl(const std::string &label,
-           std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
+        const rapidjson::Document &json_config,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       virtual ~TestTaskImpl();
 

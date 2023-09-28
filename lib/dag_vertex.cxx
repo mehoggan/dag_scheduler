@@ -290,33 +290,30 @@ namespace com
       current_status_(other.current_status_),
       label_(other.label())
     {
+      if (other.task_) {
+        task_ = other.task_->clone();
+      }
       reset_incomming_edge_count();
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
       // DAG_t should be the object that orchestrates that.
-      // Also the internal task cannot be cloned nor can it be moved, for now
-      // we need to tell client code to assign another instance of the task
-      // which may be disruptive to the task if there is state inside the task
-      // that will be lost as a result of cloning.
     }
 
     DAGVertex &DAGVertex::operator=(const DAGVertex &rhs)
     {
       DAGVertex &t = *(const_cast<DAGVertex *>(&rhs));
-
       uuid_ = t.uuid_.clone();
       current_status_ = t.current_status_;
       label_ = rhs.label();
+      if (rhs.task_) {
+        task_ = rhs.task_->clone();
+      }
       reset_incomming_edge_count();
       // We cannot add back the connections since the edge adds a weak_ptr
       // to a DAGVertex we no longer can duplicate. This has to be done
       // outside the class by the code that is cloning the DAGVertex.
       // DAG_t should be the object that orchestrates that.
-      // Also the internal task cannot be cloned nor can it be moved, for now
-      // we need to tell client code to assign another instance of the task
-      // which may be disruptive to the task if there is state inside the task
-      // that will be lost as a result of cloning.
       return (*this);
     }
 

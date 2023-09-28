@@ -6,6 +6,7 @@ bin_PROGRAMS = https_dag_scheduler_runner dag_serializer_runner
 https_dag_scheduler_runner_SOURCES = service_main.cpp
 
 https_dag_scheduler_runner_CPPFLAGS = -Werror -Wall -pedantic \
+		-Wno-enum-constexpr-conversion \
     -I$(abs_top_srcdir)/include \
     -I$(abs_top_srcdir)/deps/build/boost/include \
     -I$(abs_top_srcdir)/deps/build/openssl/include
@@ -44,6 +45,7 @@ https_dag_scheduler_runner_LDFLAGS += -pthread
 dag_serializer_runner_SOURCES = dag_serializer_main.cpp
 
 dag_serializer_runner_CPPFLAGS = -Werror -Wall -pedantic \
+		-Wno-enum-constexpr-conversion \
     -I$(abs_top_srcdir)/include \
     -I$(abs_top_srcdir)/deps/build/boost/include \
     -I$(abs_top_srcdir)/deps/build/openssl/include
