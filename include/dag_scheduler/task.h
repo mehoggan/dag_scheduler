@@ -47,6 +47,22 @@ namespace com
       explicit Task(std::vector<std::unique_ptr<TaskStage>> &stages);
 
       /**
+       * @brief ctor that assisgns stages to Tasks.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStages to be run when
+       *                   Task is run. Its purpose is to make interrupting the
+       *                   Task easier at well defined user boundaries.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const rapidjson::Document &json_initial_inputs);
+
+      /**
        * @brief ctor that gives a Task a descriptive name and stages.
        *
        * A constructor for a \ref Task that assigns a set of
@@ -70,12 +86,51 @@ namespace com
        * @param[in] stages A collection of \ref TaskStage (s) to be run when
        *                   this's run member function is called.
        * @param[in] label A descriptive user defined label for (this).
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        const rapidjson::Document &json_initial_inputs);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
        * @param[in] complete_callback An optional function to call at the end
-       * of a Task.
+       *                              of a Task.
        */
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
         std::function<void (bool)> complete_callback);
+
+      /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional function to call at the end
+       *                              of a Task.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        std::function<void (bool)> complete_callback,
+        const rapidjson::Document &json_initial_inputs);
 
       /**
        * @brief ctor that gives a Task a descriptive name and stages.
@@ -96,6 +151,28 @@ namespace com
         std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       /**
+       * @brief ctor that gives a Task a descriptive name and stages.
+       *
+       * A constructor for a \ref Task that assigns a set of
+       * \ref TaskStage (s) to a \ref Task and a descriptive label to the
+       * \ref Task.
+       *
+       * @param[in] stages A collection of \ref TaskStage (s) to be run when
+       *                   this's run member function is called.
+       * @param[in] label A descriptive user defined label for (this).
+       * @param[in] complete_callback An optional \ref TaskCallbackPlugin that
+       *                              is called when as many as \ref TaskStage
+       *                              are completed by the \ref Task.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
+       */
+      Task(std::vector<std::unique_ptr<TaskStage>> &stages,
+        const std::string &label,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin,
+        const rapidjson::Document &json_initial_inputs);
+
+      /**
        * @brief ctor that assisgns stages to Tasks.
        *
        * A constructor for a \ref Task that assigns a set of
@@ -105,9 +182,13 @@ namespace com
        *                   Task is run. Its purpose is to make interrupting the
        *                   Task easier at well defined user boundaries.
        * @param[in] json_config The json document to be used for configuration.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
        */
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
-        const rapidjson::Document &json_config);
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_json_initial_inputs);
 
       /**
        * @brief ctor that gives a Task a descriptive name and stages.
@@ -120,10 +201,14 @@ namespace com
        *                   this's run member function is called.
        * @param[in] label A descriptive user defined label for (this).
        * @param[in] json_config The json document to be used for configuration.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
        */
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
-        const rapidjson::Document &json_config);
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_json_initial_inputs);
 
       /**
        * @brief ctor that gives a Task a descriptive name and stages.
@@ -138,11 +223,15 @@ namespace com
        * @param[in] complete_callback An optional function to call at the end
        * of a Task.
        * @param[in] json_config The json document to be used for configuration.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
        */
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
         std::function<void (bool)> complete_callback,
-        const rapidjson::Document &json_config);
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_json_initial_inputs);
 
       /**
        * @brief ctor that gives a Task a descriptive name and stages.
@@ -158,11 +247,15 @@ namespace com
        *                              is called when as many as \ref TaskStage
        *                              are completed by the \ref Task.
        * @param[in] json_config The json document to be used for configuration.
+       * @param[in] json_initial_inputs A json body that defines an intial set
+       *                                of inputs to be provided to all \ref
+       *                                TaskStage (s) owned by \ref (*this).
        */
       Task(std::vector<std::unique_ptr<TaskStage>> &stages,
         const std::string &label,
         std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin,
-        const rapidjson::Document &json_config);
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_json_initial_inputs);
 
       /**
        * @brief dtor
@@ -293,6 +386,18 @@ namespace com
       virtual void json_config_str(std::string &out_str) const;
 
       /**
+       * @brief A helper method to visualize the initial inputs owned by \ref
+       * this.
+       *
+       * A member function of \ref Vertex that assists in visualizing the
+       * initial inputs document passed in at construction time.
+       *
+       * @param[out] out_str A \ref std::string that represests the \ref
+       *                     rapidjson::Document owned by this.
+       */
+      virtual void json_initial_inputs_str(std::string &out_str) const;
+
+      /**
        * @brief A clone method to acquire a copy of the internal task.
        *
        * A clone method to acquire a copy of the internal task.
@@ -347,6 +452,9 @@ namespace com
     protected:
       void set_json_config(const rapidjson::Document &json_config);
 
+      void set_json_initial_inputs(
+        const rapidjson::Document &json_initial_inputs);
+
     private:
       void update_uuid(const UUID &uuid);
 
@@ -359,6 +467,7 @@ namespace com
       std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin_;
       UUID uuid_;
       std::unique_ptr<rapidjson::Document> json_config_;
+      std::unique_ptr<rapidjson::Document> json_initial_inputs_;
     };
   }
 }

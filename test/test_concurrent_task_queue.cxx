@@ -1,3 +1,4 @@
+#include <chrono>
 #include <gtest/gtest.h>
 
 #include "dag_scheduler/concurrent_task_queue.h"
@@ -5,8 +6,11 @@
 #include "dag_scheduler/task.h"
 #include "dag_scheduler/uuid.h"
 
+#include <condition_variable>
 #include <iostream>
+#include <mutex>
 #include <string>
+#include <thread>
 
 namespace com
 {
@@ -72,6 +76,9 @@ namespace com
     TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data)
     {
       ConcurrentTaskQueue queue;
+      std::condition_variable signal_condition;
+      std::mutex signal_block;
+      std::unique_lock<std::mutex> signal_lock(signal_block);
 
       std::vector<std::string> uuids;
       std::thread t([&]() {
@@ -83,13 +90,18 @@ namespace com
           uuids.push_back(uuid_str);
           queue.push(std::move(task_ptr));
         }
+        std::this_thread::sleep_for(std::chrono::seconds(4));
+        signal_lock.unlock();
+        signal_condition.notify_one();
       });
 
-      std::unique_ptr<Task> j;
-      bool found = queue.wait_for_and_pop(j, std::chrono::seconds(8));
-      ASSERT_TRUE(j != nullptr);
+      std::unique_ptr<Task> task_ptr;
+      bool found = queue.wait_for_and_pop(task_ptr, std::chrono::seconds(2));
+
+      signal_condition.wait(signal_lock);
+      ASSERT_TRUE(task_ptr != nullptr);
       ASSERT_TRUE(found);
-      EXPECT_EQ(uuids[0], j->get_uuid().as_string());
+      EXPECT_EQ(uuids[0], task_ptr->get_uuid().as_string());
 
       t.join();
     }

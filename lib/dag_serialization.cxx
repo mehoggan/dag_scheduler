@@ -1,5 +1,8 @@
 #include "dag_scheduler/dag_serialization.h"
 
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+
 #include <boost/dll/import.hpp>
 #include <boost/dll/shared_library.hpp>
 #include <boost/dll/shared_library_load_mode.hpp>
@@ -21,6 +24,9 @@ namespace com
     const std::string YAMLDagDeserializer::VERTICES_KEY = "Vertices";
     const std::string YAMLDagDeserializer::TASK_KEY = "Task";
     const std::string YAMLDagDeserializer::STAGES_KEY = "Stages";
+    const std::string YAMLDagDeserializer::CONFIGURATION_KEY = "Configuration";
+    const std::string YAMLDagDeserializer::INITIAL_INPUTS_KEY =
+      "InitialInputs";
 
     const std::string YAMLDagDeserializer::TITLE_KEY = "Title";
     const std::string YAMLDagDeserializer::NAME_KEY = "Name";
@@ -94,6 +100,10 @@ namespace com
       if (ret.empty()) {
         ret = std::string("      Task:\n") +
           std::string("        Name: <optional string>\n") +
+          std::string("        InitialInputs: <optional YAML>\n") +
+          std::string("          <valid YAML>\n") +
+          std::string("        Configuration: <optional YAML>\n") +
+          std::string("          <valid YAML>\n") +
           std::string("        Callback: <optional>\n") +
           std::string("            LibraryName: <string>\n") +
           std::string("            SymbolName: <string>\n") +
@@ -102,6 +112,10 @@ namespace com
       } else {
         ret = std::string("      Task:\n") +
           std::string("        Name: <optional string>\n") +
+          std::string("        InitialInputs: <optional YAML>\n") +
+          std::string("          <valid YAML>\n") +
+          std::string("        Configuration: <optional YAML>\n") +
+          std::string("          <valid YAML>\n") +
           std::string("        Callback: <optional>\n") +
           std::string("            LibraryName: <string>\n") +
           std::string("            SymbolName: <string>\n") +
@@ -149,10 +163,14 @@ namespace com
       if (ret.empty()) {
         ret = std::string("DAG:\n") +
           std::string("  Title: <optional string>\n") +
+          std::string("  Configuation: <optional YAML>\n") +
+          std::string("    <valid YAML>\n") +
           std::string("  ...");
       } else {
         ret = std::string("DAG:\n") +
           std::string("  Title: <optional string>\n") +
+          std::string("  Configuation: <optional YAML>\n") +
+          std::string("    <valid YAML>\n") +
           ret;
       }
     }
@@ -201,23 +219,47 @@ namespace com
 
       std::unique_ptr<DAG> ret;
       if (dag_node[DAG_KEY]) {
+        // Not sure if this will ever get triggered. But better to
+        // communicate more than less to users.
         if (not dag_node[DAG_KEY].IsMap()) {
           auto error = std::string("\"DAG\" the root elment must be a ") +
             std::string("YAML map.");
           throw_wrong_type(UpTo::DAG, error);
-        } // Not sure if this will ever get triggered. But better to
-          // communicate more than less to users.
+        }
 
         const YAML::Node &dag_definition_node = dag_node[DAG_KEY];
+        rapidjson::Document json_dag_configuration;
+        if (dag_definition_node[CONFIGURATION_KEY]) {
+          YAML::Emitter json_emitter;
+          json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq <<
+            dag_definition_node[CONFIGURATION_KEY];
+          std::string json_str(json_emitter.c_str() + 1);
+          if (json_dag_configuration
+            .Parse<0>(json_str.c_str())
+            .HasParseError()) {
+            std::stringstream error_str;
+            error_str << "Could not parse dag configuration from " <<
+              dag_definition_node[CONFIGURATION_KEY];
+            Logging::error(LOG_TAG, error_str.str());
+            throw YAMLDagDeserializerError(error_str.str());
+          }
+          rapidjson::StringBuffer buffer;
+          rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+          json_dag_configuration.Accept(writer);
+          Logging::info(LOG_TAG, "Converting",
+            dag_definition_node[CONFIGURATION_KEY], "to json string of",
+            buffer.GetString());
+        }
+
         std::string title;
         if (dag_definition_node[TITLE_KEY]) {
           title = dag_definition_node[TITLE_KEY].as<std::string>();
-          ret = std::make_unique<DAG>(title);
+          ret = std::make_unique<DAG>(title, json_dag_configuration);
         } else {
           Logging::warn(LOG_TAG, "No title specified is this intended?\n",
             "Sample input would look like:\n",
             full_sample_output());
-          ret = std::make_unique<DAG>();
+          ret = std::make_unique<DAG>(json_dag_configuration);
         }
 
         Logging::info(LOG_TAG, "Going to build DAG with title --", title,
@@ -261,11 +303,9 @@ namespace com
       return ret;
     }
       
-
     void YAMLDagDeserializer::make_vertices(const YAML::Node &vertices_node,
       std::unique_ptr<DAG> &dag) const
     {
-      (void) dag;
       if (vertices_node.IsSequence()) {
         const auto &vertices = vertices_node.as<std::vector<YAML::Node>>();
         Logging::info(LOG_TAG, "Going to process vertices", vertices_node,
@@ -290,6 +330,9 @@ namespace com
             DAGVertex next_vertex(name, std::move(task), std::move(uuid));
             dag->add_vertex(std::move(next_vertex));
           }
+        } else {
+          Logging::warn(LOG_TAG, "Empty verticies node specified to",
+            typeid(*this).name());
         }
       } else {
         auto error = std::string("\"Vertices\" must be a YAML Sequence.");
@@ -315,10 +358,53 @@ namespace com
           "with no stages");
       }
 
+      rapidjson::Document json_config;
+      if (task_node[CONFIGURATION_KEY]) {
+        YAML::Emitter json_emitter;
+        json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq <<
+          task_node[CONFIGURATION_KEY];
+        std::string json_str(json_emitter.c_str() + 1);
+        if (json_config.Parse<0>(json_str.c_str()).HasParseError()) {
+          std::stringstream error_str;
+          error_str << "Could not parse task configuration from " <<
+            task_node[CONFIGURATION_KEY];
+          Logging::error(LOG_TAG, error_str.str());
+          throw YAMLDagDeserializerError(error_str.str());
+        }
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        json_config.Accept(writer);
+        Logging::info(LOG_TAG, "Converting",
+          task_node[CONFIGURATION_KEY], "to json string of",
+          buffer.GetString());
+      }
+      rapidjson::Document json_initial_inputs;
+      if (task_node[INITIAL_INPUTS_KEY]) {
+        YAML::Emitter json_emitter;
+        json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq <<
+          task_node[INITIAL_INPUTS_KEY];
+        std::string json_str(json_emitter.c_str() + 1);
+        if (json_initial_inputs.Parse<0>(json_str.c_str()).HasParseError()) {
+          std::stringstream error_str;
+          error_str << "Could not parse task initial inputs from " <<
+            task_node[INITIAL_INPUTS_KEY];
+          Logging::error(LOG_TAG, error_str.str());
+          throw YAMLDagDeserializerError(error_str.str());
+        }
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        json_initial_inputs.Accept(writer);
+        Logging::info(LOG_TAG, "Converting",
+          task_node[INITIAL_INPUTS_KEY], "to json string of",
+          buffer.GetString());
+      }
+
       if (task_node[CALLBACK_KEY]) {
-        make_task_callback(task_name, stages, task_node[CALLBACK_KEY], task);
+        make_task_callback(task_name, stages, task_node[CALLBACK_KEY], task,
+          json_config, json_initial_inputs);
       } else {
-        task = std::make_unique<Task>(stages, task_name);
+        task = std::make_unique<Task>(stages, task_name, json_config,
+          json_initial_inputs);
       }
     }
 
@@ -342,7 +428,9 @@ namespace com
       const std::string &task_name,
       std::vector<std::unique_ptr<TaskStage>> &stages,
       const YAML::Node &callback_node,
-      std::unique_ptr<Task> &task) const
+      std::unique_ptr<Task> &task,
+      const rapidjson::Document &json_config,
+      const rapidjson::Document &json_initial_inputs) const
     {
       std::function<void (bool)> task_callback;
       Logging::info(LOG_TAG, "Going to create task callback from",
@@ -360,7 +448,8 @@ namespace com
             task_callback = make_task_function_callback(
               shared_library,
               callback_node[SYMBOL_NAME_KEY].as<std::string>());
-            task = std::make_unique<Task>(stages, task_name, task_callback);
+            task = std::make_unique<Task>(stages, task_name, task_callback,
+              json_config, json_initial_inputs);
           } else if (type == CallbackType::PLUGIN) {
             std::unique_ptr<TaskCallbackPlugin> task_callback_plugin;
             make_task_function_callback_plugin(shared_library,
@@ -374,7 +463,8 @@ namespace com
               throw YAMLDagDeserializerError(error_stream.str());
             }
             task = std::make_unique<Task>(
-              stages, task_name, std::move(task_callback_plugin));
+              stages, task_name, std::move(task_callback_plugin),
+              json_config, json_initial_inputs);
           } else {
             throw YAMLDagDeserializerNonSupportedCallbackType(
               std::string("Unspported callback type specified. Currently ") +

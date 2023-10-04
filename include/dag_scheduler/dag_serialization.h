@@ -22,26 +22,34 @@ namespace com
      * The definition in YAML for a DAG would be of the form:
      * DAG:
      *   Title: <optional string>
-     *     Vertices:
-     *       - Vertex:
+     *   Configuation: <optional YAML>
+     *     <valid YAML>
+     *   Vertices:
+     *     - Vertex:
+     *       Name: <optional string>
+     *       UUID: <valid uuid4 string>
+     *       Task:
      *         Name: <optional string>
-     *         UUID: <valid uuid4 string>
-     *         Task:
-     *           Name: <optional string>
-     *           Callback: <optional>
+     *         Callback: <optional>
+     *           LibraryName: <string>
+     *           SymbolName: <string>
+     *           Type: <enum {Plugin, Function}>
+     *         Stages:
+     *           - Name: <optional string>
      *             LibraryName: <string>
      *             SymbolName: <string>
-     *             Type: <enum {Plugin, Function}>
-     *           Stages:
-     *             - Name: <optional string>
-     *               LibraryName: <string>
-     *               SymbolName: <string>
-     *             ...
+     *           ...
+     *         TODO (mehoggan): Make sure these are tested.
+     *         InitialInputs: <optional YAML>
+     *           <valid YAML>
+     *         Configuration: <optional YAML>
+     *           <valid YAML>
      *       ...
-     *       Connections:
-     *         - Connection:
-     *           From: <valid uuid4 string from vertex>
-     *           To: <valid uuid4 string from vertex>
+     *     ...
+     *     Connections:
+     *       - Connection:
+     *         From: <valid uuid4 string from vertex>
+     *         To: <valid uuid4 string from vertex>
      *         ...
      */
     class YAMLDagDeserializerError : public std::exception
@@ -78,7 +86,8 @@ namespace com
       const static std::string VERTICES_KEY;
       const static std::string TASK_KEY;
       const static std::string STAGES_KEY;
-      const static std::string STAGE_KEY;
+      const static std::string CONFIGURATION_KEY;
+      const static std::string INITIAL_INPUTS_KEY;
 
       const static std::string TITLE_KEY;
       const static std::string NAME_KEY;
@@ -123,7 +132,9 @@ namespace com
         const std::string &task_name,
         std::vector<std::unique_ptr<TaskStage>> &stages,
         const YAML::Node &callback_node,
-        std::unique_ptr<Task> &task) const;
+        std::unique_ptr<Task> &task,
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_initial_inputs) const;
       std::function<void (bool)> make_task_function_callback(
         const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name) const;

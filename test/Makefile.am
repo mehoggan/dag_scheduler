@@ -15,7 +15,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     test_dag.cxx \
     test_dag_algorithms.cxx \
     test_dag_edge.cxx \
-		test_dag_serializer.cxx \
+		test_dag_serialization.cxx \
     test_dag_vertex.cxx \
 		test_dynamic_library_registery.cxx \
     test_interruptible_task_thread.cxx \

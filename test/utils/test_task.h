@@ -28,20 +28,34 @@ namespace com
       TestTaskImpl(const std::string &label);
 
       TestTaskImpl(const std::string &label,
+        const rapidjson::Document &json_initial_inputs);
+
+      TestTaskImpl(const std::string &label,
+        std::function<void (bool)> complete_callback);
+
+      TestTaskImpl(const std::string &label,
+        const rapidjson::Document &json_initial_inputs,
         std::function<void (bool)> complete_callback);
 
       TestTaskImpl(const std::string &label,
         std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       TestTaskImpl(const std::string &label,
-        const rapidjson::Document &json_config);
+        const rapidjson::Document &json_initial_inputs,
+        std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       TestTaskImpl(const std::string &label,
         const rapidjson::Document &json_config,
-          std::function<void (bool)> complete_callback);
+        const rapidjson::Document &json_initial_inputs);
 
       TestTaskImpl(const std::string &label,
         const rapidjson::Document &json_config,
+        const rapidjson::Document &json_initial_inputs,
+        std::function<void (bool)> complete_callback);
+
+      TestTaskImpl(const std::string &label,
+        const rapidjson::Document &json_config,
+        const rapidjson::Document &json_initial_inputs,
         std::unique_ptr<TaskCallbackPlugin> &&complete_callback_plugin);
 
       virtual ~TestTaskImpl();
