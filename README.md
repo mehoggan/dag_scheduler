@@ -68,3 +68,12 @@ following command from the root directory of this repository. </br>
 // If you cannot find the logs then you can simply just run:
 > ./test/gtest_libdag_scheduler
 ```
+
+## Build Dockerfile(s)
+
+```sh
+> rm -rf ./build
+> rm -rf ./deps/build
+> pushd ./deps/openssl && make clean && make distclean
+> docker build -f ./<distro>.docker
+```
