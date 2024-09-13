@@ -36,7 +36,8 @@ function build_boostbeast {
 
   ./scripts/build.boostbeast.sh \
     "${BUILD_DIR}" \
-    "boost" > ${SCRIPT_DIR}/boost.build.log 2>&1
+    "boost" \
+    "11" > ${SCRIPT_DIR}/boost.build.log 2>&1
 
   ./scripts/install.boostbeast.sh \
     "${BUILD_DIR}" \

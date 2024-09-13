@@ -2,6 +2,7 @@ set -e
 
 BUILD_DIR=${1}
 SUB_FOLDER=${2}
+CXX_VER=${3}
 
 MAKE_CMD=$(which make)
 echo "Going to build boost in ${BUILD_DIR} with ${MAKE_CMD}..."
@@ -9,7 +10,7 @@ echo "Going to build boost in ${BUILD_DIR} with ${MAKE_CMD}..."
 if [[ "${OSTYPE}" == "linux-gnu"* ]]; then
   cd ${BUILD_DIR}/${SUB_FOLDER} && \
     ./b2 clean && \
-    ./b2 pch=off cxxstd=17
+    ./b2 pch=off cxxstd="${CXX_VER}"
 elif [[ "${OSTYPE}" == "darwin"* ]]; then
   PYTHON_INCLUDES="/Library/Frameworks/Python.framework/Versions/3.8"
   PYTHON_INCLUDES="${PYTHON_INCLUDES}/include/python3.8"
@@ -29,5 +30,5 @@ elif [[ "${OSTYPE}" == "darwin"* ]]; then
     export C_INCLUDE_PATH="${PYTHON_INCLUDES}:${C_INCLUDE_PATH}" && \
     export CPLUS_INCLUDE_PATH="${PYTHON_INCLUDES}:${CPLUS_INCLUDE_PATH}" && \
     ./b2 clean && \
-    ./b2 -j$(sysctl -n hw.ncpu) cxxstd=17
+    ./b2 -j$(sysctl -n hw.ncpu) cxxstd="${CXX_VER}"
 fi
