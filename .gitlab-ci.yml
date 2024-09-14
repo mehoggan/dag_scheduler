@@ -5,6 +5,8 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 docker-build-debian-latest:
+  rules:
+    when: never
   # Use the official docker image.
   image: docker:latest
   stage: build
@@ -30,6 +32,8 @@ docker-build-debian-latest:
         - debian.docker
 
 docker-build-centos-latest:
+  rules:
+    when: never
   # Use the official docker image.
   image: docker:latest
   stage: build
