@@ -3,16 +3,12 @@
 
 #include "dag_scheduler/uuid.h"
 
-#include <memory>
-#include <sstream>
 #include <ostream>
+#include <sstream>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class BaseTaskStage
-    {
+namespace com {
+  namespace dag_scheduler {
+    class BaseTaskStage {
     public:
       /**
        * @brief default ctor
@@ -70,8 +66,8 @@ namespace com
        *        \ref BaseTaskStage.
        *
        * Each \ref BaseTaskStage should be easily identifed by users. This is
-       * done by allowing users to assign a label to a BaseTaskStage. This member
-       * function returns that label.
+       * done by allowing users to assign a label to a BaseTaskStage. This
+       * member function returns that label.
        *
        * @return The label specified by the user.
        */
@@ -141,8 +137,8 @@ namespace com
        *
        * @return true if \p lhs has the same \ref uuid as \p rhs.
        */
-      friend bool operator==(const BaseTaskStage &lhs,
-        const BaseTaskStage &rhs);
+      friend bool
+      operator==(const BaseTaskStage &lhs, const BaseTaskStage &rhs);
 
       /**
        * @brief Inequality operator for a \ref BaseTaskStage.
@@ -152,8 +148,8 @@ namespace com
        *
        * @return false if \p lhs has the same \ref uuid as \p rhs.
        */
-      friend bool operator!=(const BaseTaskStage &lhs,
-        const BaseTaskStage &rhs);
+      friend bool
+      operator!=(const BaseTaskStage &lhs, const BaseTaskStage &rhs);
 
       /**
        * @brief A utility function to print a \ref BaseTaskStage to a stream.
@@ -166,8 +162,8 @@ namespace com
        *
        * @return The stream after \p t has been written to it.
        */
-      friend std::ostream &operator<<(std::ostream &out,
-        const BaseTaskStage &t);
+      friend std::ostream &
+      operator<<(std::ostream &out, const BaseTaskStage &t);
 
       /**
        * @brief A utility function to print a \ref BaseTaskStage to a stream.
@@ -180,14 +176,14 @@ namespace com
        *
        * @return The stream after \p t has been written to it.
        */
-      friend std::stringstream &operator<<(std::stringstream &out,
-        const BaseTaskStage &t);
+      friend std::stringstream &
+      operator<<(std::stringstream &out, const BaseTaskStage &t);
 
     protected:
       std::string label_;
       UUID uuid_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

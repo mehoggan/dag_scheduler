@@ -1,3 +1,8 @@
+### September 14, 2024
+
+* Resuming development after a long break. TODO (mehoggan): Add notes on where
+  to resume development.
+
 ### August 24, 2023
 
 * Upon running tests on OSX it is noted that the following test is broken:

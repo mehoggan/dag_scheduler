@@ -6,12 +6,9 @@
 
 #include <chrono>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class InterruptibleTaskThread
-    {
+namespace com {
+  namespace dag_scheduler {
+    class InterruptibleTaskThread {
     public:
       /**
        * @brief
@@ -32,8 +29,8 @@ namespace com
 
       InterruptibleTaskThread(const InterruptibleTaskThread &) = delete;
 
-      InterruptibleTaskThread &operator=(
-        const InterruptibleTaskThread &) = delete;
+      InterruptibleTaskThread &
+      operator=(const InterruptibleTaskThread &) = delete;
 
       /**
        * @brief
@@ -105,7 +102,7 @@ namespace com
       volatile std::atomic_bool running_;
       std::thread thread_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

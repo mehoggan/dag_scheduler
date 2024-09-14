@@ -7,23 +7,23 @@
 #include <atomic>
 #include <chrono>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class TestTaskStageImpl : public TaskStage
-    {
+namespace com {
+  namespace dag_scheduler {
+    class TestTaskStageImpl : public TaskStage {
     public:
       TestTaskStageImpl();
 
-      explicit TestTaskStageImpl(const std::string &label,
+      explicit TestTaskStageImpl(
+        const std::string &label,
         const std::chrono::nanoseconds &run_sleep_time =
-          std::chrono::nanoseconds(100000000));
+          std::chrono::nanoseconds(100000000)
+      );
 
-      TestTaskStageImpl(const std::string &label,
-        const UUID &uuid,
+      TestTaskStageImpl(
+        const std::string &label, const UUID &uuid,
         const std::chrono::nanoseconds &run_sleep_time =
-          std::chrono::nanoseconds(100000000));
+          std::chrono::nanoseconds(100000000)
+      );
 
       virtual ~TestTaskStageImpl();
 
@@ -50,6 +50,6 @@ namespace com
       int *nasty_user_defined_pointer_;
       std::chrono::nanoseconds run_sleep_time_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 #endif

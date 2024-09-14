@@ -6,14 +6,10 @@
 #include <memory>
 #include <string>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    namespace testing
-    {
-      class Pathing
-      {
+namespace com {
+  namespace dag_scheduler {
+    namespace testing {
+      class Pathing {
       public:
         Pathing();
 
@@ -33,8 +29,7 @@ namespace com
         std::filesystem::path executable_path_;
       };
 
-      class TestEnvironment : public ::testing::Environment
-      {
+      class TestEnvironment : public ::testing::Environment {
       public:
         static std::string EXE_PATH;
         static com::dag_scheduler::LogTag TEST_TAG;
@@ -42,6 +37,6 @@ namespace com
 
         virtual void SetUp();
       };
-    }
-  }
-}
+    } // namespace testing
+  } // namespace dag_scheduler
+} // namespace com

@@ -7,41 +7,33 @@
 
 #include <atomic>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class TestTaskStage :
       public ::testing::Test,
-      public LoggedClass<TestTaskStage>
-    {
+      public LoggedClass<TestTaskStage> {
     public:
-      TestTaskStage() :
-        LoggedClass<TestTaskStage>(*this)
-      {}
+      TestTaskStage() : LoggedClass<TestTaskStage>(*this) {}
 
     protected:
       virtual void SetUp() {}
       virtual void TearDown() {}
     };
 
-    TEST_F(TestTaskStage, default_ctor)
-    {
+    TEST_F(TestTaskStage, default_ctor) {
       std::unique_ptr<TaskStage> test(new TestTaskStageImpl);
       EXPECT_NE(nullptr, test);
       EXPECT_EQ(test->get_uuid().as_string(), test->label());
     }
 
-    TEST_F(TestTaskStage, label_ctor)
-    {
+    TEST_F(TestTaskStage, label_ctor) {
       std::unique_ptr<TaskStage> test(new TestTaskStageImpl("test_label"));
       EXPECT_NE(nullptr, test);
       EXPECT_NE(test->get_uuid().as_string(), test->label());
       EXPECT_EQ("test_label", test->label());
     }
 
-    TEST_F(TestTaskStage, run)
-    {
+    TEST_F(TestTaskStage, run) {
       TestTaskStageImpl tt;
       EXPECT_TRUE(tt.run());
 
@@ -49,8 +41,7 @@ namespace com
       EXPECT_TRUE(tt_ptr->run());
     }
 
-    TEST_F(TestTaskStage, kill_if_is_running)
-    {
+    TEST_F(TestTaskStage, kill_if_is_running) {
       TestTaskStageImpl tt;
       EXPECT_TRUE(tt.end());
 
@@ -61,5 +52,5 @@ namespace com
       EXPECT_FALSE(tt_ptr->is_running());
       EXPECT_TRUE(tt_ptr->end());
     }
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com

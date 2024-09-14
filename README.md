@@ -28,7 +28,7 @@ following command from the root directory of this repository. </br>
 
 ```sh
 > brew install autoconf automake libtool autoconf-archive googletest \
-    rapidjson yaml-cpp
+    rapidjson yaml-cpp ossp-uuid
 ```
 
 ## Fedora DNF System Setup
@@ -76,4 +76,21 @@ following command from the root directory of this repository. </br>
 > rm -rf ./deps/build
 > pushd ./deps/openssl && make clean && make distclean
 > docker build -f ./<distro>.docker
+```
+
+## Notes on Autoformatting Code
+
+First install clang-formatter
+
+### OSX Setup
+
+```sh
+brew install clang-format
+```
+
+### Running clang-format
+```sh
+find $(pwd) -name "*.h" -o -name "*.cpp" -o -name "*.cxx" -o -name "*.hpp" \
+  | grep -v "deps\|build" \
+  | xargs clang-format -i
 ```

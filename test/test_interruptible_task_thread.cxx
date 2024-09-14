@@ -8,19 +8,14 @@
 
 #include <condition_variable>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class TestInterruptibleTaskThread :
       public ::testing::Test,
-      public LoggedClass<TestInterruptibleTaskThread>
-    {
+      public LoggedClass<TestInterruptibleTaskThread> {
     public:
       TestInterruptibleTaskThread() :
-        LoggedClass<TestInterruptibleTaskThread>(*this),
-        ts_(LOG_TAG)
-      {}
+        LoggedClass<TestInterruptibleTaskThread>(*this), ts_(LOG_TAG) {}
 
     protected:
       InterruptibleTaskThread ts_;
@@ -31,15 +26,13 @@ namespace com
       virtual void TearDown() {}
     };
 
-    TEST_F(TestInterruptibleTaskThread, ctor)
-    {
+    TEST_F(TestInterruptibleTaskThread, ctor) {
       EXPECT_FALSE(ts_.is_running());
       EXPECT_FALSE(ts_.was_interrupted());
       EXPECT_FALSE(ts_.has_task());
     }
 
-    TEST_F(TestInterruptibleTaskThread, move_ctor_not_running)
-    {
+    TEST_F(TestInterruptibleTaskThread, move_ctor_not_running) {
       InterruptibleTaskThread ts(std::move(ts_));
       EXPECT_FALSE(ts.is_running());
       EXPECT_FALSE(ts.was_interrupted());
@@ -49,8 +42,7 @@ namespace com
       EXPECT_FALSE(ts_.has_task());
     }
 
-    TEST_F(TestInterruptibleTaskThread, move_assignement_not_running)
-    {
+    TEST_F(TestInterruptibleTaskThread, move_assignement_not_running) {
 
       InterruptibleTaskThread ts;
       ts = std::move(ts_);
@@ -62,8 +54,7 @@ namespace com
       EXPECT_FALSE(ts_.has_task());
     }
 
-    TEST_F(TestInterruptibleTaskThread, set_task_and_run_succesfull)
-    {
+    TEST_F(TestInterruptibleTaskThread, set_task_and_run_succesfull) {
       std::condition_variable exit_cond;
       auto complete_callback = [&](bool status) {
         EXPECT_TRUE(status);
@@ -75,7 +66,8 @@ namespace com
       std::mutex exit_mutex;
       std::unique_lock<std::mutex> exit_lock(exit_mutex);
       std::unique_ptr<TestTaskImpl> test_task(
-        new TestTaskImpl("test_task", complete_callback));
+        new TestTaskImpl("test_task", complete_callback)
+      );
       bool started = ts_.set_task_and_run(std::move(test_task));
       EXPECT_TRUE(started);
       EXPECT_TRUE(ts_.has_task());
@@ -84,8 +76,7 @@ namespace com
       ts_.shutdown();
     }
 
-    TEST_F(TestInterruptibleTaskThread, set_task_and_run_with_interrupt)
-    {
+    TEST_F(TestInterruptibleTaskThread, set_task_and_run_with_interrupt) {
       auto complete_callback = [&](bool status) {
         EXPECT_FALSE(status);
         EXPECT_FALSE(ts_.is_running());
@@ -93,11 +84,12 @@ namespace com
         EXPECT_FALSE(ts_.has_task());
       };
       std::unique_ptr<TestTaskImpl> test_task(
-        new TestTaskImpl("test_task", complete_callback));
+        new TestTaskImpl("test_task", complete_callback)
+      );
       bool started = ts_.set_task_and_run(std::move(test_task));
       EXPECT_TRUE(started);
       ts_.set_interrupt();
       ts_.shutdown();
     }
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com

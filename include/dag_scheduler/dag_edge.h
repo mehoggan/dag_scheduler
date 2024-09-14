@@ -4,19 +4,15 @@
 #include "dag_scheduler/dag_vertex.h"
 #include "dag_scheduler/uuid.h"
 
-#include <functional>
 #include <list>
 #include <memory>
 #include <ostream>
 #include <string>
-#include <vector>
 
 #include <gtest/gtest_prod.h>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class that represents a directed edge in a acyclic graph
      *        (dag).
@@ -25,23 +21,17 @@ namespace com
      * operations that can be performed on it. Users can check for connected
      * \ref DAGVertex and get access to the connected \ref DAGVertex.
      */
-    class DAGEdge
-    {
+    class DAGEdge {
     private:
       friend class DAG;
       friend class DAGVertex;
       friend struct DAGVertex::DAGVertex_connection;
-      friend bool dag_topological_sort(DAG &g,
-        std::list<DAGVertex> &sorted_vertices); 
+      friend bool
+      dag_topological_sort(DAG &g, std::list<DAGVertex> &sorted_vertices);
 
     public:
       // TODO: Use DAG class to manage status.
-      enum class Status
-      {
-        initialized,
-        traversed,
-        non_traverable
-      };
+      enum class Status { initialized, traversed, non_traverable };
 
     public:
       /**
@@ -67,9 +57,9 @@ namespace com
        */
       DAGEdge(DAGEdge &&other);
 
-      //! 
+      //!
       /*!
-      */
+       */
       /**
        * @brief A assignment move operator for a \ref DAGEdge
        *
@@ -88,7 +78,7 @@ namespace com
        * this and returns it. However, it resets the connection which can only
        * be made from an object that knows about the connection.
        *
-       * @return A \ref DAGEdge that is an identical copy of this. 
+       * @return A \ref DAGEdge that is an identical copy of this.
        */
       DAGEdge clone();
 
@@ -100,7 +90,7 @@ namespace com
        * the \ref DAGVertex that this edge points to.
        *
        * @return A \ref std::weak_ptr<\ref DAGVertex> that points to the
-       *         \ref DAGVertex that this points to. 
+       *         \ref DAGVertex that this points to.
        */
       std::weak_ptr<DAGVertex> get_connection();
 
@@ -110,7 +100,7 @@ namespace com
        * @param[in] v A \ref DAGVertex for which we are checking for a
        *              connection to.
        *
-       * @return true if \ref this points to \ref v. False other wise. 
+       * @return true if \ref this points to \ref v. False other wise.
        */
       bool is_a_connection_to(const DAGVertex &v) const;
 
@@ -120,7 +110,7 @@ namespace com
        * A member function of \ref DAGEdge that return the \ref uuid that
        * uniqly identifies any clone of \ref this.
        *
-       * @return A \ref uuid that uniqly identifies any clone of \ref this. 
+       * @return A \ref uuid that uniqly identifies any clone of \ref this.
        */
       const UUID &get_uuid() const;
 
@@ -191,6 +181,6 @@ namespace com
       FRIEND_TEST(TestDagEdge, connections);
       FRIEND_TEST(TestDagEdge, equality_operators_with_connection);
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 #endif

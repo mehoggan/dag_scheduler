@@ -4,13 +4,11 @@
 #include <uuid/uuid.h>
 
 #include <ostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class that represents a unique identifier.
      *
@@ -19,8 +17,7 @@ namespace com
      * an item like a \ref dag or a \ref dag_vertex for the purposes of
      * mutating it while not impacting the original.
      */
-    class UUID
-    {
+    class UUID {
     public:
       /**
        * @brief ctor
@@ -90,8 +87,7 @@ namespace com
        *
        * @return The stream \p out after \p u was written to it.
        */
-      friend std::ostream &operator<<(std::ostream &out, const UUID &u)
-      {
+      friend std::ostream &operator<<(std::ostream &out, const UUID &u) {
         out << u.as_string();
         return out;
       }
@@ -104,9 +100,8 @@ namespace com
        *
        * @return The stream \p out after \p u was written to it.
        */
-      friend std::stringstream &operator<<(std::stringstream &out,
-        const UUID &u)
-      {
+      friend std::stringstream &
+      operator<<(std::stringstream &out, const UUID &u) {
         out << u.as_string();
         return out;
       }
@@ -119,10 +114,9 @@ namespace com
        *
        * @return true if \p lhs and \p rhs are not initialized, or
        *         if the string representation of \p rhs equals that of
-       *         \p rhs, false otherwise. 
+       *         \p rhs, false otherwise.
        */
-      friend bool operator==(const UUID &lhs, const UUID &rhs)
-      {
+      friend bool operator==(const UUID &lhs, const UUID &rhs) {
         bool ret = true;
 
         if (!lhs.is_initialized() && !rhs.is_initialized()) {
@@ -145,10 +139,9 @@ namespace com
        *
        * @return false if \p lhs and \p rhs are not initialized, or
        *         if the string representation of \p rhs equals that of
-       *         \p rhs, true otherwise. 
+       *         \p rhs, true otherwise.
        */
-      friend bool operator!=(const UUID &lhs, const UUID &rhs)
-      {
+      friend bool operator!=(const UUID &lhs, const UUID &rhs) {
         return !(lhs == rhs);
       }
 
@@ -158,6 +151,6 @@ namespace com
       UUID(const UUID &other);
       UUID &operator=(const UUID &rhs);
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 #endif

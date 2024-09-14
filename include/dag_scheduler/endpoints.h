@@ -14,16 +14,14 @@
 #pragma clang diagnostic pop
 #endif
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    struct Responder
-    {
+namespace com {
+  namespace dag_scheduler {
+    struct Responder {
     public:
       typedef boost::beast::http::empty_body EmptyBodyType;
       typedef boost::beast::http::string_body StringBodyType;
-      typedef boost::beast::http::basic_fields<std::allocator<char>> FieldsType;
+      typedef boost::beast::http::basic_fields<std::allocator<char>>
+        FieldsType;
       typedef boost::beast::http::message<false, StringBodyType, FieldsType>
         StringMessageType;
       typedef boost::beast::http::message<false, EmptyBodyType, FieldsType>
@@ -35,8 +33,7 @@ namespace com
       virtual void send(EmptyMessageType &&) = 0;
     };
 
-    struct EndpointHandler
-    {
+    struct EndpointHandler {
     public:
       typedef boost::beast::http::string_body StringBodyType;
       typedef boost::beast::http::request<StringBodyType> StringRequestType;
@@ -48,11 +45,13 @@ namespace com
 
       virtual ~EndpointHandler();
 
-      virtual bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder);
+      virtual bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      );
 
-      virtual bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) const;
+      virtual bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) const;
 
     private:
       boost::beast::string_view endpoint_;
@@ -60,22 +59,24 @@ namespace com
 
     struct DocRootEndpoint :
       public EndpointHandler,
-      LoggedClass<DocRootEndpoint>
-    {
+      LoggedClass<DocRootEndpoint> {
     public:
       explicit DocRootEndpoint(const boost::beast::string_view &doc_root);
 
       virtual ~DocRootEndpoint();
 
-      bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) final;
+      bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) final;
 
-      bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) const final;
+      bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) const final;
 
     private:
-      bool handle_request(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) const;
+      bool handle_request(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) const;
 
     private:
       boost::beast::string_view doc_root_;
@@ -83,18 +84,19 @@ namespace com
 
     struct RegisterDAGEndpoint :
       public EndpointHandler,
-      LoggedClass<RegisterDAGEndpoint>
-    {
+      LoggedClass<RegisterDAGEndpoint> {
     public:
       ~RegisterDAGEndpoint();
 
-      bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) final;
+      bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) final;
 
-      bool operator()(StringRequestType &&req,
-        std::unique_ptr<Responder> &&responder) const final;
+      bool operator()(
+        StringRequestType &&req, std::unique_ptr<Responder> &&responder
+      ) const final;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

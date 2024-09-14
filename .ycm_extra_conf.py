@@ -54,7 +54,6 @@ flags = [
     '-I/include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/deps/build/boost/include',
     '-I/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/deps/build/openssl/include',
-    '-I/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++/v1',
     '-W',
     '-Wall',
     '-Wcast-align',
@@ -75,13 +74,12 @@ flags = [
     '-install_name',
     '-std=c++17',
     '-std=gnu++17',
-    '-isysroot', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk',
-    '-isystem', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include',
-    '-isystem', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include',
-    '-isystem', '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include',
-    '-isystem', '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.1.6/include',
-    '-I', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/',
-    '-I', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1',
+    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
+    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
+    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
+    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include',
+    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include',
+    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include'
 ]
 
 

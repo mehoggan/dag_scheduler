@@ -5,24 +5,17 @@
 
 #include <iostream>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class TestDagAlgorithms : public ::testing::Test
-    {
+namespace com {
+  namespace dag_scheduler {
+    class TestDagAlgorithms : public ::testing::Test {
     protected:
       virtual void SetUp() {}
 
       virtual void TearDown() {}
 
-      DAG &get_dag()
-      {
-        return d_;
-      }
+      DAG &get_dag() { return d_; }
 
-      std::vector<DAGVertex> fill_dag_default()
-      {
+      std::vector<DAGVertex> fill_dag_default() {
         DAGVertex v0("a"), v1("b"), v2("c"), v3("d"), v4("e"), v5("f"),
           v6("g"), v7("h"), v8("i"), v9("j");
         std::vector<DAGVertex> vertices_to_add;
@@ -39,7 +32,8 @@ namespace com
 
         std::vector<DAGVertex> vertices_cloned;
         vertices_cloned.reserve(vertices_to_add.size());
-        std::for_each(vertices_to_add.begin(), vertices_to_add.end(),
+        std::for_each(
+          vertices_to_add.begin(), vertices_to_add.end(),
           [&](DAGVertex &v) {
             DAGVertex v_clone_1 = v.clone();
             DAGVertex v_clone_2 = v.clone();
@@ -63,8 +57,7 @@ namespace com
       DAG d_;
     };
 
-    TEST_F(TestDagAlgorithms, dag_vertices_with_no_incomming_edges)
-    {
+    TEST_F(TestDagAlgorithms, dag_vertices_with_no_incomming_edges) {
       {
         std::vector<DAGVertex> vertices = fill_dag_default();
 
@@ -92,8 +85,7 @@ namespace com
       }
     }
 
-    TEST_F(TestDagAlgorithms, dag_topological_sort)
-    {
+    TEST_F(TestDagAlgorithms, dag_topological_sort) {
       std::vector<DAGVertex> vertices = fill_dag_default();
 
       get_dag().connect(vertices[0], vertices[1]);
@@ -121,8 +113,7 @@ namespace com
       get_dag().reset();
     }
 
-    TEST_F(TestDagAlgorithms, dag_topological_sort_non_linear)
-    {
+    TEST_F(TestDagAlgorithms, dag_topological_sort_non_linear) {
       std::vector<DAGVertex> vertices = fill_dag_default();
 
       get_dag().connect(vertices[0], vertices[1]); // a -> b
@@ -178,8 +169,7 @@ namespace com
       get_dag().reset();
     }
 
-    TEST_F(TestDagAlgorithms, process_dag)
-    {
+    TEST_F(TestDagAlgorithms, process_dag) {
       {
         std::vector<DAGVertex> vertices = fill_dag_default();
 
@@ -223,8 +213,7 @@ namespace com
       }
     }
 
-    TEST_F(TestDagAlgorithms, process_dag_cyclic)
-    {
+    TEST_F(TestDagAlgorithms, process_dag_cyclic) {
       {
         std::vector<DAGVertex> vertices = fill_dag_default();
 
@@ -252,5 +241,5 @@ namespace com
         get_dag().reset();
       }
     }
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com

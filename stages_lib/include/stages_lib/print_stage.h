@@ -5,16 +5,12 @@
 #include "dag_scheduler/uuid.h"
 
 #include <memory>
-#include <sstream>
 #include <ostream>
+#include <sstream>
 
-namespace com
-{
-  namespace stages_lib
-  {
-    class PrintStage :
-      public com::dag_scheduler::TaskStage
-    {
+namespace com {
+  namespace stages_lib {
+    class PrintStage : public com::dag_scheduler::TaskStage {
     public:
       /**
        * @brief default ctor
@@ -180,8 +176,8 @@ namespace com
        *
        * @return The stream after \p t has been written to it.
        */
-      friend std::stringstream &operator<<(std::stringstream &out,
-        const PrintStage &t);
+      friend std::stringstream &
+      operator<<(std::stringstream &out, const PrintStage &t);
 
     public:
       /**
@@ -202,12 +198,12 @@ namespace com
        * @return A \ref std::unique_ptr<TaskStage> inserted into a \ref Task's
        *         collection of stages to be executed within a \ref DAGVertex.
        */
-      static std::unique_ptr<com::dag_scheduler::TaskStage> make_stage(
-        const std::string &name);
+      static std::unique_ptr<com::dag_scheduler::TaskStage>
+      make_stage(const std::string &name);
 
     private:
       std::atomic_bool running_;
     };
-  }
-}
+  } // namespace stages_lib
+} // namespace com
 #endif

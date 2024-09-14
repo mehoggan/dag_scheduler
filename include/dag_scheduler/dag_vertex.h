@@ -13,10 +13,8 @@
 
 #include <gtest/gtest_prod.h>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class DAGEdge;
     class DAG;
 
@@ -31,8 +29,7 @@ namespace com
      * how many \ref DAGEdges come from an instance, and check to see how
      * many \ref DAGEdges point at a given instance.
      */
-    class DAGVertex
-    {
+    class DAGVertex {
     private:
       friend class DAGEdge;
       friend class DAG;
@@ -45,8 +42,7 @@ namespace com
        * This is a utility class used to reconnect two \ref DAGVertex
        * and their associated \ref DAGEdge.
        */
-      struct DAGVertex_connection
-      {
+      struct DAGVertex_connection {
       public:
         /**
          * @brief A constructor for a \ref DAGVertex_connection
@@ -57,7 +53,7 @@ namespace com
 
         /**
          * @brief A constructor for a \ref DAGVertex_connection
-         * 
+         *
          * A constructor for a \ref DAGVertex_connection
          *
          * @param edge The \ref DAGEdge that points to \ref vertex.
@@ -70,7 +66,7 @@ namespace com
          *
          * A getter for the \ref DAGEdge that points to \ref vertex_
          *
-         * @return A const reference to the member variable edge_ 
+         * @return A const reference to the member variable edge_
          */
         const DAGEdge &edge() const;
 
@@ -80,7 +76,7 @@ namespace com
          *
          * A getter for the \ref DAGVertex that is pointed to by \ref edge_.
          *
-         * @return A const reference to the member variable vertex_. 
+         * @return A const reference to the member variable vertex_.
          */
         const DAGVertex &vertex() const;
 
@@ -90,8 +86,7 @@ namespace com
       };
 
       // TODO: Use dag class to manage status.
-      enum class Status
-      {
+      enum class Status {
         INITIALIZED,
         SCHEDULED,
         RUNNING,
@@ -127,7 +122,7 @@ namespace com
        *                  \ref DAGVertex.
        * @param[in] task A DAGTask which contains stages to be executed.
        */
-      DAGVertex(const std::string &label, std::unique_ptr<Task> &&task); 
+      DAGVertex(const std::string &label, std::unique_ptr<Task> &&task);
 
       /**
        * @brief A constructor for a \ref DAGVertex
@@ -139,8 +134,10 @@ namespace com
        * @param[in] task A DAGTask which contains stages to be executed.
        * @param[in] uuid A user defined UUID.
        */
-      DAGVertex(const std::string &label, std::unique_ptr<Task> &&task,
-        class UUID &&uuid); 
+      DAGVertex(
+        const std::string &label, std::unique_ptr<Task> &&task,
+        class UUID &&uuid
+      );
 
       /**
        * @brief A constructor for a \ref DAGVertex
@@ -154,7 +151,7 @@ namespace com
        */
 
       /**
-       * @brief A destructor for a \ref DAGVertex 
+       * @brief A destructor for a \ref DAGVertex
        *
        * A destructor for a \ref DAGVertex
        */
@@ -186,7 +183,7 @@ namespace com
        * A member function of \ref DAGVertex that makes an identical copy of
        * this and returns it. However, does not preseve \ref DAGEdges.
        *
-       * @return A \ref DAGVertex that is an identical copy of this. 
+       * @return A \ref DAGVertex that is an identical copy of this.
        */
       DAGVertex clone();
 
@@ -196,7 +193,7 @@ namespace com
        * @param[in] other The \ref DAGVertex for which an \ref DAGEdge is
        *                  drawn to.
        *
-       * @return true if connection is made false otherwise. 
+       * @return true if connection is made false otherwise.
        */
       bool connect(std::shared_ptr<DAGVertex> other);
 
@@ -231,10 +228,10 @@ namespace com
        *
        * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>>
        *         which contains ref counted instances of the connections
-       *         restablished by calling this function. 
+       *         restablished by calling this function.
        */
-      std::vector<std::shared_ptr<DAGVertex>> restablish_connections(
-        std::vector<DAGVertex_connection> &connections);
+      std::vector<std::shared_ptr<DAGVertex>>
+      restablish_connections(std::vector<DAGVertex_connection> &connections);
 
       /**
        * @brief Used to get the number of \ref DAGVertex (s) this points to.
@@ -244,7 +241,7 @@ namespace com
        * a \ref DAGEdge.
        *
        * @return A positive integer with the number of \ref DAGEdge (s) that
-       *         extend from \ref this to other \ref DAGVertex (s). 
+       *         extend from \ref this to other \ref DAGVertex (s).
        */
       std::size_t edge_count() const;
 
@@ -259,7 +256,7 @@ namespace com
        *               \ref DAGEdge that \ref this contains in the order
        *               that the \ref DAGEdge (s) were added.
        */
-      void visit_all_edges(std::function<void (const DAGEdge &)> cb) const;
+      void visit_all_edges(std::function<void(const DAGEdge &)> cb) const;
 
       /**
        * @brief A utility function used with \ref clone to preserve
@@ -272,7 +269,7 @@ namespace com
        * \ref restablish_connections with the return value.
        *
        * @return A \ref std::vector<\ref DAGVertex_connections> of the
-       *         \ref DAGEdge (s) and their associate \ref DAGVertex. 
+       *         \ref DAGEdge (s) and their associate \ref DAGVertex.
        */
       std::vector<DAGVertex_connection> clone_all_connections();
 
@@ -285,7 +282,7 @@ namespace com
        * @return true if \ref DAGEdge::connect_to was called with \ref this
        *         provided as the ref counted object proveded as an argument to
        *         the aforementioned function of \ref DAGEdge. If the
-       *         contrary, then \ref false is returned. 
+       *         contrary, then \ref false is returned.
        */
       bool has_incomming_edges() const;
 
@@ -297,7 +294,7 @@ namespace com
        * for the number of \ref DAGEdge (s) that point at \ref this.
        *
        * @return A positive integer that represents the number of
-       *         \ref DAGEdge (s) that point at this. 
+       *         \ref DAGEdge (s) that point at this.
        */
       std::size_t incomming_edge_count() const;
 
@@ -308,7 +305,7 @@ namespace com
        * A member getter function for \ref DAGVertex for the unique id owned
        * by a instance or any clone of that instance of a \ref DAGEdge.
        *
-       * @return A \ref uuid owned by the instance of \ref this. 
+       * @return A \ref uuid owned by the instance of \ref this.
        */
       const UUID &get_uuid() const;
 
@@ -325,7 +322,7 @@ namespace com
        * helps identify a instance of \ref DAGVertex. Note that it is not
        * guaranteed to be unique.
        *
-       * @return A string representation of that label. 
+       * @return A string representation of that label.
        */
       const std::string &label() const;
 
@@ -345,8 +342,7 @@ namespace com
        *
        * @return A reference to \p out after it was streamed to.
        */
-      friend std::ostream &operator<<(std::ostream &out,
-        const DAGVertex &v);
+      friend std::ostream &operator<<(std::ostream &out, const DAGVertex &v);
 
       /**
        * @brief Comparison operator to compare equivalence of two
@@ -406,8 +402,7 @@ namespace com
 
     private:
       FRIEND_TEST(TestDagVertex, connect_and_contains_connection);
-      FRIEND_TEST(TestDagVertex,
-        visit_all_edges_points_to_actual_verticies);
+      FRIEND_TEST(TestDagVertex, visit_all_edges_points_to_actual_verticies);
       FRIEND_TEST(TestDagVertex, clone_all_edges_and_restablish_connections);
       FRIEND_TEST(TestDagVertex, move_ctor_with_edges);
       FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges);
@@ -417,8 +412,9 @@ namespace com
       FRIEND_TEST(TestDagVertex, copy_ctor_with_edges);
       FRIEND_TEST(TestDagVertex, assignment_operator_with_edges);
       FRIEND_TEST(TestDagVertex, move_ctor_with_edges_with_task);
-      FRIEND_TEST(TestDagVertex,
-        assignment_move_operator_with_edges_with_task);
+      FRIEND_TEST(
+        TestDagVertex, assignment_move_operator_with_edges_with_task
+      );
       FRIEND_TEST(TestDagVertex, copy_ctor_no_edges_with_task);
       FRIEND_TEST(TestDagVertex, assignment_operator_no_edges_with_task);
       FRIEND_TEST(TestDagVertex, clone_all_edges_with_task);
@@ -430,6 +426,6 @@ namespace com
       FRIEND_TEST(TestDagVertex, reset_incomming_edge_count);
       FRIEND_TEST(TestDagVertex, get_edge_at);
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 #endif

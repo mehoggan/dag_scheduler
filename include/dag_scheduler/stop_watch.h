@@ -7,16 +7,13 @@
 #include <chrono>
 #include <string>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class that sets up stderror and stdout loggers for a derived
      *        class.
      */
-    class StopWatch
-    {
+    class StopWatch {
     public:
       /**
        * @brief ctor which starts timer conditionally at construction time.
@@ -29,8 +26,10 @@ namespace com
        *                                  stop watch start at construction
        *                                  time.
        */
-      StopWatch(const LogTag &tag, const std::string &memo,
-        bool start_on_construction = true);
+      StopWatch(
+        const LogTag &tag, const std::string &memo,
+        bool start_on_construction = true
+      );
 
       /**
        * @brief dtor
@@ -120,8 +119,8 @@ namespace com
       void reset();
 
     private:
-      std::chrono::nanoseconds print(
-        const std::chrono::high_resolution_clock::time_point &stop);
+      std::chrono::nanoseconds
+      print(const std::chrono::high_resolution_clock::time_point &stop);
 
     private:
       LogTag LOG_TAG;
@@ -130,7 +129,7 @@ namespace com
       std::atomic_bool was_started_;
       std::chrono::high_resolution_clock::time_point start_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

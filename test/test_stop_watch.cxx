@@ -5,18 +5,13 @@
 
 #include <iostream>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class TestStopWatch :
       public ::testing::Test,
-      public LoggedClass<TestStopWatch>
-    {
+      public LoggedClass<TestStopWatch> {
     public:
-      TestStopWatch() :
-        LoggedClass<TestStopWatch>(*this)
-      {}
+      TestStopWatch() : LoggedClass<TestStopWatch>(*this) {}
 
     protected:
       virtual void SetUp() {}
@@ -24,8 +19,7 @@ namespace com
       virtual void TearDown() {}
     };
 
-    TEST_F(TestStopWatch, output_validate)
-    {
+    TEST_F(TestStopWatch, output_validate) {
       StopWatch sw(LogTag(__FUNCTION__), "no-op-0");
       sw.mark();
       sw = StopWatch(LogTag(__FUNCTION__), "no-op-1", false);
@@ -42,5 +36,5 @@ namespace com
       sw.mark();
       sw.stop();
     }
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
