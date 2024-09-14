@@ -2,6 +2,8 @@
 
 * Resuming development after a long break. TODO (mehoggan): Add notes on where
   to resume development.
+* Implemented clang-format.
+* Moving master branch to main.
 
 ### August 24, 2023
 
