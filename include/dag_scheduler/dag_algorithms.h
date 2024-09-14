@@ -6,10 +6,8 @@
 
 #include <list>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     typedef std::vector<std::vector<DAGVertex>> processed_order_type;
 
     /**
@@ -21,7 +19,7 @@ namespace com
      * @param[in] g The \ref dag for which to apply the search.
      *
      * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>> of
-     *         all the \ref DAGVertex (s) which have no incomming edges. 
+     *         all the \ref DAGVertex (s) which have no incomming edges.
      */
     std::vector<std::shared_ptr<DAGVertex>>
     dag_vertices_with_no_incomming_edges(DAG &g);
@@ -39,10 +37,9 @@ namespace com
      * @param[out] sorted_vertices The topological sorted \ref DAGVertex
      *                             from \ref g.
      *
-     * @return true \ref dag has a cycle, false otherwise. 
+     * @return true \ref dag has a cycle, false otherwise.
      */
-    bool dag_topological_sort(DAG &g,
-      std::list<DAGVertex> &sorted_vertices);
+    bool dag_topological_sort(DAG &g, std::list<DAGVertex> &sorted_vertices);
 
     /**
      * @brief Takes a dag and processes in parallel all \ref DAGVertex that
@@ -62,11 +59,11 @@ namespace com
      *                 of \ref DAGVertex (s) processed.
      *
      * @return False if \ref g could not have all \ref DAGVertex (s)
-     *         visited. 
+     *         visited.
      */
-    bool process_dag(DAG &g, processed_order_type &out,
-      TaskScheduler &scheduler);
-  }
-}
+    bool
+    process_dag(DAG &g, processed_order_type &out, TaskScheduler &scheduler);
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

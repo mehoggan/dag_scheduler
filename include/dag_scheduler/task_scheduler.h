@@ -13,78 +13,75 @@
 #include <mutex>
 #include <tuple>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class TaskScheduler :
       public LoggedClass<TaskScheduler>,
-      public boost::noncopyable
-    {
+      public boost::noncopyable {
     public:
       /**
-       * @brief 
+       * @brief
        */
       TaskScheduler();
 
       /**
-       * @brief 
+       * @brief
        *
-       * @return 
+       * @return
        */
       bool startup();
 
       /**
-       * @brief 
+       * @brief
        *
        * @param t
        */
       void queue_task(std::unique_ptr<Task> &&t);
 
       /**
-       * @brief 
+       * @brief
        *
        * @param t
        *
-       * @return 
+       * @return
        */
       bool kill_task(const Task &t);
 
       /**
-       * @brief 
+       * @brief
        *
        * @param u
        *
-       * @return 
+       * @return
        */
       bool kill_task(const UUID &u);
 
       /**
-       * @brief 
+       * @brief
        */
       void pause();
 
       /**
-       * @brief 
+       * @brief
        */
       void resume();
 
       /**
        * @brief
        *
-       * @return 
+       * @return
        */
       bool is_paused();
 
       /**
-       * @brief 
+       * @brief
        */
       void shutdown();
 
       /**
-       * @brief 
+       * @brief
        *
-       * @return 
+       * @return
        */
       bool is_shutdown();
 
@@ -98,7 +95,7 @@ namespace com
       std::array<std::unique_ptr<InterruptibleTaskThread>, 10> thread_pool_;
       std::mutex thread_pool_lock_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

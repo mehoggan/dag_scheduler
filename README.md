@@ -77,3 +77,20 @@ following command from the root directory of this repository. </br>
 > pushd ./deps/openssl && make clean && make distclean
 > docker build -f ./<distro>.docker
 ```
+
+## Notes on Autoformatting Code
+
+First install clang-formatter
+
+### OSX Setup
+
+```sh
+brew install clang-format
+```
+
+### Running clang-format
+```sh
+find $(pwd) -name "*.h" -o -name "*.cpp" -o -name "*.cxx" -o -name "*.hpp" \
+  | grep -v "deps\|build" \
+  | xargs clang-format -i
+```

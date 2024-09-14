@@ -7,19 +7,12 @@
 #include <deque>
 #include <memory>
 #include <mutex>
-#include <queue>
-#include <thread>
-#include <type_traits>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class ConcurrentTaskQueue
-    {
+namespace com {
+  namespace dag_scheduler {
+    class ConcurrentTaskQueue {
     private:
-      struct queue_not_empty
-      {
+      struct queue_not_empty {
       public:
         queue_not_empty(const std::deque<std::unique_ptr<Task>> &queue);
 
@@ -37,8 +30,7 @@ namespace com
 
       ConcurrentTaskQueue(const ConcurrentTaskQueue &) = delete;
 
-      ConcurrentTaskQueue &operator=(const ConcurrentTaskQueue &) =
-        delete;
+      ConcurrentTaskQueue &operator=(const ConcurrentTaskQueue &) = delete;
 
       ConcurrentTaskQueue(ConcurrentTaskQueue &&) = delete;
 
@@ -76,7 +68,7 @@ namespace com
        * moment the function that uses it. Storing the return value in a
        * variable and checking its value later MIGHT NOT be true.
        *
-       * @return true if the queue has data in it, and false otherwise. 
+       * @return true if the queue has data in it, and false otherwise.
        */
       bool empty() const;
 
@@ -100,7 +92,7 @@ namespace com
        * @param[out] popped_value The \ref task to assign to if queue is
                                   NOT empty.
        *
-       * @return True if queue was not empty and item was removed. 
+       * @return True if queue was not empty and item was removed.
        */
       bool try_pop(std::unique_ptr<Task> &popped_value);
 
@@ -144,12 +136,14 @@ namespace com
        * @return "true" if queue was not empty and item was removed.
        */
       template <typename Rep, typename Period>
-      bool wait_for_and_pop(std::unique_ptr<Task> &popped_value,
-        const std::chrono::duration<Rep, Period> &wait_duration)
-      {
+      bool wait_for_and_pop(
+        std::unique_ptr<Task> &popped_value,
+        const std::chrono::duration<Rep, Period> &wait_duration
+      ) {
         std::unique_lock<std::mutex> lock(mutex_);
-        if(!condition_variable_.wait_for(lock, wait_duration,
-          queue_not_empty(queue_))) {
+        if (!condition_variable_.wait_for(
+              lock, wait_duration, queue_not_empty(queue_)
+            )) {
           return false;
         }
 
@@ -162,9 +156,9 @@ namespace com
        * @brief A function to remove an item from the queue.
        *
        * A member function of \ref ConcurrentTaskQueue<Task> that attempts
-       * to remove a defined item from anywhere in the queue. If the user calls
-       * this that task will be removed permenantly from the queue and not
-       * returned
+       * to remove a defined item from anywhere in the queue. If the user
+       * calls this that task will be removed permenantly from the queue and
+       * not returned
        *
        * @param[in] to_remove A reference to a task to be removed from the
        *                      queue.
@@ -173,16 +167,16 @@ namespace com
        *
        * @return "true" if item was found and removed, false otherwise.
        */
-      void remove_task_from_queue(const UUID &to_remove,
-        std::unique_ptr<Task> &ret_ptr);
+      void remove_task_from_queue(
+        const UUID &to_remove, std::unique_ptr<Task> &ret_ptr
+      );
 
     private:
-       std::deque<std::unique_ptr<Task>> queue_;
-       mutable std::mutex mutex_;
-       std::condition_variable condition_variable_;
+      std::deque<std::unique_ptr<Task>> queue_;
+      mutable std::mutex mutex_;
+      std::condition_variable condition_variable_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif
-

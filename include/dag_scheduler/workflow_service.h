@@ -9,8 +9,8 @@
 
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ssl/stream.hpp>
-#include <boost/beast/http.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/http.hpp>
 
 #include <memory>
 
@@ -20,16 +20,11 @@
  * async-ssl/http_server_async_ssl.cpp
  */
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class WorkflowService :
-      public LoggedClass<WorkflowService>
-    {
+namespace com {
+  namespace dag_scheduler {
+    class WorkflowService : public LoggedClass<WorkflowService> {
     public:
-      struct ConnectionInfo
-      {
+      struct ConnectionInfo {
         std::string address_;
         std::uint32_t port_;
         std::string doc_root_;
@@ -37,32 +32,31 @@ namespace com
         std::string pem_;
       };
 
-      struct Router
-      {
+      struct Router {
       public:
-        bool register_endpoint(const boost::beast::string_view &endpoint,
-          std::unique_ptr<EndpointHandler> handler);
+        bool register_endpoint(
+          const boost::beast::string_view &endpoint,
+          std::unique_ptr<EndpointHandler> handler
+        );
 
-        std::unique_ptr<EndpointHandler> &operator[](
-          const boost::beast::string_view &endpoint);
+        std::unique_ptr<EndpointHandler> &
+        operator[](const boost::beast::string_view &endpoint);
 
       private:
         std::unordered_map<
-          boost::beast::string_view,
-          std::unique_ptr<EndpointHandler>> router_;
+          boost::beast::string_view, std::unique_ptr<EndpointHandler>>
+          router_;
       };
 
       class HTTPSListener :
         public LoggedClass<HTTPSListener>,
-        public std::enable_shared_from_this<HTTPSListener>
-      {
+        public std::enable_shared_from_this<HTTPSListener> {
       public:
         HTTPSListener(
-          boost::asio::io_context &ioc,
-          boost::asio::ssl::context &ctx,
+          boost::asio::io_context &ioc, boost::asio::ssl::context &ctx,
           boost::asio::ip::tcp::endpoint &endpoint,
-          std::shared_ptr<const std::string> &doc_root,
-          Router &router_);
+          std::shared_ptr<const std::string> &doc_root, Router &router_
+        );
 
         ~HTTPSListener() override;
 
@@ -73,8 +67,9 @@ namespace com
       private:
         void do_accept();
 
-        void on_accept(boost::beast::error_code ec,
-                       boost::asio::ip::tcp::socket socket);
+        void on_accept(
+          boost::beast::error_code ec, boost::asio::ip::tcp::socket socket
+        );
 
         void create_acceptor();
 
@@ -98,17 +93,16 @@ namespace com
       boost::asio::ssl::context ctx_;
       Router router_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
-namespace YAML
-{
-  template<>
-  struct convert<com::dag_scheduler::WorkflowService::ConnectionInfo>
-  {
-    static bool decode(const Node &node,
-      com::dag_scheduler::WorkflowService::ConnectionInfo &rhs)
-    {
+namespace YAML {
+  template <>
+  struct convert<com::dag_scheduler::WorkflowService::ConnectionInfo> {
+    static bool decode(
+      const Node &node,
+      com::dag_scheduler::WorkflowService::ConnectionInfo &rhs
+    ) {
       if (node.size() != 5) {
         return false;
       }
@@ -123,6 +117,6 @@ namespace YAML
       return true;
     }
   };
-}
+} // namespace YAML
 
 #endif

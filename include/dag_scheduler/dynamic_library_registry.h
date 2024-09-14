@@ -3,10 +3,8 @@
 #include <cstddef>
 #include <unordered_set>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class that keeps dynamic libraries loaded in memory for use
      *        by a \ref DAG and its associated \ref TaskStage (s).
@@ -25,8 +23,7 @@ namespace com
      * \ref boost::dll::shared_library went out of scope within \ref
      * YAMLDagDeserializer.
      */
-    class DynamicLibraryRegistry
-    {
+    class DynamicLibraryRegistry {
     public:
       struct RegistryItem;
 
@@ -51,18 +48,18 @@ namespace com
        * @return A \ref RegisteryItem which associates the name of the library
        *         for future lookup within the \ref DynamicLibraryRegistry.
        */
-      static const RegistryItem &register_dynamic_library(
-        const std::string &name);
+      static const RegistryItem &
+      register_dynamic_library(const std::string &name);
 
     public:
       /**
        * @brief A struct that associates a path or a library name to an
        * underlying boost::dll::shared_library.
        *
-       * TODO (mehoggan): Add in the ability to deregister a \ref RegistryItem.
+       * TODO (mehoggan): Add in the ability to deregister a \ref
+       * RegistryItem.
        */
-      struct RegistryItem
-      {
+      struct RegistryItem {
       public:
         /**
          * @brief ctor.
@@ -118,6 +115,6 @@ namespace com
 
     private:
       static std::unordered_set<RegistryItem, RegistryItem> registery_;
-    };    
-  }
-}
+    };
+  } // namespace dag_scheduler
+} // namespace com

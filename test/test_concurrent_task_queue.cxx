@@ -12,18 +12,14 @@
 #include <string>
 #include <thread>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     class TestConcurrentTaskQueue :
       public ::testing::Test,
-      public LoggedClass<TestConcurrentTaskQueue>
-    {
+      public LoggedClass<TestConcurrentTaskQueue> {
     public:
       TestConcurrentTaskQueue() :
-        LoggedClass<TestConcurrentTaskQueue>(*this)
-      {}
+        LoggedClass<TestConcurrentTaskQueue>(*this) {}
 
     protected:
       virtual void SetUp() {}
@@ -31,14 +27,12 @@ namespace com
       virtual void TearDown() {}
     };
 
-    TEST_F(TestConcurrentTaskQueue, test_size_when_empty)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_size_when_empty) {
       ConcurrentTaskQueue empty_queue;
       EXPECT_EQ(0u, empty_queue.size());
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_size_predictable_conccurent)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_size_predictable_conccurent) {
       ConcurrentTaskQueue non_empty_queue;
       std::unique_ptr<Task> task_ptr(new Task);
       non_empty_queue.push(std::move(task_ptr));
@@ -53,8 +47,7 @@ namespace com
       EXPECT_EQ(2u, non_empty_queue.size());
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data) {
       ConcurrentTaskQueue queue;
 
       std::vector<std::string> uuids;
@@ -73,8 +66,7 @@ namespace com
       EXPECT_EQ(uuids[0], j->get_uuid().as_string());
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data) {
       ConcurrentTaskQueue queue;
       std::condition_variable signal_condition;
       std::mutex signal_block;
@@ -106,8 +98,7 @@ namespace com
       t.join();
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_empty)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_empty) {
       ConcurrentTaskQueue queue;
       EXPECT_TRUE(queue.empty());
       std::unique_ptr<Task> task_ptr(new Task);
@@ -117,8 +108,7 @@ namespace com
       EXPECT_TRUE(queue.empty());
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue)
-    {
+    TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue) {
       ConcurrentTaskQueue queue;
       std::unique_ptr<Task> task_ptr(new Task);
       const UUID &ref = task_ptr->get_uuid();
@@ -130,8 +120,9 @@ namespace com
       EXPECT_TRUE(queue.empty());
     }
 
-    TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok)
-    {
+    TEST_F(
+      TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok
+    ) {
       ConcurrentTaskQueue queue;
 
       std::unique_ptr<Task> task_ptr(new Task);
@@ -145,13 +136,14 @@ namespace com
       std::unique_ptr<Task> removed;
       queue.remove_task_from_queue(ref, removed);
       ASSERT_TRUE(removed != nullptr);
-      EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string()); 
+      EXPECT_EQ(removed->get_uuid().as_string(), ref.as_string());
       EXPECT_FALSE(queue.empty());
 
       std::unique_ptr<Task> remains_check;
       queue.try_pop(remains_check);
-      EXPECT_EQ(ref_remains.as_string(),
-        remains_check->get_uuid().as_string());
+      EXPECT_EQ(
+        ref_remains.as_string(), remains_check->get_uuid().as_string()
+      );
     }
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com

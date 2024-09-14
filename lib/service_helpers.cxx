@@ -1,9 +1,7 @@
 #include "dag_scheduler/service_helpers.h"
 
-namespace detail
-{
-  boost::beast::string_view mime_type(boost::beast::string_view path)
-  {
+namespace detail {
+  boost::beast::string_view mime_type(boost::beast::string_view path) {
     const auto ext = [&path] {
       const auto pos = path.rfind(".");
       boost::beast::string_view ret;
@@ -61,10 +59,8 @@ namespace detail
     return ret;
   }
 
-  std::string path_cat(
-    boost::beast::string_view base,
-    boost::beast::string_view path)
-  {
+  std::string
+  path_cat(boost::beast::string_view base, boost::beast::string_view path) {
     std::string ret;
     if (base.empty()) {
       ret = std::string(path);
@@ -80,42 +76,44 @@ namespace detail
   }
 
   void load_server_cert(
-    boost::asio::ssl::context &ctx,
-    const boost::filesystem::path &pem_path_,
-    com::dag_scheduler::LogTag &LOG_TAG)
-  {
+    boost::asio::ssl::context &ctx, const boost::filesystem::path &pem_path_,
+    com::dag_scheduler::LogTag &LOG_TAG
+  ) {
     /*
      * The certificate was generated from CMD.EXE on Windows 10 using:
      * winpty openssl dhparam -out dh.pem 2048
      * winpty openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 \
      *  -days 10000 -out cert.pem -subj "//C=US\ST=CA\L=Los Angeles\O=Beast\\
      *  CN=www.example.com"
-    */
+     */
     com::dag_scheduler::Logging::info(LOG_TAG, "Loading SSL cert...");
 
-    ctx.set_password_callback([](std::size_t,
-      boost::asio::ssl::context_base::password_purpose) {
+    ctx.set_password_callback(
+      [](std::size_t, boost::asio::ssl::context_base::password_purpose) {
         return "test";
-      });
+      }
+    );
 
     ctx.set_options(
       boost::asio::ssl::context::default_workarounds |
       boost::asio::ssl::context::no_sslv2 |
-      boost::asio::ssl::context::single_dh_use);
+      boost::asio::ssl::context::single_dh_use
+    );
 
     ctx.use_certificate_chain_file(pem_path_.string());
     ctx.use_private_key_file(
-      pem_path_.string(),
-      boost::asio::ssl::context::file_format::pem);
+      pem_path_.string(), boost::asio::ssl::context::file_format::pem
+    );
   }
 
   boost::beast::http::response<boost::beast::http::string_body>
   bad_request_handler(
     boost::beast::string_view why,
-    boost::beast::http::request<boost::beast::http::string_body> &req)
-  {
+    boost::beast::http::request<boost::beast::http::string_body> &req
+  ) {
     boost::beast::http::response<boost::beast::http::string_body> res(
-      boost::beast::http::status::bad_request, req.version());
+      boost::beast::http::status::bad_request, req.version()
+    );
     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
     res.set(boost::beast::http::field::content_script_type, "text/html");
     res.keep_alive(req.keep_alive());
@@ -124,32 +122,35 @@ namespace detail
     return res;
   }
 
-   boost::beast::http::response<boost::beast::http::string_body>
-   not_found_handler(
-     boost::beast::string_view target,
-     boost::beast::http::request<boost::beast::http::string_body> &req)
-   {
-     boost::beast::http::response<boost::beast::http::string_body> res(
-       boost::beast::http::status::not_found, req.version());
-     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-     res.set(boost::beast::http::field::content_type, "text/html");
-     res.keep_alive(req.keep_alive());
-     res.body() = "The resource '" + std::string(target) + "' was not found.\n";
-     res.prepare_payload();
-     return res;
-   }
+  boost::beast::http::response<boost::beast::http::string_body>
+  not_found_handler(
+    boost::beast::string_view target,
+    boost::beast::http::request<boost::beast::http::string_body> &req
+  ) {
+    boost::beast::http::response<boost::beast::http::string_body> res(
+      boost::beast::http::status::not_found, req.version()
+    );
+    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(boost::beast::http::field::content_type, "text/html");
+    res.keep_alive(req.keep_alive());
+    res.body() =
+      "The resource '" + std::string(target) + "' was not found.\n";
+    res.prepare_payload();
+    return res;
+  }
 
-   boost::beast::http::response<boost::beast::http::string_body>
-   server_error_handler(
-     boost::beast::string_view what,
-     boost::beast::http::request<boost::beast::http::string_body> &req)
-   {
-     boost::beast::http::response<boost::beast::http::string_body> res(
-       boost::beast::http::status::internal_server_error, req.version());
-     res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-     res.set(boost::beast::http::field::content_type, "text/html");
-     res.keep_alive(req.keep_alive());
-     res.body() = "An error occurred: '" + std::string(what) + "'\n";
-     return res;
-   }
-}
+  boost::beast::http::response<boost::beast::http::string_body>
+  server_error_handler(
+    boost::beast::string_view what,
+    boost::beast::http::request<boost::beast::http::string_body> &req
+  ) {
+    boost::beast::http::response<boost::beast::http::string_body> res(
+      boost::beast::http::status::internal_server_error, req.version()
+    );
+    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
+    res.set(boost::beast::http::field::content_type, "text/html");
+    res.keep_alive(req.keep_alive());
+    res.body() = "An error occurred: '" + std::string(what) + "'\n";
+    return res;
+  }
+} // namespace detail

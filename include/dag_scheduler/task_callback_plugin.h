@@ -4,12 +4,9 @@
 #include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class TaskCallbackPlugin
-    {
+namespace com {
+  namespace dag_scheduler {
+    class TaskCallbackPlugin {
     public:
       /**
        * @brief virtual distructor.
@@ -41,7 +38,7 @@ namespace com
        */
       virtual std::unique_ptr<TaskCallbackPlugin> clone() const;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif

@@ -3,8 +3,8 @@
 
 #include "dag_scheduler/dag.h"
 #include "dag_scheduler/dynamic_library_registry.h"
-#include "dag_scheduler/task_stage.h"
 #include "dag_scheduler/task_callback_plugin.h"
+#include "dag_scheduler/task_stage.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -12,10 +12,8 @@
 
 #include <exception>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class used to deserialize YAML into a DAG.
      *
@@ -52,35 +50,35 @@ namespace com
      *         To: <valid uuid4 string from vertex>
      *         ...
      */
-    class YAMLDagDeserializerError : public std::exception
-    {
+    class YAMLDagDeserializerError : public std::exception {
     public:
       explicit YAMLDagDeserializerError(const std::string &what);
 
       const char *what() const noexcept override;
+
     private:
       std::string what_;
     };
 
-    class YAMLDagDeserializerNonSupportedCallbackType : public std::exception
-    {
+    class YAMLDagDeserializerNonSupportedCallbackType :
+      public std::exception {
     public:
       explicit YAMLDagDeserializerNonSupportedCallbackType(
-        const std::string &what);
+        const std::string &what
+      );
 
       const char *what() const noexcept override;
+
     private:
       std::string what_;
     };
 
-    class YAMLDagWrongTypeError : public YAMLDagDeserializerError
-    {
+    class YAMLDagWrongTypeError : public YAMLDagDeserializerError {
     public:
       explicit YAMLDagWrongTypeError(const std::string &what);
     };
 
-    class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer>
-    {
+    class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer> {
     public:
       const static std::string DAG_KEY;
       const static std::string VERTICES_KEY;
@@ -98,8 +96,7 @@ namespace com
       const static std::string CALLBACK_TYPE_KEY;
 
     public:
-      enum class UpTo
-      {
+      enum class UpTo {
         CONNECTIONS,
         EMPTY,
         DAG,
@@ -110,12 +107,7 @@ namespace com
         STAGE
       };
 
-      enum class CallbackType
-      {
-        FUNCTION,
-        PLUGIN,
-        DNE
-      };
+      enum class CallbackType { FUNCTION, PLUGIN, DNE };
 
     public:
       YAMLDagDeserializer();
@@ -123,42 +115,47 @@ namespace com
       std::unique_ptr<DAG> make_dag(const YAML::Node &dag_node) const;
 
     private:
-      void make_vertices(const YAML::Node &vertices_node,
-        std::unique_ptr<DAG> &dag) const;
-      void make_task(const YAML::Node &task_node,
-        std::unique_ptr<Task> &task) const;
+      void make_vertices(
+        const YAML::Node &vertices_node, std::unique_ptr<DAG> &dag
+      ) const;
+      void make_task(const YAML::Node &task_node, std::unique_ptr<Task> &task)
+        const;
       void throw_wrong_type(const UpTo &upto, const std::string &error) const;
       void make_task_callback(
         const std::string &task_name,
         std::vector<std::unique_ptr<TaskStage>> &stages,
-        const YAML::Node &callback_node,
-        std::unique_ptr<Task> &task,
+        const YAML::Node &callback_node, std::unique_ptr<Task> &task,
         const rapidjson::Document &json_config,
-        const rapidjson::Document &json_initial_inputs) const;
-      std::function<void (bool)> make_task_function_callback(
+        const rapidjson::Document &json_initial_inputs
+      ) const;
+      std::function<void(bool)> make_task_function_callback(
         const DynamicLibraryRegistry::RegistryItem &shared_library,
-        const std::string &symbol_name) const;
+        const std::string &symbol_name
+      ) const;
       void make_task_function_callback_plugin(
         const DynamicLibraryRegistry::RegistryItem &shared_library,
         const std::string &symbol_name,
-        std::unique_ptr<TaskCallbackPlugin> &ret) const;
+        std::unique_ptr<TaskCallbackPlugin> &ret
+      ) const;
       bool verify_symbol_present(
         const DynamicLibraryRegistry::RegistryItem &shared_library,
-        const std::string &symbol_name,
-        const std::string &section_name,
-        std::string &cb_symbols) const;
-      void load_stages(const YAML::Node &stages_node,
-        std::vector<std::unique_ptr<TaskStage>> &out_stages) const;
+        const std::string &symbol_name, const std::string &section_name,
+        std::string &cb_symbols
+      ) const;
+      void load_stages(
+        const YAML::Node &stages_node,
+        std::vector<std::unique_ptr<TaskStage>> &out_stages
+      ) const;
       std::unique_ptr<TaskStage> dynamically_load_stage(
         const DynamicLibraryRegistry::RegistryItem &shared_library,
-        const std::string &symbol_name,
-        const std::string &stage_name) const;
+        const std::string &symbol_name, const std::string &stage_name
+      ) const;
 
     public:
       static std::string sample_dag_output(const UpTo &upto);
       static std::string full_sample_output();
-      static CallbackType callback_type_from_string(
-        const std::string &enum_str);
+      static CallbackType
+      callback_type_from_string(const std::string &enum_str);
 
     private:
       static void stage_str(std::string &ret);
@@ -169,22 +166,18 @@ namespace com
       static void connections_str(std::string &ret);
       static void dag_str(std::string &ret);
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
-namespace YAML
-{
-  template<>
-  struct convert<std::unique_ptr<com::dag_scheduler::DAG>>
-  {
-    static bool decode(const Node &node,
-      std::unique_ptr<com::dag_scheduler::DAG> &rhs)
-    {
-      (void) node, (void) rhs;
+namespace YAML {
+  template <> struct convert<std::unique_ptr<com::dag_scheduler::DAG>> {
+    static bool
+    decode(const Node &node, std::unique_ptr<com::dag_scheduler::DAG> &rhs) {
+      (void)node, (void)rhs;
       com::dag_scheduler::YAMLDagDeserializer deserializer;
       rhs = deserializer.make_dag(node);
       return true;
     }
   };
-}
+} // namespace YAML
 #endif

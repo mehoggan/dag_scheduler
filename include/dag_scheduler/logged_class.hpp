@@ -3,10 +3,8 @@
 
 #include "dag_scheduler/logging.h"
 
-namespace com
-{
-  namespace dag_scheduler
-  {
+namespace com {
+  namespace dag_scheduler {
     /**
      * @brief A class that sets up stderror and stdout loggers for a derived
      *        class.
@@ -16,9 +14,7 @@ namespace com
      *
      * @tparam DerivedType Used in RTTI for an instance of \tref DerivedType.
      */
-    template <typename DerivedType>
-    class LoggedClass
-    {
+    template <typename DerivedType> class LoggedClass {
     public:
       /**
        * @brief ctor
@@ -28,11 +24,11 @@ namespace com
        * @param[in] cout_level The level at which to log to std::cout.
        * @param[in] cerr_level The level at which to log to std::cerr.
        */
-      explicit LoggedClass(const DerivedType &d,
+      explicit LoggedClass(
+        const DerivedType &d,
         boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
-        boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR) :
-        LOG_TAG(Logging::LogTag_for_this(d))
-      {
+        boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR
+      ) : LOG_TAG(Logging::LogTag_for_this(d)) {
         Logging::add_std_cout_logger(LOG_TAG, cout_level);
         Logging::add_std_cerr_logger(LOG_TAG, cerr_level);
       }
@@ -40,8 +36,7 @@ namespace com
       /**
        * @brief dtor
        */
-      virtual ~LoggedClass()
-      {}
+      virtual ~LoggedClass() {}
 
     protected:
       LogTag LOG_TAG;
@@ -52,6 +47,6 @@ namespace com
       LoggedClass(LoggedClass &&rhs) = delete;
       LoggedClass &operator=(LoggedClass &&rhs) = delete;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 #endif

@@ -4,15 +4,12 @@
 #include "dag_scheduler/uuid.h"
 
 #include <memory>
-#include <sstream>
 #include <ostream>
+#include <sstream>
 
-namespace com
-{
-  namespace dag_scheduler
-  {
-    class TaskStage
-    {
+namespace com {
+  namespace dag_scheduler {
+    class TaskStage {
     public:
       /**
        * @brief default ctor
@@ -186,8 +183,8 @@ namespace com
        *
        * @return The stream after \p t has been written to it.
        */
-      friend std::stringstream &operator<<(std::stringstream &out,
-        const TaskStage &t);
+      friend std::stringstream &
+      operator<<(std::stringstream &out, const TaskStage &t);
 
     protected:
       TaskStage(const std::string &label, const UUID &uuid);
@@ -196,7 +193,7 @@ namespace com
       std::string label_;
       UUID uuid_;
     };
-  }
-}
+  } // namespace dag_scheduler
+} // namespace com
 
 #endif
