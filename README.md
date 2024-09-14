@@ -28,7 +28,7 @@ following command from the root directory of this repository. </br>
 
 ```sh
 > brew install autoconf automake libtool autoconf-archive googletest \
-    rapidjson yaml-cpp
+    rapidjson yaml-cpp ossp-uuid
 ```
 
 ## Fedora DNF System Setup
