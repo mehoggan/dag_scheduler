@@ -1,0 +1,17 @@
+DAG:
+  Title: "Test DAG"
+  Vertices:
+    - Vertex:
+      UUID: "258a05c9-14df-42a2-b787-2455b3ec9e39"
+      Task:
+        Stages:
+          - LibraryName: "/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/build/stages_lib/lib/.libs/libstages_lib.dylib"
+            SymbolName: "print_stage"
+    - Vertex:
+      UUID: "258a05c9-14df-42a2-b787-2455b3ec9e39"
+      Task:
+        Stages:
+          - LibraryName: "/Users/matthew.hoggan/Devel/gitlab/mehoggan/dag_scheduler/build/stages_lib/lib/.libs/libstages_lib.dylib"
+            SymbolName: "print_stage"
+
+
