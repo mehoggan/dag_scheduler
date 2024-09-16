@@ -1,11 +1,10 @@
-#include <gtest/gtest.h>
-
-#include "utils/test_environment.h"
-
 #include <dag_scheduler/logging.h>
+#include <gtest/gtest.h>
 
 #include <filesystem>
 #include <iostream>
+
+#include "utils/test_environment.h"
 
 int main(int argc, char *argv[]) {
   const std::string exe_path = argv[0];
@@ -15,8 +14,7 @@ int main(int argc, char *argv[]) {
   com::dag_scheduler::Logging::add_std_cout_logger(main_tag);
 
   ::testing::AddGlobalTestEnvironment(
-    new com::dag_scheduler::testing::TestEnvironment
-  );
+      new com::dag_scheduler::testing::TestEnvironment);
   ::testing::InitGoogleTest(&argc, argv);
 
   return RUN_ALL_TESTS();

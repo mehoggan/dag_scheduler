@@ -1,5 +1,4 @@
 #include <dag_scheduler/workflow_service.h>
-
 #include <yaml-cpp/yaml.h>
 
 #ifdef __clang__
@@ -23,15 +22,13 @@
 
 int main(int argc, char *argv[]) {
   boost::program_options::options_description desc("Allowed options");
-  desc
-    .add_options()("server_yaml", boost::program_options::value<std::string>()->required(), "Absolute path to server.yml file.")(
-      "help", "Help menu."
-    );
+  desc.add_options()("server_yaml",
+                     boost::program_options::value<std::string>()->required(),
+                     "Absolute path to server.yml file.")("help", "Help menu.");
 
   boost::program_options::variables_map vm;
   boost::program_options::store(
-    boost::program_options::parse_command_line(argc, argv, desc), vm
-  );
+      boost::program_options::parse_command_line(argc, argv, desc), vm);
   boost::program_options::notify(vm);
 
   int ret = EXIT_FAILURE;
@@ -45,7 +42,7 @@ int main(int argc, char *argv[]) {
       YAML::Node yaml_node = YAML::LoadFile(service_yaml_file);
       std::cout << "Loaded YAML file." << std::endl;
       auto ci =
-        yaml_node.as<com::dag_scheduler::WorkflowService::ConnectionInfo>();
+          yaml_node.as<com::dag_scheduler::WorkflowService::ConnectionInfo>();
       std::cout << "Deserialized YAML file." << std::endl;
       com::dag_scheduler::WorkflowService ws(ci);
     } catch (const std::exception &e) {
