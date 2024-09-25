@@ -1,0 +1,22 @@
+FROM centos
+
+# Configure system (pre setup)
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i \
+  's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' \
+  /etc/yum.repos.d/CentOS-*
+RUN dnf groupinstall -y "Development Tools"
+RUN dnf install -y perl-core zlib-devel libuuid-devel
+RUN dnf --enablerepo=powertools install -y autoconf-archive autogen \
+  gtest-devel gmock-devel bzip2-devel
+
+# Add the source and build dependencies (actual setup)
+RUN mkdir -p /home/dag_scheduler
+ADD . /home/dag_scheduler
+WORKDIR /home/dag_scheduler
+# If the build fails locally make sure to `cd deps/openssl && make clean &&
+# make distclean` on your local development box.
+RUN cd /home/dag_scheduler/deps/openssl && \
+  rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
+RUN ./scripts/setup.deps.sh; echo "Status is $?"

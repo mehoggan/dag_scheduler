@@ -4,6 +4,7 @@
 #include <boost/exception/exception.hpp>
 #include <cctype>
 #include <map>
+#include <stdexcept>
 #include <string>
 
 #include "dag_scheduler/dag_serialization.h"
@@ -88,6 +89,49 @@ std::string get_base_dag_configuration_as_json_str() {
                      [](unsigned char c) { return std::isspace(c); }),
       json_str.end());
   return json_str;
+}
+
+YAML::Node get_dag_yaml_upto(
+    const YAMLDagDeserializer::UpTo &upto,
+    const std::optional<std::string> &maybe_dag_title =
+        std::optional<std::string>(),
+    const std::optional<YAML::Node> &maybe_dag_configuration_node =
+        std::optional<YAML::Node>(),
+    const std::optional<std::vector<YAML::Node>> &maybe_vertices =
+        std::optional<std::vector<YAML::Node>>({})) {
+  YAML::Node ret;
+  switch (upto) {
+    case YAMLDagDeserializer::UpTo::DAG: {
+      if (maybe_dag_title.has_value()) {
+        ret["DAG"] = std::map<std::string, std::string>(
+            {{YAMLDagDeserializer::TITLE_KEY, "Test YAML DAG"}});
+      } else {
+        ret["DAG"] = std::map<std::string, std::string>();
+      }
+    } break;
+    case YAMLDagDeserializer::UpTo::CONFIGURATION: {
+      ret = get_dag_yaml_upto(YAMLDagDeserializer::UpTo::DAG, maybe_dag_title,
+                              maybe_dag_configuration_node, maybe_vertices);
+      if (maybe_dag_configuration_node.has_value()) {
+        ret["DAG"][YAMLDagDeserializer::CONFIGURATION_KEY] =
+            maybe_dag_configuration_node.value();
+      }
+    } break;
+    case YAMLDagDeserializer::UpTo::VERTICES: {
+      ret = get_dag_yaml_upto(YAMLDagDeserializer::UpTo::CONFIGURATION,
+                              maybe_dag_title, maybe_dag_configuration_node,
+                              maybe_vertices);
+      if (maybe_vertices.has_value()) {
+        const std::vector<YAML::Node> &vertices = maybe_vertices.value();
+        ret[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
+            vertices;
+      }
+    } break;
+    default:
+      ret = YAML::Node();
+  }
+
+  return ret;
 }
 
 TEST(TestYAMLDagDeserializer, output_upto_empty) {
@@ -272,9 +316,9 @@ TEST(TestYAMLDagDeserializer, make_dag_wrong_root_element) {
 }
 
 TEST(TestYAMLDagDeserializer, make_dag_title) {
-  YAML::Node yaml_node;
-  yaml_node["DAG"] = std::map<std::string, std::string>(
-      {{YAMLDagDeserializer::TITLE_KEY, "Test YAML DAG"}});
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::DAG,
+                        std::optional<std::string>("Test YAML DAG"));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -284,10 +328,10 @@ TEST(TestYAMLDagDeserializer, make_dag_title) {
 TEST(TestYAMLDagDeserializer, make_dag_title_dag_config) {
   YAML::Node dag_configuration_node;
   get_base_dag_configuration(dag_configuration_node);
-  YAML::Node yaml_node;
-  yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-       {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::CONFIGURATION,
+                        std::optional<std::string>("Test YAML DAG"),
+                        std::optional<YAML::Node>(dag_configuration_node));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -309,9 +353,9 @@ TEST(TestYAMLDagDeserializer, make_dag) {
 TEST(TestYAMLDagDeserializer, make_dag_dag_config) {
   YAML::Node dag_configuration_node;
   get_base_dag_configuration(dag_configuration_node);
-  YAML::Node yaml_node;
-  yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+  YAML::Node yaml_node = get_dag_yaml_upto(
+      YAMLDagDeserializer::UpTo::CONFIGURATION, std::optional<std::string>(),
+      std::optional<YAML::Node>(dag_configuration_node));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("", test_dag->title());
@@ -322,9 +366,9 @@ TEST(TestYAMLDagDeserializer, make_dag_dag_config) {
 }
 
 TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_not_list_of_obj) {
-  YAML::Node yaml_node;
-  yaml_node[YAMLDagDeserializer::DAG_KEY] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::DAG,
+                        std::optional<std::string>("Test YAML DAG"));
   yaml_node[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
       "This is bad input";
   try {
@@ -339,15 +383,14 @@ TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_not_list_of_obj) {
   }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_config) {
+TEST(TestYAMLDagDeserializer, make_dag_label_config_empty_vertices) {
   YAML::Node dag_configuration_node;
   get_base_dag_configuration(dag_configuration_node);
-  YAML::Node yaml_node;
-  yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-       {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-  yaml_node[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
-      std::vector<YAML::Node>{};
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::VERTICES,
+                        std::optional<std::string>("Test YAML DAG"),
+                        std::optional<YAML::Node>(dag_configuration_node),
+                        std::optional<std::vector<YAML::Node>>({}));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -358,16 +401,15 @@ TEST(TestYAMLDagDeserializer, make_dag_label_config) {
 }
 
 TEST(TestYAMLDagDeserializer, make_dag_vertices_title) {
-  YAML::Node yaml_node;
-  yaml_node[YAMLDagDeserializer::DAG_KEY] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
   YAML::Node first_vertex;
   first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
   YAML::Node second_vertex;
   second_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_2;
   std::vector<YAML::Node> vertices = {first_vertex, second_vertex};
-  yaml_node[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
-      vertices;
+  YAML::Node yaml_node = get_dag_yaml_upto(
+      YAMLDagDeserializer::UpTo::VERTICES,
+      std::optional<std::string>("Test YAML DAG"), std::optional<YAML::Node>(),
+      std::optional<std::vector<YAML::Node>>(vertices));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -383,17 +425,16 @@ TEST(TestYAMLDagDeserializer, make_dag_vertices_title) {
 TEST(TestYAMLDagDeserializer, make_dag_title_dag_config_vertices) {
   YAML::Node dag_configuration_node;
   get_base_dag_configuration(dag_configuration_node);
-  YAML::Node yaml_node;
-  yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-       {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
   YAML::Node first_vertex;
   first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
   YAML::Node second_vertex;
   second_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_2;
   std::vector<YAML::Node> vertices = {first_vertex, second_vertex};
-  yaml_node[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
-      vertices;
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::VERTICES,
+                        std::optional<std::string>("Test YAML DAG"),
+                        std::optional<YAML::Node>(dag_configuration_node),
+                        std::optional<std::vector<YAML::Node>>(vertices));
   auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
   ASSERT_NE(nullptr, test_dag);
   EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -410,14 +451,13 @@ TEST(TestYAMLDagDeserializer, make_dag_title_dag_config_vertices) {
 }
 
 TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_no_vertex_uuid) {
-  YAML::Node yaml_node;
-  yaml_node[YAMLDagDeserializer::DAG_KEY] = std::map<std::string, YAML::Node>(
-      {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")}});
   YAML::Node first_vertex;
   first_vertex[YAMLDagDeserializer::NAME_KEY] = "A Vertex without a uuid.";
   std::vector<YAML::Node> vertices = {first_vertex};
-  yaml_node[YAMLDagDeserializer::DAG_KEY][YAMLDagDeserializer::VERTICES_KEY] =
-      vertices;
+  YAML::Node yaml_node = get_dag_yaml_upto(
+      YAMLDagDeserializer::UpTo::VERTICES,
+      std::optional<std::string>("Test YAML DAG"), std::optional<YAML::Node>(),
+      std::optional<std::vector<YAML::Node>>(vertices));
   try {
     yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(false);
@@ -428,6 +468,29 @@ TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_no_vertex_uuid) {
   }
 }
 
+TEST(TestYAMLDagDeserializer, make_dag_same_vertices_throws_exception) {
+  YAML::Node dag_configuration_node;
+  get_base_dag_configuration(dag_configuration_node);
+  YAML::Node first_vertex;
+  first_vertex[YAMLDagDeserializer::UUID_KEY] = TEST_UUID_1;
+  std::vector<YAML::Node> vertices = {first_vertex, first_vertex};
+  YAML::Node yaml_node =
+      get_dag_yaml_upto(YAMLDagDeserializer::UpTo::VERTICES,
+                        std::optional<std::string>("Test YAML DAG"),
+                        std::optional<YAML::Node>(dag_configuration_node),
+                        std::optional<std::vector<YAML::Node>>(vertices));
+  try {
+    yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_TRUE(false);
+  } catch (const std::runtime_error &excep) {
+    std::string expected_what =
+        std::string("Failed to add vertex to DAG ") +
+        std::string("because there was already a vertex with ") + TEST_UUID_1 +
+        std::string(" present in DAG");
+    EXPECT_EQ(expected_what, std::string(excep.what()));
+  }
+}
+// TODO (matthew.hoggan) -- port to use get_dag_yaml_upto!!!
 TEST(TestYAMLDagDeserializer, make_dag_vertices_named_task) {
   YAML::Node yaml_node;
   yaml_node[YAMLDagDeserializer::DAG_KEY] = std::map<std::string, YAML::Node>(

@@ -23,33 +23,6 @@ ADD . /home/dag_scheduler
 WORKDIR /home/dag_scheduler
 # If the build fails locally make sure to `cd deps/openssl && make clean &&
 # make distclean` on your local development box.
-# RUN cd /home/dag_scheduler/deps/openssl
-# RUN rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
-# RUN ./scripts/setup.deps.sh
-
-# Now build the actual project
-RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \
-  rm -rf ./build; \
-  autoreconf -i; \
-  mkdir -p ./build; \
-  cd ./build; \
-  ../configure && \
-  make -j5; \
-  cd ..
-
-# Verify the build was successful.
-RUN cd build && \
-  export TOP=/home/dag_scheduler/deps/build && \
-  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
-  make check
-
-# Verify the service actually works.
-RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
-  export TOP=/home/dag_scheduler/deps/build && \
-  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
-  mkdir -p ${DOC_ROOT} && \
-  ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
-  sleep 5 && \
-  ./scripts/dag_scheduler_service_test.sh
+RUN cd /home/dag_scheduler/deps/openssl
+RUN rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
+RUN ./scripts/setup.deps.sh; echo "Status is $?"

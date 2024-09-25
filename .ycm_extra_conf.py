@@ -74,12 +74,12 @@ flags = [
     '-install_name',
     '-std=c++17',
     '-std=gnu++17',
-    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
-    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
-    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include/c++/v1',
-    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include',
-    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include',
-    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/usr/include'
+    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include/c++/v1',
+    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include/c++/v1',
+    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include/c++/v1',
+    '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include',
+    '-isystem', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include',
+    '-I', '/Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk/usr/include'
 ]
 
 

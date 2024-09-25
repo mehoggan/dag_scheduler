@@ -96,6 +96,7 @@ class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer> {
     CONNECTIONS,
     EMPTY,
     DAG,
+    CONFIGURATION,
     VERTICES,
     VERTEX,
     TASK,

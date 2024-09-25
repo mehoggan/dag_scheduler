@@ -37,9 +37,9 @@ ADD . /home/dag_scheduler
 WORKDIR /home/dag_scheduler
 # If the build fails locally make sure to `cd deps/openssl && make clean &&
 # make distclean` on your local development box.
-RUN cd /home/dag_scheduler/deps/openssl && \
-  rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
-RUN ./scripts/setup.deps.sh; echo "Status is $?"
+# RUN cd /home/dag_scheduler/deps/openssl && \
+#   rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
+# RUN ./scripts/setup.deps.sh; echo "Status is $?"
 
 # Now build the actual project
 RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \

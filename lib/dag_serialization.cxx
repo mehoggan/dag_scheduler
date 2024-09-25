@@ -154,6 +154,7 @@ std::string YAMLDagDeserializer::sample_dag_output(const UpTo &upto) {
       vertex_str(ret);
     case UpTo::VERTICES:
       verticies_str(ret);
+    case UpTo::CONFIGURATION:
     case UpTo::DAG:
       dag_str(ret);
     case UpTo::EMPTY: {
@@ -295,8 +296,16 @@ void YAMLDagDeserializer::make_vertices(const YAML::Node &vertices_node,
                         vertex_node, ". To add a task reference the",
                         "following:\n", sample_dag_output(UpTo::TASK));
         }
+        UUID uuid_clone = uuid.clone();
         DAGVertex next_vertex(name, std::move(task), std::move(uuid));
-        dag->add_vertex(std::move(next_vertex));
+        if (not dag->add_vertex(std::move(next_vertex))) {
+          std::string error_str = std::string("Failed to add vertex to DAG ") +
+                                  std::string("because there was already ") +
+                                  std::string("a vertex with ") +
+                                  uuid_clone.as_string() + " present in DAG";
+          Logging::error(LOG_TAG, error_str);
+          throw std::runtime_error(error_str);
+        }
       }
     } else {
       Logging::warn(LOG_TAG, "Empty verticies node specified to",

@@ -10,7 +10,6 @@
 
 #include "dag_scheduler/concurrent_task_queue.h"
 #include "dag_scheduler/interruptible_task_thread.h"
-#include "dag_scheduler/logged_class.hpp"
 #include "dag_scheduler/task.h"
 
 namespace com {
