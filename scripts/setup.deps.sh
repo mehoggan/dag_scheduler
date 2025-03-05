@@ -14,6 +14,10 @@ fi
 mkdir "${BUILD_DIR}/build"
 
 function build_openssl {
+  rm -f ${SCRIPT_DIR}/openssl.configure.log
+  rm -f ${SCRIPT_DIR}/openssl.build.log
+  rm -f ${SCRIPT_DIR}/openssl.install.log
+
   ./scripts/configure.openssl.sh \
     "${BUILD_DIR}" \
     "${BUILD_TYPE}" \
@@ -30,6 +34,10 @@ function build_openssl {
 build_openssl
 
 function build_boostbeast {
+  rm -f ${SCRIPT_DIR}/boost.configure.log
+  rm -f ${SCRIPT_DIR}/boost.build.log
+  rm -f ${SCRIPT_DIR}/boost.install.log
+
   ./scripts/configure.boostbeast.sh \
     "${BUILD_DIR}" \
     "boost" > ${SCRIPT_DIR}/boost.configure.log 2>&1
@@ -37,7 +45,7 @@ function build_boostbeast {
   ./scripts/build.boostbeast.sh \
     "${BUILD_DIR}" \
     "boost" \
-    "11" > ${SCRIPT_DIR}/boost.build.log 2>&1
+    "17" > ${SCRIPT_DIR}/boost.build.log 2>&1
 
   ./scripts/install.boostbeast.sh \
     "${BUILD_DIR}" \

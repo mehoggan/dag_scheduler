@@ -25,7 +25,7 @@ case "${host_os}" in
 		;;
 	darwin*)
 		build_mac=yes
-    AC_PROG_CXX([clang++])
+    AC_PROG_CXX([g++])
     AC_MSG_RESULT(["Going to use $CXX as compiler in OSx environtment."])
 		;;
 	*)
