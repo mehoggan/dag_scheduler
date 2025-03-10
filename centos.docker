@@ -10,62 +10,56 @@ RUN dnf groupinstall -y "Development Tools"
 RUN dnf install -y perl-core zlib-devel libuuid-devel
 RUN dnf --enablerepo=powertools install -y autoconf-archive autogen \
   gtest-devel gmock-devel bzip2-devel
+RUN rpm --query --all --queryformat '%{NAME}.%{ARCH}: %{SUMMARY}\n'
 
 # There are some packages not available to centos 8 so we manually build them.
 # This may be true for other future systems, use package managers where
 # possible.
-RUN dnf install -y git cmake
-RUN mkdir -p /opt/deps
-WORKDIR /opt/deps
-RUN git clone https://github.com/Tencent/rapidjson.git && \
-  cd rapidjson && \
-  mkdir build && \
-  cd build && \
-  cmake ../ && \
-  make install
-RUN git clone https://github.com/jbeder/yaml-cpp.git && \
-  cd yaml-cpp && \
-  mkdir build && \
-  cd build && \
-  cmake -DYAML_BUILD_SHARED_LIBS=ON ../ && \
-  make && \
-  make install
-
-# Add the source and build dependencies (actual setup)
-RUN mkdir -p /home/dag_scheduler
-ADD . /home/dag_scheduler
-WORKDIR /home/dag_scheduler
-# If the build fails locally make sure to `cd deps/openssl && make clean &&
-# make distclean` on your local development box.
-RUN cd /home/dag_scheduler/deps/openssl && \
-  rm -rf /home/dag_scheduler/deps/build /home/dag_scheduler/build
-RUN ./scripts/setup.deps.sh; echo "Status is $?"
-
-# Now build the actual project
-RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \
-  rm -rf ./build; \
-  autoreconf -i; \
-  mkdir -p ./build; \
-  cd ./build; \
-  ../configure && \
-  make -j5; \
-  cd ..
-
-# Verify the build was successful.
-RUN cd build && \
-  export TOP=/home/dag_scheduler/deps/build && \
-  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib64 && \
-  make check
-
-# Verify the service actually works.
-RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
-  export TOP=/home/dag_scheduler/deps/build && \
-  export LD_LIBRARY_PATH=${TOP}/boost/lib && \
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
-  ldconfig /usr/local/lib64 && \
-  mkdir -p ${DOC_ROOT} && \
-  ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
-  sleep 5 && \
-  ./scripts/dag_scheduler_service_test.sh
+# RUN dnf install -y git cmake
+# RUN mkdir -p /opt/deps
+# WORKDIR /opt/deps
+# RUN git clone https://github.com/Tencent/rapidjson.git && \
+#   cd rapidjson && \
+#   mkdir build && \
+#   cd build && \
+#   cmake ../ && \
+#   make install
+# RUN git clone https://github.com/jbeder/yaml-cpp.git && \
+#   cd yaml-cpp && \
+#   mkdir build && \
+#   cd build && \
+#   cmake -DYAML_BUILD_SHARED_LIBS=ON ../ && \
+#   make && \
+#   make install
+#
+# # Add the source and build dependencies (actual setup)
+# RUN mkdir -p /home/dag_scheduler
+# ADD . /home/dag_scheduler
+# WORKDIR /home/dag_scheduler
+#
+# # Now build the actual project
+# RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \
+#   rm -rf ./build; \
+#   autoreconf -i; \
+#   mkdir -p ./build; \
+#   cd ./build; \
+#   ../configure && \
+#   make -j5; \
+#   cd ..
+#
+# # Verify the build was successful.
+# RUN cd build && \
+#   export LD_LIBRARY_PATH=${TOP}/boost/lib && \
+#   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
+#   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib64 && \
+#   make check
+#
+# # Verify the service actually works.
+# RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
+#   export LD_LIBRARY_PATH=${TOP}/boost/lib && \
+#   export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${TOP}/openssl/lib64 && \
+#   ldconfig /usr/local/lib64 && \
+#   mkdir -p ${DOC_ROOT} && \
+#   ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
+#   sleep 5 && \
+#   ./scripts/dag_scheduler_service_test.sh

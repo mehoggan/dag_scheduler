@@ -3,18 +3,11 @@ lib_LTLIBRARIES = libstages_lib.la
 libstages_lib_la_CPPFLAGS = -Werror -Wall -pedantic \
 		-Wno-enum-constexpr-conversion \
     -I$(abs_top_srcdir)/include/ \
-    -I$(abs_top_srcdir)/stages_lib/include \
-    -I$(abs_top_srcdir)/deps/build/boost/include
+    -I$(abs_top_srcdir)/stages_lib/include
 
 libstages_lib_la_SOURCES = print_stage.cxx
 
-libstages_lib_la_LDFLAGS = -L$(abs_top_srcdir)/deps/build/boost/lib
-if LINUX
-libstages_lib_la_LDFLAGS += -L$(abs_top_srcdir)/deps/build/openssl/lib64
-else
-libstages_lib_la_LDFLAGS += -L$(abs_top_srcdir)/deps/build/openssl/lib
-endif
-libstages_lib_la_LDFLAGS += -pthread
+libstages_lib_la_LDFLAGS = -pthread
 
 if LINUX
 libstages_lib_la_LIBADD = $(INIT_LIBS) -lm

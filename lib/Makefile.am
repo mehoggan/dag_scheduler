@@ -1,11 +1,13 @@
 lib_LTLIBRARIES = libdag_scheduler.la
 
 libdag_scheduler_la_CPPFLAGS = -Werror -Wall -pedantic \
-	  -Wno-deprecated-declarations \
+		-Wno-deprecated-declarations \
 		-Wno-enum-constexpr-conversion \
-    -I$(abs_top_srcdir)/include/ \
-    -I$(abs_top_srcdir)/deps/build/boost/include \
-    -I$(abs_top_srcdir)/deps/build/openssl/include
+		-I$(abs_top_srcdir)/include
+
+if OSX
+libdag_scheduler_la_CPPFLAGS += -I$(HOMEBREW_PREFIX)/include
+endif
 
 libdag_scheduler_la_SOURCES = concurrent_task_queue.cxx \
 		base_task_stage.cxx \
@@ -28,14 +30,13 @@ libdag_scheduler_la_SOURCES = concurrent_task_queue.cxx \
     uuid.cxx \
     workflow_service.cxx
 
-libdag_scheduler_la_LDFLAGS = -L$(abs_top_srcdir)/deps/build/boost/lib
-if LINUX
-libdag_scheduler_la_LDFLAGS += -L$(abs_top_srcdir)/deps/build/openssl/lib64
+libdag_scheduler_la_LDFLAGS = -lboost_filesystem -lboost_log -lboost_system
+if OSX
+libdag_scheduler_la_LDFLAGS += -lboost_thread-mt
 else
-libdag_scheduler_la_LDFLAGS += -L$(abs_top_srcdir)/deps/build/openssl/lib
+libdag_scheduler_la_LDFLAGS += -lboost_thread
 endif
-libdag_scheduler_la_LDFLAGS += -lboost_filesystem -lboost_log -lboost_system \
-    -lboost_thread -lssl -lcrypto -pthread
+libdag_scheduler_la_LDFLAGS += -lssl -lcrypto -pthread
 
 if LINUX
 libdag_scheduler_la_LIBADD = $(INIT_LIBS) -lm

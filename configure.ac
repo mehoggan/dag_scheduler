@@ -5,6 +5,15 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
+PKG_PROG_PKG_CONFIG
+if test -z "$PKG_CONFIG"; then
+  AC_MSG_WARN([Cannot find pkg-config, make sure it is installed in your PATH])
+fi
+# PKG_CHECK_MODULES([googletest], [googletest = 1.16.0])
+PKG_CHECK_MODULES([rapidjson], [rapidjson >= 1.1])
+PKG_CHECK_MODULES([YamlCPP], [yaml-cpp >= 0.8])
+# PKG_CHECK_MODULES([osspUUID], [ossp-uuid >= 1.6])
+
 # Conditionals
 AC_CANONICAL_HOST()
 
@@ -25,8 +34,11 @@ case "${host_os}" in
 		;;
 	darwin*)
 		build_mac=yes
-    AC_PROG_CXX([g++])
+    AC_PROG_CXX([clang++])
     AC_MSG_RESULT(["Going to use $CXX as compiler in OSx environtment."])
+    HOMEBREW_PREFIX=$(echo $HOMEBREW_PREFIX)
+    AC_MSG_RESULT(["Going to use $HOMEBREW_PREFIX to find system headers"])
+    AC_SUBST([HOMEBREW_PREFIX])
 		;;
 	*)
 		AC_MSG_ERROR(["OS $host_os is not supported"])
@@ -38,7 +50,6 @@ LT_INIT()
 
 AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 AC_CONFIG_SRCDIR([lib/dag.cxx])
-PKG_CHECK_MODULES([rapidjson], [RapidJSON >= 1.1])
 
 AC_CONFIG_FILES([
   Makefile
