@@ -44,6 +44,10 @@ gtest_libdag_scheduler_LDADD += \
 endif
 gtest_libdag_scheduler_LDADD += -lm
 gtest_libdag_scheduler_LDFLAGS = -pthread
+if OSX
+gtest_libdag_scheduler_LDFLAGS += \
+		-Wl,-ld_classic
+endif
 
 CLEANFILES = *.o
 CLEANDIRS = .lib/

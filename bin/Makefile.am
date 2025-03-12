@@ -20,9 +20,12 @@ https_dag_scheduler_runner_LDADD += \
     -luuid -lyaml-cpp -lboost_program_options
 
 if LINUX
-https_dag_scheduler_runner_LDFLAGS = -lssl -lcrypto -pthread
+https_dag_scheduler_runner_LDFLAGS = \
+		-lssl -lcrypto -pthread
 else
-	https_dag_scheduler_runner_LDFLAGS = -pthread
+https_dag_scheduler_runner_LDFLAGS = \
+		-Wl,-ld_classic \
+		-pthread
 endif
 https_dag_scheduler_runner_LDADD += -lm
 
@@ -47,7 +50,9 @@ dag_serializer_runner_LDADD += \
 if LINUX
 dag_serializer_runner_LDFLAGS = -lssl -lcrypto -pthread
 else
-dag_serializer_runner_LDFLAGS = -pthread
+dag_serializer_runner_LDFLAGS = \
+		-Wl,-ld_classic \
+    -pthread
 endif
 dag_serializer_runner_LDADD += -lm
 
