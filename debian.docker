@@ -1,19 +1,7 @@
-FROM debian
+FROM dudebodacious/dag_scheduler:debian_boost_1.87.0_20250313-155028
 
 # Configure system (pre setup)
-RUN rm -rf /var/lib/apt/lists/*
-RUN apt-get clean
-RUN touch /etc/apt/apt.conf.d/99fixbadproxy && \
-  echo "Acquire::http::Pipeline-Depth 0;" > \
-    /etc/apt/apt.conf.d/99fixbadproxy && \
-  echo "Acquire::http::No-Cache true;" >> \
-    /etc/apt/apt.conf.d/99fixbadproxy && \
-  echo "Acquire::BrokenProxy true;" >> \
-    /etc/apt/apt.conf.d/99fixbadproxy && \
-  cat /etc/apt/apt.conf.d/99fixbadproxy
-RUN apt update
 RUN apt install -y \
-  build-essential=12.9 \
   autotools-dev=20220109.1 \
   autoconf-archive=20220903-3 \
   checkinstall=1.6.2+git20170426.d24a630-3+b1 \
@@ -32,9 +20,7 @@ RUN apt install -y \
   checkinstall=1.6.2+git20170426.d24a630-3+b1 \
   libtool=2.4.7-7~deb12u1 \
   libtool-bin=2.4.7-7~deb12u1 \
-  make=4.3-4.1 \
   packaging-dev=0.8.2 \
-  libboost-all-dev=1.74.0.3 \
   libssl-dev=3.0.15-1~deb12u1
 
 # Add the source and build dependencies (actual setup)
@@ -43,13 +29,27 @@ ADD . /home/dag_scheduler
 WORKDIR /home/dag_scheduler
 
 # Now build the actual project
-RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 \
-  rm -rf ./build; \
-  autoreconf -i; \
-  mkdir -p ./build; \
-  cd ./build; \
+RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 && \
+  rm -rf m4/ltoptions.m4 && \
+  rm -rf ./build
+
+RUN if [ -f ./build ]; then \
+  make -C ./build distclean; \
+fi
+
+RUN rm -rf ./build \
+  rm config.h.in* configure test-driver missing \
+    install-sh depcomp config.sub config.guess ar-llib \
+    ./configure~ ./compile; \
+  rm -rf autom4te.cache; \
+  find . -name Makefile.in -exec rm {} \;
+
+RUN export CPPFLAGS=-I/opt/boost/include; export LDFLAGS=-L/opt/boost/lib && \
+  autoreconf -i && \
+  mkdir -p ./build && \
+  cd ./build && \
   ../configure && \
-  make -j5; \
+  make -j5 && \
   cd ..
 
 # Verify the build was successful.

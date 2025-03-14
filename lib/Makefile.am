@@ -35,8 +35,9 @@ libdag_scheduler_la_LIBADD = -lboost_filesystem -lboost_log -lboost_system -lboo
 
 if LINUX
 libdag_scheduler_la_LIBADD += $(INIT_LIBS) -lm
+libdag_scheduler_la_LDFLAGS = -pthread
 else
 libdag_scheduler_la_LIBADD += $(INIT_LIBS)
+libdag_scheduler_la_LDFLAGS = -Wl,-ld_classic -pthread
 endif
 
-libdag_scheduler_la_LDFLAGS = -Wl,-ld_classic -pthread
