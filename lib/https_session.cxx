@@ -6,7 +6,7 @@
 #include <boost/beast/core/string_type.hpp>
 #include <boost/beast/http/empty_body.hpp>
 #include <boost/beast/version.hpp>
-#include <boost/system/detail/error_code.hpp>
+#include <boost/system/error_code.hpp>
 #include <utility>
 
 #include "dag_scheduler/service_helpers.h"

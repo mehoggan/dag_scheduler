@@ -4,34 +4,48 @@
 
 ## Build Dependencies
 
-If you wish to clone all dependencies at once at the time of clone run:
-
 ```sh
-> git clone --recurse-submodules -j8 git@gitlab.com:m8665/dag_scheduler.git
-```
-
-If you did not clone recursively then run the following.
-
-```sh
-> pushd ./deps/openssl; git submodule update --init --recursive; popd
-> pushd ./deps/boost; git submodule update --init --recursive; popd
-```
-
-Once the dependencies and all their dependencies are up-to-date, run the </br>
-following command from the root directory of this repository. </br>
-
-```sh
-> ./scripts/setup.deps.sh
+> git clone git@gitlab.com:m8665/dag_scheduler.git
 ```
 
 ## OSX System Setup
 
+### Prerequisites
 ```sh
-> brew install autoconf automake libtool autoconf-archive googletest \
-    rapidjson yaml-cpp ossp-uuid
+> brew install \
+    autoconf@2.72 \
+    automake \
+    libtool \
+    autoconf-archive \
+    pkgconf \
+    pkg-config \
+    llvm \
+    ossp-uuid
 ```
 
-## Fedora DNF System Setup
+```sh
+> cd [Path to Where You Want To Build Boost From]
+> mkdir boostorg
+> cd boostorg
+> git clone https://github.com/boostorg/boost.git
+> git checkout tags/boost-1.87.0 -b boost-1.87.0
+> git submodule update --init --recursive
+> ./bootstrap.sh --prefix=/usr/local/boost --with-toolset=clang
+> ./b2 clean
+> sudo mkdir /usr/local/boost
+> sudo ./b2 \
+    toolset=clang \
+    cxxflags="-stdlib=libc++" \
+    linkflags="-stdlib=libc++" \
+    --prefix=/usr/local/boost install
+> echo "export PKG_CONFIG_PATH=$(which pkg-config)" >> [Your RC file]
+> echo "export PKG_CONFIG=$(which pkg-config)" >> [Your RC file]
+> echo "export HOMEBREW_PREFIX=$(brew --prefix)" >> ~/.bash_profile
+> echo "export LDFLAGS=\"-L[BoostBuild Prefix]/lib -L${HOMEBREW_PREFIX}/lib\"" >> ~/.bash_profile
+> echo "export CPPFLAGS=\"-I[BoostBuild Prefix]/include -I${HOMEBREW_PREFIX}/include\"" >> ~/.bash_profile
+```
+
+## DNF Based System Setup (RHEL, CentOS, Fedora, ...)
 
 ```sh
 > sudo dfn install -y ...
@@ -40,8 +54,30 @@ following command from the root directory of this repository. </br>
 ## Debian Apt System Setup
 
 ```sh
-> sudo apt install -y git-all autoconf automake libtool autoconf-archive \
-    libgtest-dev rapidjson-dev 	libyaml-cpp-dev
+> sudo apt install -y \
+  build-essential=12.9 \
+  autotools-dev=20220109.1 \
+  autoconf-archive=20220903-3 \
+  checkinstall=1.6.2+git20170426.d24a630-3+b1 \
+  zlib1g-dev=1:1.2.13.dfsg-1 \
+  libbz2-dev=1.0.8-5+b1 \
+  liblzma-dev=5.4.1-0.2 \
+  libzstd-dev=1.5.4+dfsg2-5 \
+  valgrind=1:3.19.0-1 \
+  uuid-dev=2.38.1-5+deb12u3 \
+  libgtest-dev=1.12.1-0.2 \
+  libgmock-dev=1.12.1-0.2 \
+  rapidjson-dev=1.1.0+dfsg2-7.1 \
+  libyaml-cpp-dev=0.7.0+dfsg-8+b1 \
+  doxygen=1.9.4-4 \
+  autoconf-archive=20220903-3 \
+  checkinstall=1.6.2+git20170426.d24a630-3+b1 \
+  libtool=2.4.7-7~deb12u1 \
+  libtool-bin=2.4.7-7~deb12u1 \
+  make=4.3-4.1 \
+  packaging-dev=0.8.2 \
+  libboost-all-dev=1.74.0.3 \
+  libssl-dev=3.0.15-1~deb12u1
 ```
 
 ## Build file generation and compiling library and executable Unix Systems
@@ -73,8 +109,6 @@ following command from the root directory of this repository. </br>
 
 ```sh
 > rm -rf ./build
-> rm -rf ./deps/build
-> pushd ./deps/openssl && make clean && make distclean
 > docker build -f ./<distro>.docker
 ```
 

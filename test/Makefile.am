@@ -6,9 +6,11 @@ gtest_libdag_scheduler_CPPFLAGS = -Werror -Wall -pedantic \
 		-Wno-enum-constexpr-conversion \
 	  -I$(abs_top_srcdir)/include \
 	  -I$(abs_top_srcdir)/stages_lib/include \
-	  -I$(abs_top_srcdir)/test/include \
-	  -I$(abs_top_srcdir)/deps/build/boost/include \
-	  -I$(abs_top_srcdir)/deps/build/openssl/include
+	  -I$(abs_top_srcdir)/test/include
+
+if OSX
+gtest_libdag_scheduler_CPPFLAGS += -I$(HOMEBREW_PREFIX)/include
+endif
 
 gtest_libdag_scheduler_SOURCES = main.cxx \
     test_concurrent_task_queue.cxx \
@@ -30,21 +32,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     utils/test_task_stage.cxx
 
 gtest_libdag_scheduler_LDADD = \
-		$(abs_top_builddir)/lib/libdag_scheduler.la \
-    -L$(abs_top_srcdir)/deps/build/boost/lib
-gtest_libdag_scheduler_LDFLAGS = \
-    -Wl,-rpath,$(abs_top_srcdir)/deps/build/boost/lib
-if LINUX
-gtest_libdag_scheduler_LDADD += \
-    -L$(abs_top_srcdir)/deps/build/openssl/lib64
-gtest_libdag_scheduler_LDFLAGS += \
-    -Wl,-rpath,$(abs_top_srcdir)/deps/build/openssl/lib64
-else
-gtest_libdag_scheduler_LDADD += \
-    -L$(abs_top_srcdir)/deps/build/openssl/lib
-gtest_libdag_scheduler_LDFLAGS += \
-    -Wl,-rpath,$(abs_top_srcdir)/deps/build/openssl/lib
-endif
+		$(abs_top_builddir)/lib/libdag_scheduler.la
 
 gtest_libdag_scheduler_LDADD += \
     -lgtest -lgmock -luuid -lyaml-cpp -lboost_program_options \
@@ -55,7 +43,11 @@ gtest_libdag_scheduler_LDADD += \
     -lssl -lcrypto
 endif
 gtest_libdag_scheduler_LDADD += -lm
-gtest_libdag_scheduler_LDFLAGS += -pthread
+gtest_libdag_scheduler_LDFLAGS = -pthread
+if OSX
+gtest_libdag_scheduler_LDFLAGS += \
+		-Wl,-ld_classic
+endif
 
 CLEANFILES = *.o
-CLEANDIRS = deps/ .lib/
+CLEANDIRS = .lib/
