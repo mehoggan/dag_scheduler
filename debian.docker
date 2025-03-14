@@ -44,6 +44,9 @@ RUN rm -rf ./build \
   rm -rf autom4te.cache; \
   find . -name Makefile.in -exec rm {} \;
 
+RUN echo "/opt/boost/lib" | tee -a /etc/ld.so.conf.d/boost_1_8_7.conf; \
+  ldconfig
+
 RUN export CPPFLAGS=-I/opt/boost/include; export LDFLAGS=-L/opt/boost/lib && \
   autoreconf -i && \
   mkdir -p ./build && \

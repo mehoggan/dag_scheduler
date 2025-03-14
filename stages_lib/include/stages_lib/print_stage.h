@@ -1,6 +1,7 @@
 #ifndef PRINT_STAGE_H_INCLUDED
 #define PRINT_STAGE_H_INCLUDED
 
+#include <atomic>
 #include <memory>
 #include <ostream>
 #include <sstream>

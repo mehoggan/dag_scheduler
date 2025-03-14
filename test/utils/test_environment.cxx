@@ -1,12 +1,25 @@
 #include "test_environment.h"
 
-#include <stdexcept>
+#include <exception>
+#include <string>
 
 #include "dag_scheduler/logging.h"
 
 namespace com {
 namespace dag_scheduler {
 namespace testing {
+
+class NotImplementedException : public std::exception {
+ public:
+  NotImplementedException(const std::string &function_name)
+      : message_(function_name + " not implemented!!!") {}
+
+  const char *what() const noexcept override { return (message_).c_str(); }
+
+ private:
+  std::string message_;
+};
+
 Pathing::Pathing() : Pathing("") {}
 
 Pathing::Pathing(const std::string &executable_path)
@@ -17,8 +30,15 @@ std::filesystem::path Pathing::get_lib_dir_path() const {
 }
 
 std::filesystem::path Pathing::get_lib_path() const {
+#ifdef __linux__
+  return executable_path().parent_path().parent_path().parent_path() / "lib" /
+         ".libs" / "libdag_scheduler.so";
+#elif __APPLE__ && __MACH__
   return executable_path().parent_path().parent_path().parent_path() / "lib" /
          ".libs" / "libdag_scheduler.dylib";
+#else
+  throw NotImplementedException(std::string(__FUNCTION__);
+#endif
 }
 
 std::filesystem::path Pathing::get_stages_lib_dir_path() const {
@@ -26,8 +46,15 @@ std::filesystem::path Pathing::get_stages_lib_dir_path() const {
 }
 
 std::filesystem::path Pathing::get_stages_lib_path() const {
+#ifdef __linux__
+  return executable_path().parent_path().parent_path().parent_path() /
+         "stages_lib" / "lib" / ".libs" / "libstages_lib.so";
+#elif __APPLE__ && __MACH__
   return executable_path().parent_path().parent_path().parent_path() /
          "stages_lib" / "lib" / ".libs" / "libstages_lib.dylib";
+#else
+  throw NotImplementedException(__FUNCTION__);
+#endif
 }
 
 const std::filesystem::path &Pathing::executable_path() const {

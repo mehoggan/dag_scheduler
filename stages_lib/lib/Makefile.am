@@ -1,9 +1,12 @@
 lib_LTLIBRARIES = libstages_lib.la
 
 libstages_lib_la_CPPFLAGS = -Werror -Wall -pedantic \
-		-Wno-enum-constexpr-conversion \
     -I$(abs_top_srcdir)/include/ \
     -I$(abs_top_srcdir)/stages_lib/include
+
+if OSX
+libstages_lib_la_CPPFLAGS += -Wno-enum-constexpr-conversion
+endif
 
 libstages_lib_la_SOURCES = print_stage.cxx
 

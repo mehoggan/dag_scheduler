@@ -40,3 +40,4 @@ tags
 test-driver
 scripts/**.log
 **/.o
+**/configure
