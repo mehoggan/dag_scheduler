@@ -12,9 +12,9 @@ namespace com {
 namespace dag_scheduler {
 class ConcurrentTaskQueue {
  private:
-  struct queue_not_empty {
+  struct QueueNotEmpty {
    public:
-    queue_not_empty(const std::deque<std::unique_ptr<Task>> &queue);
+    QueueNotEmpty(const std::deque<std::unique_ptr<Task>> &queue);
 
     bool operator()() const;
 
@@ -141,7 +141,7 @@ class ConcurrentTaskQueue {
       const std::chrono::duration<Rep, Period> &wait_duration) {
     std::unique_lock<std::mutex> lock(mutex_);
     if (!condition_variable_.wait_for(lock, wait_duration,
-                                      queue_not_empty(queue_))) {
+                                      QueueNotEmpty(queue_))) {
       return false;
     }
 

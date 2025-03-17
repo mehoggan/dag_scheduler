@@ -14,6 +14,7 @@
 
 #include "dag_scheduler/dag_algorithms.h"
 #include "dag_scheduler/dag_edge.h"
+#include "dag_scheduler/logged_class.hpp"
 
 namespace com {
 namespace dag_scheduler {

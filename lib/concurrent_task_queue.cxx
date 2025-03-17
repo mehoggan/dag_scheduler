@@ -6,11 +6,11 @@
 
 namespace com {
 namespace dag_scheduler {
-ConcurrentTaskQueue::queue_not_empty::queue_not_empty(
+ConcurrentTaskQueue::QueueNotEmpty::QueueNotEmpty(
     const std::deque<std::unique_ptr<Task>> &queue)
     : queue_(queue) {}
 
-bool ConcurrentTaskQueue::queue_not_empty::operator()() const {
+bool ConcurrentTaskQueue::QueueNotEmpty::operator()() const {
   return !queue_.empty();
 }
 
@@ -53,7 +53,7 @@ bool ConcurrentTaskQueue::try_pop(std::unique_ptr<Task> &popped_value) {
 
 std::unique_ptr<Task> ConcurrentTaskQueue::wait_and_pop() {
   std::unique_lock<std::mutex> lock(mutex_);
-  condition_variable_.wait(lock, queue_not_empty(queue_));
+  condition_variable_.wait(lock, QueueNotEmpty(queue_));
   assert(!queue_.empty());
   std::unique_ptr<Task> popped_value = std::move(queue_.front());
   queue_.pop_front();
