@@ -1,0 +1,63 @@
+FROM dudebodacious/dag_scheduler:fedora_boost_1.87.0_20250317-114537
+
+RUN dnf install -y @development-tools \
+  autoconf-archive \
+  autogen \
+  automake \
+  bzip2-devel \
+  gmock-devel \
+  gtest-devel \
+  libtool \
+  libuuid-devel \
+  openssl-devel \
+  perl-core \
+  zlib-devel
+
+# Add the source and build dependencies (actual setup)
+RUN mkdir -p /home/dag_scheduler
+ADD . /home/dag_scheduler
+WORKDIR /home/dag_scheduler
+
+# Now build the actual project
+RUN rm -f ./configure config.* ./ltmain.sh m4/libtool.m4 m4/ltversion.m4 && \
+  rm -rf m4/ltoptions.m4 && \
+  rm -rf ./build
+
+RUN if [ -f ./build ]; then \
+  make -C ./build distclean; \
+fi
+
+RUN rm -rf ./build \
+  rm config.h.in* configure test-driver missing \
+    install-sh depcomp config.sub config.guess ar-llib \
+    ./configure~ ./compile; \
+  rm -rf autom4te.cache; \
+  find . -name Makefile.in -exec rm {} \;
+
+RUN echo "/opt/boost/lib" | tee -a /etc/ld.so.conf.d/boost_1_8_7.conf; \
+  ldconfig
+RUN echo "/opt/rapidjson/lib" | \
+  tee -a /etc/ld.so.conf.d/rapidjson_$(date +%Y%m%d).conf; \
+  ldconfig
+RUN echo "/opt/yaml-cpp/lib64" | tee -a /etc/ld.so.conf.d/yaml-cpp_$(date +%Y%m%d).conf; \
+  ldconfig
+
+RUN export PKG_CONFIG_PATH="/opt/rapidjson/lib/pkgconfig:/opt/yaml-cpp/lib64/pkgconfig" && \
+  export CPPFLAGS="-I/opt/boost/include -I/opt/rapidjson/include -I/opt/yaml-cpp/include" && \
+  export LDFLAGS="-L/opt/boost/lib -L/opt/rapidjson/lib -L/opt/yaml-cpp/lib64" && \
+  autoreconf -i && \
+  mkdir -p ./build && \
+  cd ./build && \
+  ../configure && \
+  make -j5 && \
+  cd ..
+
+# Verify the build was successful.
+RUN cd build && make check
+
+# Verify the service actually works.
+RUN export DOC_ROOT=/opt/https_dag_scheduler/doc_root && \
+  mkdir -p ${DOC_ROOT} && \
+  ./scripts/dag_scheduler_service_startup.sh ${DOC_ROOT} && \
+  sleep 5 && \
+  ./scripts/dag_scheduler_service_test.sh
