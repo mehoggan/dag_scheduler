@@ -1,5 +1,8 @@
 FROM dudebodacious/dag_scheduler:debian_boost_1.87.0_20250313-155028
 
+RUN apt update -y
+RUN apt upgrade -y
+
 # Configure system (pre setup)
 RUN apt install -y \
   autotools-dev=20220109.1 \
@@ -43,6 +46,7 @@ RUN rm -rf ./build \
     ./configure~ ./compile; \
   rm -rf autom4te.cache; \
   find . -name Makefile.in -exec rm {} \;
+RUN find . -name "*.lo" -exec rm {} \;
 
 RUN echo "/opt/boost/lib" | tee -a /etc/ld.so.conf.d/boost_1_8_7.conf; \
   ldconfig
@@ -52,7 +56,7 @@ RUN export CPPFLAGS=-I/opt/boost/include; export LDFLAGS=-L/opt/boost/lib && \
   mkdir -p ./build && \
   cd ./build && \
   ../configure && \
-  make -j5 && \
+  make && \
   cd ..
 
 # Verify the build was successful.
