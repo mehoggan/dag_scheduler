@@ -112,6 +112,10 @@
 > docker build -f ./<distro>.docker
 ```
 
+The base images for each distribution can be found at git@github.com:mehoggan/docker.io.git.
+Instructions on how to build each container and push it to Docker Hub (docker.io) can
+be found in the README.md of that repository.
+
 ## Notes on Autoformatting Code
 
 First install clang-formatter
@@ -126,3 +130,9 @@ First install clang-formatter
 ```sh
 > ./scripts/clang-format.sh
 ```
+
+## Notes on vim Development ##
+The working vim environment can be found at git@github.com:mehoggan/vim_config.git
+
+## Force Change 0 ##
+
