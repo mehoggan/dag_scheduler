@@ -1,8 +1,18 @@
-#ifndef TASK_STAGE_H_INCLUDED
-#define TASK_STAGE_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
+#define INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
 
 #include <ostream>
 #include <sstream>
+#include <string>
 
 #include "dag_scheduler/uuid.h"
 
@@ -65,7 +75,7 @@ class BaseTaskStage {
    * @brief Getter for the user friendly label that identifies a
    *        \ref BaseTaskStage.
    *
-   * Each \ref BaseTaskStage should be easily identifed by users. This is
+   * Each \ref BaseTaskStage should be easily identified by users. This is
    * done by allowing users to assign a label to a BaseTaskStage. This
    * member function returns that label.
    *
@@ -76,7 +86,7 @@ class BaseTaskStage {
   /**
    * @brief Getter for the uuid that identifies a \ref task.
    *
-   * Each \ref task should be easily identifed. The \ref uuid owned by
+   * Each \ref task should be easily identified. The \ref uuid owned by
    * a \ref task does exactly that, and this is how you get it.
    *
    * @return The \ref uuid owned by (this).
@@ -99,8 +109,8 @@ class BaseTaskStage {
    * @brief A virtual function used to check if task_stag is running.
    *
    * It is up to the derived class to define what this means, but it is
-   * recomended that it return only true if \ref run was called and
-   * the stage is still activly running.
+   * recommended that it return only true if \ref run was called and
+   * the stage is still actively running.
    *
    * @return true if \ref BaseTaskStage was run successfully, false
    *         otherwise.
@@ -111,16 +121,16 @@ class BaseTaskStage {
    * @brief A virtual function used to end a \ref BaseTaskStage 's
    *        current path of execution. It is up to a running
    *        \ref BaseTaskStage to check this flag and ensure that it
-   *        it ends what is running in a thread safe maner.
+   *        it ends what is running in a thread safe manner.
    *
-   * @return true if \ref BaseTaskStage was ended successfully. flase
+   * @return true if \ref BaseTaskStage was ended successfully. false
    *         otherwise.
    */
   virtual bool end();
 
   /**
    * @brief A virtual function used to force users to cleanup any
-   *        memory that was alloctaed during a call to
+   *        memory that was allocated during a call to
    *        \ref BaseTaskStage::run.
    */
   virtual void cleanup();
@@ -129,7 +139,7 @@ class BaseTaskStage {
   /**
    * @brief Equality operator for a \ref BaseTaskStage.
    *
-   * Two \ref BaseTaskStage (s) are considerede equal if and only if their
+   * Two \ref BaseTaskStage (s) are considered equal if and only if their
    * \ref uuid (s) are the equal.
    *
    * @param[in] lhs The left hand side of the equivalence operator.
@@ -142,8 +152,8 @@ class BaseTaskStage {
   /**
    * @brief Inequality operator for a \ref BaseTaskStage.
    *
-   * @param[in] lhs The left hand side of the inequivalence operator.
-   * @param[in] rhs The right hand side of the inequivalence operator.
+   * @param[in] lhs The left hand side of the not equal operator.
+   * @param[in] rhs The right hand side of the not equal operator.
    *
    * @return false if \p lhs has the same \ref uuid as \p rhs.
    */
@@ -183,4 +193,4 @@ class BaseTaskStage {
 }  // namespace dag_scheduler
 }  // namespace com
 
-#endif
+#endif  // INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_

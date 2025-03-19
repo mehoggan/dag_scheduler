@@ -1,12 +1,22 @@
-#ifndef CONCURRENT_QUEUE_H
-#define CONCURRENT_QUEUE_H
-
-#include <dag_scheduler/task.h>
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_
+#define INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_
 
 #include <condition_variable>
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <utility>
+
+#include "dag_scheduler/task.h"
 
 namespace com {
 namespace dag_scheduler {
@@ -14,7 +24,7 @@ class ConcurrentTaskQueue {
  private:
   struct QueueNotEmpty {
    public:
-    QueueNotEmpty(const std::deque<std::unique_ptr<Task>> &queue);
+    explicit QueueNotEmpty(const std::deque<std::unique_ptr<Task>> &queue);
 
     bool operator()() const;
 
@@ -105,7 +115,7 @@ class ConcurrentTaskQueue {
    * \ref ConcurrentTaskQueue<Task> is not empty the item is removed
    * and returned based on if there are items on the queue.
    *
-   * WARNING: Will block indefinetly or until the underlying mutex is lost
+   * WARNING: Will block indefinitely or until the underlying mutex is lost
    *
    * @return popped_value The \ref task to assign to if queue is
    *                      NOT empty.
@@ -155,7 +165,7 @@ class ConcurrentTaskQueue {
    *
    * A member function of \ref ConcurrentTaskQueue<Task> that attempts
    * to remove a defined item from anywhere in the queue. If the user
-   * calls this that task will be removed permenantly from the queue and
+   * calls this that task will be removed permanently from the queue and
    * not returned
    *
    * @param[in] to_remove A reference to a task to be removed from the
@@ -176,4 +186,4 @@ class ConcurrentTaskQueue {
 }  // namespace dag_scheduler
 }  // namespace com
 
-#endif
+#endif  // INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_

@@ -131,8 +131,25 @@ First install clang-formatter
 > ./scripts/clang-format.sh
 ```
 
-## Notes on vim Development ##
+## Notes on vim Development on OSx##
 The working vim environment can be found at git@github.com:mehoggan/vim_config.git
+
+To get the ALE plugin to work you will need to run the following:
+
+```sh
+brew install clazy-standalone
+brew install cppcheck cpplint
+brew install ccls
+brew install cspell
+brew install flawfinder cquery
+```
+
+```sh
+brew install bear
+# After following the appropriate build steps in the build section above, run:
+bear -- ./configure
+bear -- make
+```
 
 ## Force Change 1 ##
 
