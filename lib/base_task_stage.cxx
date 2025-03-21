@@ -12,12 +12,12 @@ BaseTaskStage::BaseTaskStage(const std::string &label) : label_(label) {}
 
 BaseTaskStage::~BaseTaskStage() {}
 
-BaseTaskStage::BaseTaskStage(BaseTaskStage &&other)
+BaseTaskStage::BaseTaskStage(BaseTaskStage &&other) noexcept
     : label_(std::move(other.label_)), uuid_(std::move(other.uuid_)) {
   assert(not other.is_running() && "You cannot move a running BaseTaskStage");
 }
 
-BaseTaskStage &BaseTaskStage::operator=(BaseTaskStage &&other) {
+BaseTaskStage &BaseTaskStage::operator=(BaseTaskStage &&other) noexcept {
   assert(not other.is_running() && "You cannot move a running BaseTaskStage");
 
   label_ = std::move(other.label_);
@@ -46,19 +46,20 @@ bool operator!=(const BaseTaskStage &lhs, const BaseTaskStage &rhs) {
   return !(lhs == rhs);
 }
 
-std::ostream &operator<<(std::ostream &out, const BaseTaskStage &t) {
-  out << "label = " << t.label_;
-  if (t.label_ != t.uuid_.as_string()) {
-    out << " uuid = " << t.uuid_;
+std::ostream &operator<<(std::ostream &out, const BaseTaskStage &stage) {
+  out << "label = " << stage.label_;
+  if (stage.label_ != stage.uuid_.as_string()) {
+    out << " uuid = " << stage.uuid_;
   }
 
   return out;
 }
 
-std::stringstream &operator<<(std::stringstream &out, const BaseTaskStage &t) {
-  out << "label = " << t.label_;
-  if (t.label_ != t.uuid_.as_string()) {
-    out << " uuid = " << t.uuid_;
+std::stringstream &operator<<(std::stringstream &out,
+                              const BaseTaskStage &stage) {
+  out << "label = " << stage.label_;
+  if (stage.label_ != stage.uuid_.as_string()) {
+    out << " uuid = " << stage.uuid_;
   }
 
   return out;

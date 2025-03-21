@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
-#define INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
+#ifndef DAG_SCHEDULER_BASE_TASK_STAGE_H
+#define DAG_SCHEDULER_BASE_TASK_STAGE_H
 
 #include <ostream>
 #include <sstream>
@@ -16,8 +16,7 @@
 
 #include "dag_scheduler/uuid.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class BaseTaskStage {
  public:
   /**
@@ -55,7 +54,7 @@ class BaseTaskStage {
    *
    * @param[out] other The \ref BaseTaskStage to move int (this).
    */
-  BaseTaskStage(BaseTaskStage &&other);
+  BaseTaskStage(BaseTaskStage &&other) noexcept;
 
   /**
    * @brief move assignment operator.
@@ -69,7 +68,7 @@ class BaseTaskStage {
    *
    * @return A reference to (this).
    */
-  BaseTaskStage &operator=(BaseTaskStage &&other);
+  BaseTaskStage &operator=(BaseTaskStage &&other) noexcept;
 
   /**
    * @brief Getter for the user friendly label that identifies a
@@ -93,7 +92,6 @@ class BaseTaskStage {
    */
   const UUID &get_uuid() const;
 
- public:
   /**
    * @brief A virtual function used to run a \ref BaseTaskStage.
    *
@@ -135,7 +133,6 @@ class BaseTaskStage {
    */
   virtual void cleanup();
 
- public:
   /**
    * @brief Equality operator for a \ref BaseTaskStage.
    *
@@ -170,7 +167,8 @@ class BaseTaskStage {
    *
    * @return The stream after \p t has been written to it.
    */
-  friend std::ostream &operator<<(std::ostream &out, const BaseTaskStage &t);
+  friend std::ostream &operator<<(std::ostream &out,
+                                  const BaseTaskStage &stage);
 
   /**
    * @brief A utility function to print a \ref BaseTaskStage to a stream.
@@ -184,13 +182,12 @@ class BaseTaskStage {
    * @return The stream after \p t has been written to it.
    */
   friend std::stringstream &operator<<(std::stringstream &out,
-                                       const BaseTaskStage &t);
+                                       const BaseTaskStage &stage);
 
  protected:
   std::string label_;
   UUID uuid_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif  // INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
