@@ -13,23 +13,23 @@ gtest_libdag_scheduler_CPPFLAGS += -I$(HOMEBREW_PREFIX)/include
 endif
 
 gtest_libdag_scheduler_SOURCES = main.cxx \
-    test_concurrent_task_queue.cxx \
-    test_dag.cxx \
-    test_dag_algorithms.cxx \
-    test_dag_edge.cxx \
-		test_dag_serialization.cxx \
-    test_dag_vertex.cxx \
-		test_dynamic_library_registery.cxx \
-    test_interruptible_task_thread.cxx \
-    test_logging.cxx \
-    test_stop_watch.cxx \
-    test_task.cxx \
-    test_task_scheduler.cxx \
-    test_task_stage.cxx \
-    test_uuid.cxx \
-    utils/test_environment.cxx \
-    utils/test_task.cxx \
-    utils/test_task_stage.cxx
+    TestConcurrentTaskQueue.cxx \
+    TestDag.cxx \
+    TestDagAlgorithms.cxx \
+    TestDagEdge.cxx \
+		TestDagSerialization.cxx \
+    TestDagVertex.cxx \
+		TestDynamicLibraryRegistery.cxx \
+    TestInterruptibleTaskThread.cxx \
+    TestLogging.cxx \
+    TestStopWatch.cxx \
+    TestTask.cxx \
+    TestTaskScheduler.cxx \
+    TestTaskStage.cxx \
+    TestUuid.cxx \
+    utils/TestEnvironment.cxx \
+    utils/TestTask.cxx \
+    utils/TestTaskStage.cxx
 
 gtest_libdag_scheduler_LDADD = \
 		$(abs_top_builddir)/lib/libdag_scheduler.la
