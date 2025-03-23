@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef DAG_EDGE_H_INCLUDED
 #define DAG_EDGE_H_INCLUDED
 
@@ -8,11 +17,10 @@
 #include <ostream>
 #include <string>
 
-#include "dag_scheduler/dag_vertex.h"
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/DagVertex.h"
+#include "dag_scheduler/Uuid.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class that represents a directed edge in a acyclic graph
  *        (dag).
@@ -31,7 +39,7 @@ private:
 
 public:
     // TODO: Use DAG class to manage status.
-    enum class Status { initialized, traversed, non_traverable };
+    enum class Status { initialized, traversed, non_traversable };
 
 public:
     /**
@@ -181,6 +189,5 @@ private:
     FRIEND_TEST(TestDagEdge, connections);
     FRIEND_TEST(TestDagEdge, equality_operators_with_connection);
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

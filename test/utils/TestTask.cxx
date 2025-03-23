@@ -1,9 +1,17 @@
-#include "test_task.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "TestTask.h"
 
-#include "test_task_stage.h"
+#include "TestTaskStage.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 TestTaskImpl::TestTaskImpl() {
     Logging::info(LOG_TAG, "This was called. 1A");
     label_ = uuid_.as_string();
@@ -156,5 +164,4 @@ TestTaskImpl& TestTaskImpl::operator=(TestTaskImpl&& other) {
 
     return (*this);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

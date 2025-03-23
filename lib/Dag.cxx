@@ -1,4 +1,13 @@
-#include "dag_scheduler/dag.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/Dag.h"
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -12,12 +21,11 @@
 #include <stdexcept>
 #include <utility>
 
-#include "dag_scheduler/dag_algorithms.h"
-#include "dag_scheduler/dag_edge.h"
-#include "dag_scheduler/logged_class.hpp"
+#include "dag_scheduler/DagAlgorithms.h"
+#include "dag_scheduler/DagEdge.h"
+#include "dag_scheduler/LoggedClass.hpp"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 DAG::DAGException::DAGException(const char* message)
         : std::runtime_error(message), what_(message) {}
 
@@ -115,7 +123,7 @@ std::weak_ptr<DAGVertex> DAG::find_vertex_by_uuid(const UUID& u) {
     return ret;
 }
 
-std::vector<std::weak_ptr<DAGVertex>> DAG::find_all_verticies_with_label(
+std::vector<std::weak_ptr<DAGVertex>> DAG::find_all_vertices_with_label(
         const std::string& l) {
     std::vector<std::weak_ptr<DAGVertex>> ret;
 
@@ -152,7 +160,7 @@ bool DAG::contains_vertex_by_uuid(const UUID& u) {
 bool DAG::contains_vertex_by_label(const std::string& l) {
     bool ret = false;
 
-    if (!find_all_verticies_with_label(l).empty()) {
+    if (!find_all_vertices_with_label(l).empty()) {
         ret = true;
     }
 
@@ -199,9 +207,9 @@ bool DAG::connection_would_make_cyclic_by_label(const std::string& l1,
     bool ret = true;
 
     std::vector<std::weak_ptr<DAGVertex>> v1;
-    v1 = find_all_verticies_with_label(l1);
+    v1 = find_all_vertices_with_label(l1);
     std::vector<std::weak_ptr<DAGVertex>> v2;
-    v2 = find_all_verticies_with_label(l2);
+    v2 = find_all_vertices_with_label(l2);
 
     for (auto v : v1) {
         bool good = true;
@@ -265,9 +273,9 @@ bool DAG::connect_all_by_label(const std::string l1, const std::string l2) {
     bool ret = true;
 
     std::vector<std::weak_ptr<DAGVertex>> v1;
-    v1 = find_all_verticies_with_label(l1);
+    v1 = find_all_vertices_with_label(l1);
     std::vector<std::weak_ptr<DAGVertex>> v2;
-    v2 = find_all_verticies_with_label(l2);
+    v2 = find_all_vertices_with_label(l2);
 
     for (auto v : v1) {
         for (auto u : v2) {
@@ -331,9 +339,9 @@ bool DAG::all_are_connected_by_label(const std::string l1,
     bool ret = true;
 
     std::vector<std::weak_ptr<DAGVertex>> v1;
-    v1 = find_all_verticies_with_label(l1);
+    v1 = find_all_vertices_with_label(l1);
     std::vector<std::weak_ptr<DAGVertex>> v2;
-    v2 = find_all_verticies_with_label(l2);
+    v2 = find_all_vertices_with_label(l2);
 
     ret &= (!v1.empty() && !v2.empty());
 
@@ -378,7 +386,7 @@ bool DAG::remove_vertex(const DAGVertex& v) {
                         if (found) {
                             o->visit_all_edges([&](const DAGEdge& e) {
                                 if (e.connection_.lock() != nullptr) {
-                                    e.connection_.lock()->sub_incomming_edge();
+                                    e.connection_.lock()->sub_incoming_edge();
                                 }
                             });
                             o->clear_edges();
@@ -399,12 +407,11 @@ bool DAG::remove_vertex_by_uuid(const UUID& id) {
                     graph_.begin(),
                     graph_.end(),
                     [&](std::shared_ptr<DAGVertex> o) {
-                        bool found =
-                                ((o.get() != nullptr) && (o->get_uuid() == id));
+                        bool found = ((o != nullptr) && (o->get_uuid() == id));
                         if (found) {
                             o->visit_all_edges([&](const DAGEdge& e) {
                                 if (e.connection_.lock() != nullptr) {
-                                    e.connection_.lock()->sub_incomming_edge();
+                                    e.connection_.lock()->sub_incoming_edge();
                                 }
                             });
                             o->clear_edges();
@@ -593,5 +600,4 @@ DAG& DAG::operator=(const DAG& rhs) {
 
     return (*this);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

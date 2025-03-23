@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef DAG_SERIALIZATION_H_INCLUDED
 #define DAG_SERIALIZATION_H_INCLUDED
 
@@ -6,20 +15,19 @@
 #include <boost/dll.hpp>
 #include <exception>
 
-#include "dag_scheduler/dag.h"
-#include "dag_scheduler/dynamic_library_registry.h"
-#include "dag_scheduler/task_callback_plugin.h"
-#include "dag_scheduler/task_stage.h"
+#include "dag_scheduler/Dag.h"
+#include "dag_scheduler/DynamicLibraryRegistry.h"
+#include "dag_scheduler/TaskCallbackPlugin.h"
+#include "dag_scheduler/TaskStage.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class used to deserialize YAML into a DAG.
  *
  * The definition in YAML for a DAG would be of the form:
  * DAG:
  *   Title: <optional string>
- *   Configuation: <optional YAML>
+ *   Configuration: <optional YAML>
  *     <valid YAML>
  *   Vertices:
  *     - Vertex:
@@ -36,7 +44,7 @@ namespace dag_scheduler {
  *             LibraryName: <string>
  *             SymbolName: <string>
  *           ...
- *         TODO (mehoggan): Make sure these are tested.
+ *         TODO (matthew.hoggan)): Make sure these are tested.
  *         InitialInputs: <optional YAML>
  *           <valid YAML>
  *         Configuration: <optional YAML>
@@ -77,20 +85,20 @@ public:
 
 class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer> {
 public:
-    const static std::string DAG_KEY;
-    const static std::string VERTICES_KEY;
-    const static std::string TASK_KEY;
-    const static std::string STAGES_KEY;
-    const static std::string CONFIGURATION_KEY;
-    const static std::string INITIAL_INPUTS_KEY;
+    static const char DAG_KEY[];
+    static const char VERTICES_KEY[];
+    static const char TASK_KEY[];
+    static const char STAGES_KEY[];
+    static const char CONFIGURATION_KEY[];
+    static const char INITIAL_INPUTS_KEY[];
 
-    const static std::string TITLE_KEY;
-    const static std::string NAME_KEY;
-    const static std::string UUID_KEY;
-    const static std::string CALLBACK_KEY;
-    const static std::string LIBRARY_NAME_KEY;
-    const static std::string SYMBOL_NAME_KEY;
-    const static std::string CALLBACK_TYPE_KEY;
+    static const char TITLE_KEY[];
+    static const char NAME_KEY[];
+    static const char UUID_KEY[];
+    static const char CALLBACK_KEY[];
+    static const char LIBRARY_NAME_KEY[];
+    static const char SYMBOL_NAME_KEY[];
+    static const char CALLBACK_TYPE_KEY[];
 
 public:
     enum class UpTo {
@@ -169,12 +177,11 @@ private:
     static void stages_str(std::string& ret);
     static void task_str(std::string& ret);
     static void vertex_str(std::string& ret);
-    static void verticies_str(std::string& ret);
+    static void vertices_str(std::string& ret);
     static void connections_str(std::string& ret);
     static void dag_str(std::string& ret);
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 namespace YAML {
 template <> struct convert<std::unique_ptr<com::dag_scheduler::DAG>> {

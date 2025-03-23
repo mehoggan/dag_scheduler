@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef TASK_SCHEDULER_H_INCLUDED
 #define TASK_SCHEDULER_H_INCLUDED
 
@@ -8,13 +17,12 @@
 #include <mutex>
 #include <tuple>
 
-#include "dag_scheduler/concurrent_task_queue.h"
-#include "dag_scheduler/interruptible_task_thread.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task.h"
+#include "dag_scheduler/ConcurrentTaskQueue.h"
+#include "dag_scheduler/InterruptibleTaskThread.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Task.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TaskScheduler : public LoggedClass<TaskScheduler>,
                       public boost::noncopyable {
 public:
@@ -94,7 +102,6 @@ private:
     std::array<std::unique_ptr<InterruptibleTaskThread>, 10> thread_pool_;
     std::mutex thread_pool_lock_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

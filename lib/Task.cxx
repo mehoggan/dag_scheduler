@@ -1,4 +1,13 @@
-#include "dag_scheduler/task.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/Task.h"
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -7,17 +16,17 @@
 #include <iostream>
 #include <memory>
 
-#include "dag_scheduler/logging.h"
-#include "dag_scheduler/task_callback_plugin.h"
+#include "dag_scheduler/Logging.h"
+#include "dag_scheduler/TaskCallbackPlugin.h"
 
-void default_task_callback(bool) noexcept {
+void default_task_callback(bool _) noexcept {
+    (void)_;
     std::cout << "Default task callback called." << std::endl;
 }
 
 BOOST_DLL_ALIAS_SECTIONED(default_task_callback, task_callback, TaskCb)
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 Task::Task() : LoggedClass<Task>(*this), iterating_(false), kill_(false) {
     label_ = uuid_.as_string();
     rapidjson::Document json_empty;
@@ -189,14 +198,14 @@ Task::Task(Task&& other)
         , uuid_(other.uuid_.clone())
         , json_config_(std::move(other.json_config_))
         , json_initial_inputs_(std::move(other.json_initial_inputs_)) {
-    assert(not other.iterating_.load() &&
-           "You cannot move an itterating"
+    assert(!other.iterating_.load() &&
+           "You cannot move an iterating"
            "task");
 }
 
 Task& Task::operator=(Task&& other) {
-    assert(not other.iterating_.load() &&
-           "You cannot move an itterating"
+    assert(!other.iterating_.load() &&
+           "You cannot move an iterating"
            "task");
 
     iterating_.store(false);
@@ -217,7 +226,7 @@ const UUID& Task::get_uuid() const { return uuid_; }
 bool Task::iterate_stages(const std::function<bool(TaskStage&)>& next_stage) {
     bool ran_all = false;
 
-    if (not iterating_.load()) {
+    if (!iterating_.load()) {
         iterating_.store(true);
         {
             ran_all = std::all_of(
@@ -226,7 +235,7 @@ bool Task::iterate_stages(const std::function<bool(TaskStage&)>& next_stage) {
                     [&](class std::unique_ptr<TaskStage>& next) {
                         bool ran = next_stage(*next);
                         next->cleanup();
-                        bool ret = (ran && next->end() && (not kill_.load()));
+                        bool ret = (ran && next->end() && (!kill_.load()));
                         return ret;
                     });
         }
@@ -305,13 +314,13 @@ std::unique_ptr<Task> Task::clone() const {
 
     rapidjson::Document json_config;
     if (json_config_) {
-        rapidjson::Document& this_document = *(json_config_.get());
+        rapidjson::Document& this_document = *(json_config_);
         json_config.CopyFrom(this_document, json_config.GetAllocator());
     }
 
     rapidjson::Document json_initial_inputs;
     if (json_initial_inputs_) {
-        rapidjson::Document& this_document = *(json_initial_inputs_.get());
+        rapidjson::Document& this_document = *(json_initial_inputs_);
         json_initial_inputs.CopyFrom(this_document,
                                      json_initial_inputs.GetAllocator());
     }
@@ -401,5 +410,4 @@ void Task::set_json_initial_inputs(
 }
 
 void Task::update_uuid(const UUID& uuid) { uuid_ = UUID(uuid.as_string()); }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

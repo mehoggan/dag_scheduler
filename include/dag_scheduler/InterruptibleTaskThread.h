@@ -1,13 +1,21 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
 #define INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
 
 #include <chrono>
 
-#include "dag_scheduler/logging.h"
-#include "dag_scheduler/task.h"
+#include "dag_scheduler/Logging.h"
+#include "dag_scheduler/Task.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class InterruptibleTaskThread {
 public:
     /**
@@ -101,7 +109,6 @@ private:
     volatile std::atomic_bool running_;
     std::thread thread_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

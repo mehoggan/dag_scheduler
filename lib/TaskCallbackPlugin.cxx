@@ -1,9 +1,17 @@
-#include "dag_scheduler/task_callback_plugin.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/TaskCallbackPlugin.h"
 
 #include <boost/dll/alias.hpp>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 TaskCallbackPlugin::~TaskCallbackPlugin() {}
 
 void TaskCallbackPlugin::completed(bool, Task&) {
@@ -21,5 +29,4 @@ TaskCallbackPlugin default_task_callback_plugin;
 BOOST_DLL_ALIAS_SECTIONED(default_task_callback_plugin,
                           task_callback_plugin,
                           TaskCb)
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

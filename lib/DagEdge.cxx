@@ -1,13 +1,21 @@
-#include "dag_scheduler/dag_edge.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/DagEdge.h"
 
 #include <iostream>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 DAGEdge::DAGEdge() : current_status_(Status::initialized) {}
 
 DAGEdge::~DAGEdge() {
-    current_status_ = Status::non_traverable;
+    current_status_ = Status::non_traversable;
     connection_.reset();
 }
 
@@ -15,14 +23,14 @@ DAGEdge::DAGEdge(DAGEdge&& other) {
     uuid_ = std::move(other.uuid_);
     current_status_ = other.current_status_;
     connection_ = std::move(other.connection_);
-    other.current_status_ = Status::non_traverable;
+    other.current_status_ = Status::non_traversable;
 }
 
 DAGEdge& DAGEdge::operator=(DAGEdge&& rhs) {
     uuid_ = std::move(rhs.uuid_);
     current_status_ = rhs.current_status_;
     connection_ = std::move(rhs.connection_);
-    rhs.current_status_ = Status::non_traverable;
+    rhs.current_status_ = Status::non_traversable;
 
     return (*this);
 }
@@ -35,13 +43,13 @@ bool DAGEdge::connect_to(std::shared_ptr<DAGVertex> v) {
     bool ret = true;
 
     if (!connection_.expired()) {
-        connection_.lock()->sub_incomming_edge();
+        connection_.lock()->sub_incoming_edge();
         ret = false;
     }
 
     connection_ = v;
     if (!connection_.expired()) {
-        connection_.lock()->add_incomming_edge();
+        connection_.lock()->add_incoming_edge();
     }
 
     return ret;
@@ -73,8 +81,8 @@ std::string DAGEdge::current_status_as_string() const {
         case Status::traversed: {
             ret = "traversed";
         } break;
-        case Status::non_traverable: {
-            ret = "non_traverable";
+        case Status::non_traversable: {
+            ret = "non_traversable";
         } break;
     }
 
@@ -107,7 +115,7 @@ std::ostream& operator<<(std::ostream& out, const DAGEdge& e) {
     if (e.connection_.lock() == nullptr) {
         out << "nullptr";
     } else {
-        out << (*(e.connection_.lock().get()));
+        out << (*(e.connection_.lock()));
     }
 
     return out;
@@ -141,5 +149,4 @@ bool operator!=(const DAGEdge& lhs, const DAGEdge& rhs) {
 
     return ret;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

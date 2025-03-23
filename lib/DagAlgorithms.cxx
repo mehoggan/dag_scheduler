@@ -1,19 +1,27 @@
-#include "dag_scheduler/dag_algorithms.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/DagAlgorithms.h"
 
 #include <cassert>
 
-#include "dag_scheduler/dag_edge.h"
-#include "dag_scheduler/dag_vertex.h"
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/DagEdge.h"
+#include "dag_scheduler/DagVertex.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
-std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incomming_edges(
+namespace com::dag_scheduler {
+std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incoming_edges(
         DAG& g) {
     std::vector<std::shared_ptr<DAGVertex>> output;
 
     g.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
-        if (!v->has_incomming_edges()) {
+        if (!v->has_incoming_edges()) {
             output.push_back(v);
         }
     });
@@ -32,8 +40,8 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices) {
     sorted_vertices.clear();
     // Sorted nodes.
     std::list<std::shared_ptr<DAGVertex>> L;
-    // Set of nodes with no incomming edges.
-    auto Qv = dag_vertices_with_no_incomming_edges(g);
+    // Set of nodes with no incoming edges.
+    auto Qv = dag_vertices_with_no_incoming_edges(g);
     std::list<std::shared_ptr<DAGVertex>> Q(Qv.begin(), Qv.end());
 
     while (!Q.empty()) {
@@ -46,14 +54,14 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices) {
             std::shared_ptr<DAGVertex> m = e_ref.get_connection().lock();
             e_ref.connect_to(nullptr);
             assert(m && "Removing connection got rid of shared_ptr.");
-            if (!(m->has_incomming_edges())) {
+            if (!(m->has_incoming_edges())) {
                 Q.push_back(m);
             }
         });
     }
 
     ret = (L.size() != g.vertex_count());
-    for (std::shared_ptr<DAGVertex> v : L) {
+    for (const std::shared_ptr<DAGVertex>& v : L) {
         sorted_vertices.push_back(v->clone());
     }
 
@@ -80,13 +88,13 @@ bool process_dag(DAG& g, processed_order_type& out, TaskScheduler& scheduler) {
     if (ret && check.size() == g_clone.vertex_count()) {
         out.clear();
         std::vector<std::shared_ptr<DAGVertex>>
-                curr_dag_vertices_with_no_incomming_edges =
-                        dag_vertices_with_no_incomming_edges(g_clone);
+                curr_dag_vertices_with_no_incoming_edges =
+                        dag_vertices_with_no_incoming_edges(g_clone);
 
         std::vector<DAGVertex> vertices_to_process;
-        while (!curr_dag_vertices_with_no_incomming_edges.empty()) {
-            std::for_each(curr_dag_vertices_with_no_incomming_edges.begin(),
-                          curr_dag_vertices_with_no_incomming_edges.end(),
+        while (!curr_dag_vertices_with_no_incoming_edges.empty()) {
+            std::for_each(curr_dag_vertices_with_no_incoming_edges.begin(),
+                          curr_dag_vertices_with_no_incoming_edges.end(),
                           [&](std::shared_ptr<DAGVertex> v) {
                               DAGVertex v_clone = v->clone();
                               assert(g_clone.remove_vertex(*(v.get())) &&
@@ -106,9 +114,9 @@ bool process_dag(DAG& g, processed_order_type& out, TaskScheduler& scheduler) {
                     });
             vertices_to_process.clear();
 
-            curr_dag_vertices_with_no_incomming_edges.clear();
-            curr_dag_vertices_with_no_incomming_edges =
-                    dag_vertices_with_no_incomming_edges(g_clone);
+            curr_dag_vertices_with_no_incoming_edges.clear();
+            curr_dag_vertices_with_no_incoming_edges =
+                    dag_vertices_with_no_incoming_edges(g_clone);
         }
     } else {
         Logging::fatal(LOG_TAG, g.title(), "was cyclic.");
@@ -116,5 +124,4 @@ bool process_dag(DAG& g, processed_order_type& out, TaskScheduler& scheduler) {
 
     return ret;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

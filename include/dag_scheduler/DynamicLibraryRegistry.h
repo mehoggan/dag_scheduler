@@ -1,9 +1,19 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_DYNAMIC_LIBRARY_REGISTRY_H
+#define DAG_SCHEDULER_DYNAMIC_LIBRARY_REGISTRY_H
 #include <boost/dll/shared_library.hpp>
 #include <cstddef>
 #include <unordered_set>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class that keeps dynamic libraries loaded in memory for use
  *        by a \ref DAG and its associated \ref TaskStage (s).
@@ -44,7 +54,7 @@ public:
      *                 system. However, this should work for a libray on the
      *                 underlying operating system's library path.
      *
-     * @return A \ref RegisteryItem which associates the name of the library
+     * @return A \ref RegistryItem which associates the name of the library
      *         for future lookup within the \ref DynamicLibraryRegistry.
      */
     static const RegistryItem& register_dynamic_library(
@@ -113,7 +123,7 @@ public:
     };
 
 private:
-    static std::unordered_set<RegistryItem, RegistryItem> registery_;
+    static std::unordered_set<RegistryItem, RegistryItem> registry_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
+#endif

@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <chrono>
@@ -7,22 +16,21 @@
 #include <string>
 #include <thread>
 
-#include "dag_scheduler/concurrent_task_queue.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task.h"
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/ConcurrentTaskQueue.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Task.h"
+#include "dag_scheduler/Uuid.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestConcurrentTaskQueue : public ::testing::Test,
                                 public LoggedClass<TestConcurrentTaskQueue> {
 public:
     TestConcurrentTaskQueue() : LoggedClass<TestConcurrentTaskQueue>(*this) {}
 
 protected:
-    virtual void SetUp() {}
+    void SetUp() override {}
 
-    virtual void TearDown() {}
+    void TearDown() override {}
 };
 
 TEST_F(TestConcurrentTaskQueue, test_size_when_empty) {
@@ -30,7 +38,7 @@ TEST_F(TestConcurrentTaskQueue, test_size_when_empty) {
     EXPECT_EQ(0u, empty_queue.size());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_size_predictable_conccurent) {
+TEST_F(TestConcurrentTaskQueue, test_size_predictable_concurrent) {
     ConcurrentTaskQueue non_empty_queue;
     std::unique_ptr<Task> task_ptr(new Task);
     non_empty_queue.push(std::move(task_ptr));
@@ -139,5 +147,4 @@ TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok) {
     queue.try_pop(remains_check);
     EXPECT_EQ(ref_remains.as_string(), remains_check->get_uuid().as_string());
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

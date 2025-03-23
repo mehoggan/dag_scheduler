@@ -1,17 +1,25 @@
-#include "dag_scheduler/task_scheduler.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/TaskScheduler.h"
 
 #include <string>
 #include <vector>
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 TaskScheduler::TaskScheduler()
         : LoggedClass<TaskScheduler>(*this), pause_(true), kill_(true) {
     for (std::uint8_t id = 0; id < thread_pool_.size(); ++id) {
-        thread_pool_[id].reset(
-                new InterruptibleTaskThread(LogTag(std::to_string(id))));
+        thread_pool_[id] = std::make_unique<InterruptibleTaskThread>(
+                LogTag(std::to_string(id)));
     }
 }
 
@@ -72,7 +80,6 @@ bool TaskScheduler::kill_task(const UUID& u) {
     std::unique_ptr<Task> to_kill;
     queue_.remove_task_from_queue(u, to_kill);
     return true;
-    ;
 }
 
 void TaskScheduler::pause() { pause_.store(true); }
@@ -92,12 +99,11 @@ std::size_t TaskScheduler::first_unused_thread() {
     std::lock_guard<std::mutex> lock(thread_pool_lock_);
     std::size_t first_unused_index = static_cast<std::size_t>(-1);
     for (std::size_t i = 0; i < thread_pool_.size(); ++i) {
-        if (not thread_pool_[i]->is_running()) {
+        if (!thread_pool_[i]->is_running()) {
             first_unused_index = i;
             break;
         }
     }
     return first_unused_index;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

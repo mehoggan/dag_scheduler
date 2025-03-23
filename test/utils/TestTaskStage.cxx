@@ -1,9 +1,17 @@
-#include "test_task_stage.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "TestTaskStage.h"
 
 #include <assert.h>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 TestTaskStageImpl::TestTaskStageImpl() : TestTaskStageImpl("") {
     label_ = get_uuid().as_string();
 }
@@ -32,14 +40,14 @@ TestTaskStageImpl::TestTaskStageImpl(TestTaskStageImpl&& other)
         , nasty_user_defined_pointer_(
                   std::move(other.nasty_user_defined_pointer_))
         , run_sleep_time_(std::move(other.run_sleep_time_)) {
-    assert(not other.is_running() && "You cannot move a running TaskStage");
+    assert(!other.is_running() && "You cannot move a running TaskStage");
 
     other.nasty_user_defined_pointer_ = nullptr;
 }
 
 TestTaskStageImpl& TestTaskStageImpl::operator=(TestTaskStageImpl&& other) {
     TaskStage::operator=(std::move(other));
-    assert(not other.is_running() && "You cannot move a running TaskStage");
+    assert(!other.is_running() && "You cannot move a running TaskStage");
     running_.store(false);
     nasty_user_defined_pointer_ = std::move(other.nasty_user_defined_pointer_);
     run_sleep_time_ = std::move(other.run_sleep_time_);
@@ -75,5 +83,4 @@ std::unique_ptr<TaskStage> TestTaskStageImpl::clone() const {
             std::make_unique<TestTaskStageImpl>(label_, uuid_);
     return test_task_stage_impl_ptr;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

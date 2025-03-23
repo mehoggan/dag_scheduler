@@ -1,13 +1,21 @@
-#include "dag_scheduler/dag_vertex.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/DagVertex.h"
 
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 
-#include "dag_scheduler/dag_edge.h"
+#include "dag_scheduler/DagEdge.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 DAGVertex::DAGVertex_connection::DAGVertex_connection() {}
 
 DAGVertex::DAGVertex_connection::DAGVertex_connection(DAGEdge& edge,
@@ -24,17 +32,17 @@ const DAGVertex& DAGVertex::DAGVertex_connection::vertex() const {
 DAGVertex::DAGVertex()
         : current_status_(Status::INITIALIZED)
         , label_(uuid_.as_string())
-        , incomming_edge_count_(0) {}
+        , incoming_edge_count_(0) {}
 
 DAGVertex::DAGVertex(const std::string& label)
         : current_status_(Status::INITIALIZED)
         , label_(label)
-        , incomming_edge_count_(0) {}
+        , incoming_edge_count_(0) {}
 
 DAGVertex::DAGVertex(const std::string& label, std::unique_ptr<Task>&& task)
         : current_status_(Status::INITIALIZED)
         , label_(label)
-        , incomming_edge_count_(0)
+        , incoming_edge_count_(0)
         , task_(std::move(task)) {}
 
 DAGVertex::DAGVertex(const std::string& label,
@@ -43,14 +51,14 @@ DAGVertex::DAGVertex(const std::string& label,
         : uuid_(std::move(uuid))
         , current_status_(Status::INITIALIZED)
         , label_(label)
-        , incomming_edge_count_(0)
+        , incoming_edge_count_(0)
         , task_(std::move(task)) {}
 
 DAGVertex::~DAGVertex() {
     current_status_ = Status::INVALID;
     label_.clear();
     clear_edges();
-    incomming_edge_count_.store(0);
+    incoming_edge_count_.store(0);
 }
 
 DAGVertex::DAGVertex(DAGVertex&& other) {
@@ -58,12 +66,12 @@ DAGVertex::DAGVertex(DAGVertex&& other) {
     label_ = std::move(other.label_);
     current_status_ = other.current_status_;
     edges_ = std::move(other.edges_);
-    incomming_edge_count_ = other.incomming_edge_count_.load();
+    incoming_edge_count_ = other.incoming_edge_count_.load();
     task_ = std::move(other.task_);
 
     other.label_.clear();
     other.current_status_ = Status::INVALID;
-    other.incomming_edge_count_.store(0ul);
+    other.incoming_edge_count_.store(0ul);
 }
 
 DAGVertex& DAGVertex::operator=(DAGVertex&& rhs) {
@@ -71,12 +79,12 @@ DAGVertex& DAGVertex::operator=(DAGVertex&& rhs) {
     label_ = std::move(rhs.label_);
     current_status_ = rhs.current_status_;
     edges_ = std::move(rhs.edges_);
-    incomming_edge_count_ = rhs.incomming_edge_count_.load();
+    incoming_edge_count_ = rhs.incoming_edge_count_.load();
     task_ = std::move(rhs.task_);
 
     rhs.label_.clear();
     rhs.current_status_ = Status::INVALID;
-    rhs.incomming_edge_count_.store(0ul);
+    rhs.incoming_edge_count_.store(0ul);
 
     return (*this);
 }
@@ -153,8 +161,8 @@ DAGVertex::clone_all_connections() {
         DAGVertex v_clone = e->get_connection().lock()->clone();
         ret.push_back(DAGVertex_connection(e_clone, v_clone));
         DAGVertex& tmp = *const_cast<DAGVertex*>(&ret.back().vertex());
-        tmp.reset_incomming_edge_count();
-        assert(ret.back().vertex().incomming_edge_count() == 0 &&
+        tmp.reset_incoming_edge_count();
+        assert(ret.back().vertex().incoming_edge_count() == 0 &&
                "Reseting edge count failed.");
     }
 
@@ -198,21 +206,21 @@ const std::string& DAGVertex::label() const { return label_; }
 
 std::unique_ptr<Task>& DAGVertex::get_task() { return task_; }
 
-bool DAGVertex::has_incomming_edges() const {
-    return (incomming_edge_count_ > 0);
+bool DAGVertex::has_incoming_edges() const {
+    return (incoming_edge_count_ > 0);
 }
 
-std::size_t DAGVertex::incomming_edge_count() const {
-    return incomming_edge_count_;
+std::size_t DAGVertex::incoming_edge_count() const {
+    return incoming_edge_count_;
 }
 
-void DAGVertex::add_incomming_edge() { ++incomming_edge_count_; }
+void DAGVertex::add_incoming_edge() { ++incoming_edge_count_; }
 
-void DAGVertex::sub_incomming_edge() { --incomming_edge_count_; }
+void DAGVertex::sub_incoming_edge() { --incoming_edge_count_; }
 
 void DAGVertex::clear_edges() { edges_.clear(); }
 
-void DAGVertex::reset_incomming_edge_count() { incomming_edge_count_.store(0); }
+void DAGVertex::reset_incoming_edge_count() { incoming_edge_count_.store(0); }
 
 const DAGEdge& DAGVertex::get_edge_at(std::size_t i) const {
     assert(i < edges_.size() && "Index out of bounds.");
@@ -226,7 +234,7 @@ DAGVertex::DAGVertex(const DAGVertex& other)
     if (other.task_) {
         task_ = other.task_->clone();
     }
-    reset_incomming_edge_count();
+    reset_incoming_edge_count();
     // We cannot add back the connections since the edge adds a weak_ptr
     // to a DAGVertex we no longer can duplicate. This has to be done
     // outside the class by the code that is cloning the DAGVertex.
@@ -241,7 +249,7 @@ DAGVertex& DAGVertex::operator=(const DAGVertex& rhs) {
     if (rhs.task_) {
         task_ = rhs.task_->clone();
     }
-    reset_incomming_edge_count();
+    reset_incoming_edge_count();
     // We cannot add back the connections since the edge adds a weak_ptr
     // to a DAGVertex we no longer can duplicate. This has to be done
     // outside the class by the code that is cloning the DAGVertex.
@@ -253,7 +261,7 @@ std::ostream& operator<<(std::ostream& out, const DAGVertex& v) {
     out << "uuid_ = " << v.uuid_
         << " current_status_ = " << v.current_status_as_string()
         << " label = " << v.label_ << " "
-        << "incomming_edge_count = " << v.incomming_edge_count_ << " "
+        << "incoming_edge_count = " << v.incoming_edge_count_ << " "
         << " edges = " << std::endl
         << std::endl
         << "edges(" << v.edge_count() << "): ";
@@ -284,7 +292,7 @@ bool operator==(const DAGVertex& lhs, const DAGVertex& rhs) {
         std::size_t lhs_edge_count = lhs.edge_count();
         std::size_t rhs_edge_count = rhs.edge_count();
         ret &= (lhs_edge_count == rhs_edge_count);
-        ret &= (lhs.incomming_edge_count() == rhs.incomming_edge_count());
+        ret &= (lhs.incoming_edge_count() == rhs.incoming_edge_count());
         /*
          * We omit comparision of edges since a vertex checks its edges
          * in equality which would lead to infinite recursion.
@@ -302,5 +310,4 @@ bool operator==(const DAGVertex& lhs, const DAGVertex& rhs) {
 bool operator!=(const DAGVertex& lhs, const DAGVertex& rhs) {
     return !(lhs == rhs);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

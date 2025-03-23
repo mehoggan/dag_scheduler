@@ -1,24 +1,32 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
 #include <iostream>
 
-#include "dag_scheduler/dag.h"
-#include "dag_scheduler/dag_algorithms.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "utils/test_task.h"
+#include "dag_scheduler/Dag.h"
+#include "dag_scheduler/DagAlgorithms.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "utils/TestTask.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestDag : public ::testing::Test, public LoggedClass<TestDag> {
 public:
     TestDag() : LoggedClass<TestDag>(*this) {}
 
 protected:
-    virtual void SetUp() {}
+    void SetUp() override {}
 
-    virtual void TearDown() {}
+    void TearDown() override {}
 
     DAG& get_dag() { return d_; }
 
@@ -770,5 +778,4 @@ TEST_F(TestDag, remove_vertices_with_label) {
         EXPECT_EQ(0u, v->incomming_edge_count());
     });
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

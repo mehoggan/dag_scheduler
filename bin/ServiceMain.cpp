@@ -7,7 +7,7 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#include <dag_scheduler/workflow_service.h>
+#include <dag_scheduler/WorkflowService.h>
 #include <yaml-cpp/yaml.h>
 
 #ifdef __clang__

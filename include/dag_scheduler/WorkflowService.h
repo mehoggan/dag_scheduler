@@ -1,5 +1,14 @@
-#ifndef WORKFLOW_ORCHESTRATOR_H_INCLUDED
-#define WORKFLOW_ORCHESTRATOR_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_WORKFLOW_ORCHESTRATOR_H
+#define DAG_SCHEDULER_WORKFLOW_ORCHESTRATOR_H
 
 #include <yaml-cpp/yaml.h>
 
@@ -9,9 +18,9 @@
 #include <boost/beast/http.hpp>
 #include <memory>
 
-#include "dag_scheduler/endpoints.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/service_helpers.h"
+#include "dag_scheduler/Endpoints.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/ServiceHelpers.h"
 
 /*
  * Code in this module borrowed from:
@@ -19,8 +28,7 @@
  * async-ssl/http_server_async_ssl.cpp
  */
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class WorkflowService : public LoggedClass<WorkflowService> {
 public:
     struct ConnectionInfo {
@@ -88,8 +96,7 @@ private:
     boost::asio::ssl::context ctx_;
     Router router_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 namespace YAML {
 template <>

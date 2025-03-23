@@ -1,7 +1,16 @@
-#ifndef ENDPOINTS_H_INCLUDED
-#define ENDPOINTS_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_ENDPOINTS_H
+#define DAG_SCHEDULER_ENDPOINTS_H
 
-#include "dag_scheduler/logged_class.hpp"
+#include "dag_scheduler/LoggedClass.hpp"
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -14,8 +23,7 @@
 #pragma clang diagnostic pop
 #endif
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 struct Responder {
 public:
     typedef boost::beast::http::empty_body EmptyBodyType;
@@ -58,7 +66,7 @@ struct DocRootEndpoint : public EndpointHandler, LoggedClass<DocRootEndpoint> {
 public:
     explicit DocRootEndpoint(const boost::beast::string_view& doc_root);
 
-    virtual ~DocRootEndpoint();
+    ~DocRootEndpoint() override;
 
     bool operator()(StringRequestType&& req,
                     std::unique_ptr<Responder>&& responder) final;
@@ -77,7 +85,7 @@ private:
 struct RegisterDAGEndpoint : public EndpointHandler,
                              LoggedClass<RegisterDAGEndpoint> {
 public:
-    ~RegisterDAGEndpoint();
+    ~RegisterDAGEndpoint() override;
 
     bool operator()(StringRequestType&& req,
                     std::unique_ptr<Responder>&& responder) final;
@@ -85,7 +93,6 @@ public:
     bool operator()(StringRequestType&& req,
                     std::unique_ptr<Responder>&& responder) const final;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

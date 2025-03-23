@@ -1,4 +1,13 @@
-#include "dag_scheduler/logging.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/Logging.h"
 
 #include <boost/core/null_deleter.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -33,8 +42,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(severity,
                             boost::log::trivial::severity_level)
 BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Tag", std::string)
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 std::atomic<bool> Logging::init_(false);
 std::unordered_map<LogTag, boost::weak_ptr<Logging::TextSink>>
         Logging::loggers_;
@@ -213,5 +221,4 @@ bool Logging::clear_all() {
 
     return ret;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

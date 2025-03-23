@@ -1,7 +1,16 @@
-#ifndef SERVICE_HELPERS_H_INCLUDED
-#define SERVICE_HELPERS_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_SERVICE_HELPERS_H
+#define DAG_SCHEDULER_SERVICE_HELPERS_H
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
 #ifdef __clang__
 #pragma clang diagnostic push

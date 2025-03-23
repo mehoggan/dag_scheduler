@@ -1,13 +1,23 @@
-#include <dag_scheduler/logging.h>
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef TEST_DAG_SCHEDULER_TEST_ENVIRONMENT_H
+#define TEST_DAG_SCHEDULER_TEST_ENVIRONMENT_H
+
+#include <dag_scheduler/Logging.h>
 #include <gtest/gtest.h>
 
 #include <filesystem>
 #include <memory>
 #include <string>
 
-namespace com {
-namespace dag_scheduler {
-namespace testing {
+namespace com::dag_scheduler::testing {
 class Pathing {
 public:
     Pathing();
@@ -34,8 +44,7 @@ public:
     static com::dag_scheduler::LogTag TEST_TAG;
     static Pathing PATHING;
 
-    virtual void SetUp();
+    void SetUp() override;
 };
-}  // namespace testing
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler::testing
+#endif

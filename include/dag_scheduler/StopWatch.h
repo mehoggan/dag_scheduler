@@ -1,14 +1,22 @@
-#ifndef DAG_SCOPED_TIMER_H_INCLUDED
-#define DAG_SCOPED_TIMER_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_STOP_WATCH_H
+#define DAG_SCHEDULER_STOP_WATCH_H
 
 #include <atomic>
 #include <chrono>
 #include <string>
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class that sets up stderror and stdout loggers for a derived
  *        class.
@@ -50,7 +58,7 @@ public:
      *
      */
     /**
-     * @brief assignement operator for StopWatch.
+     * @brief assignment operator for StopWatch.
      *
      * The assignment operator behaves like a full reset of the
      * \ref StopWatch in the since that in sets the current time to now
@@ -74,7 +82,7 @@ public:
     StopWatch(StopWatch&& other);
 
     /**
-     * @brief move assignement operator for StopWatch.
+     * @brief move assignment operator for StopWatch.
      *
      * The move assignment operator behaves like a full reset of the
      * \ref stop watch in the since that it sets the current time to now
@@ -128,7 +136,6 @@ private:
     std::atomic_bool was_started_;
     std::chrono::high_resolution_clock::time_point start_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

@@ -1,27 +1,35 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef DAG_ALGORITHMS_H_INCLUDED
 #define DAG_ALGORITHMS_H_INCLUDED
 
 #include <list>
 
-#include "dag_scheduler/dag.h"
-#include "dag_scheduler/task_scheduler.h"
+#include "dag_scheduler/Dag.h"
+#include "dag_scheduler/TaskScheduler.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 typedef std::vector<std::vector<DAGVertex>> processed_order_type;
 
 /**
- * @brief Takes a dag and finds all dag_vertices with no incomming edges.
+ * @brief Takes a dag and finds all dag_vertices with no incoming edges.
  *
- * Takes in a dag and returns all \ref DAGVertex with no incomming
+ * Takes in a dag and returns all \ref DAGVertex with no incoming
  * \ref dag_edge (s).
  *
  * @param[in] g The \ref dag for which to apply the search.
  *
  * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>> of
- *         all the \ref DAGVertex (s) which have no incomming edges.
+ *         all the \ref DAGVertex (s) which have no incoming edges.
  */
-std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incomming_edges(
+std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incoming_edges(
         DAG& g);
 
 /**
@@ -44,17 +52,17 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices);
 /**
  * @brief Takes a dag and processes in parallel all \ref DAGVertex that
  *        can be grouped by checking for all \ref DAGVertex with no
- *        incomming dag_edge (s). Subsequently it removes them and
+ *        incoming dag_edge (s). Subsequently it removes them and
  *        continues on until not \ref DAGVertex (s) are left in \ref g.
  *
  * Takes a dag and process in parallel all \ref DAGVertex that can
- * be grouped by checking for all \ref DAGVertex with no incomming
+ * be grouped by checking for all \ref DAGVertex with no incoming
  * \ref dag_edge (s). Subsequently it removes them and continues on
  * until not \ref DAGVertex (s) are left in \ref g.
  *
  * @param[in] g The \ref dag to sort.
  * @param[out] out A \ref std::vector<\ref std::vector<\ref DAGVertex>>
- *                 which is an orderd set of collections that contain
+ *                 which is an ordered set of collections that contain
  *                 a set of \ref DAGVertex which represents batches
  *                 of \ref DAGVertex (s) processed.
  *
@@ -62,7 +70,6 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices);
  *         visited.
  */
 bool process_dag(DAG& g, processed_order_type& out, TaskScheduler& scheduler);
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

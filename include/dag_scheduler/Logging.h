@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef COM_VISUALIZATION_LOGGING_H_INCLUDED
 #define COM_VISUALIZATION_LOGGING_H_INCLUDED
 

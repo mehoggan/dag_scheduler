@@ -1,17 +1,24 @@
-#include "test_environment.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "TestEnvironment.h"
 
 #include <exception>
 #include <string>
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
-namespace testing {
+namespace com::dag_scheduler::testing {
 
 class NotImplementedException : public std::exception {
 public:
-    NotImplementedException(const std::string& function_name)
+    explicit NotImplementedException(const std::string& function_name)
             : message_(function_name + " not implemented!!!") {}
 
     const char* what() const noexcept override { return (message_).c_str(); }
@@ -77,6 +84,4 @@ void TestEnvironment::SetUp() {
         PATHING = Pathing(EXE_PATH);
     }
 }
-}  // namespace testing
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler::testing

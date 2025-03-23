@@ -1,5 +1,14 @@
-#ifndef TEST_TASK_H_INCLUDED
-#define TEST_TASK_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef TEST_DAG_SCHEDULER_TEST_TASK_H
+#define TEST_DAG_SCHEDULER_TEST_TASK_H
 
 #include <gtest/gtest_prod.h>
 #include <rapidjson/document.h>
@@ -7,12 +16,11 @@
 #include <atomic>
 #include <functional>
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task.h"
-#include "dag_scheduler/task_callback_plugin.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Task.h"
+#include "dag_scheduler/TaskCallbackPlugin.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestTaskImpl : public Task {
 private:
     FRIEND_TEST(TestTask,
@@ -21,7 +29,7 @@ private:
 public:
     TestTaskImpl();
 
-    TestTaskImpl(const std::string& label);
+    explicit TestTaskImpl(const std::string& label);
 
     TestTaskImpl(const std::string& label,
                  const rapidjson::Document& json_initial_inputs);
@@ -57,12 +65,11 @@ public:
             const rapidjson::Document& json_initial_inputs,
             std::unique_ptr<TaskCallbackPlugin>&& complete_callback_plugin);
 
-    virtual ~TestTaskImpl();
+    ~TestTaskImpl() override;
 
     TestTaskImpl(TestTaskImpl&& other);
 
     TestTaskImpl& operator=(TestTaskImpl&& other);
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

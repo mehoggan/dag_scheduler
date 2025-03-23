@@ -1,7 +1,15 @@
-#include "dag_scheduler/stop_watch.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/StopWatch.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 StopWatch::StopWatch(const LogTag& tag,
                      const std::string& memo,
                      bool start_on_construction)
@@ -92,8 +100,7 @@ void StopWatch::reset() { start_ = std::chrono::high_resolution_clock::now(); }
 
 std::chrono::nanoseconds StopWatch::print(
         const std::chrono::high_resolution_clock::time_point& stop) {
-    std::chrono::duration<unsigned long long int, std::nano> duration =
-            (stop - start_);
+    std::chrono::duration<std::uint64_t, std::nano> duration = (stop - start_);
     auto print_d =
             std::chrono::duration_cast<std::chrono::nanoseconds>(duration)
                     .count();
@@ -102,5 +109,4 @@ std::chrono::nanoseconds StopWatch::print(
 
     return duration;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

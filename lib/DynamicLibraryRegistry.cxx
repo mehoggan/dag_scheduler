@@ -1,23 +1,31 @@
-#include "dag_scheduler/dynamic_library_registry.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/DynamicLibraryRegistry.h"
 
 #include <sstream>
 #include <stdexcept>
 #include <unordered_set>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 std::unordered_set<DynamicLibraryRegistry::RegistryItem,
                    DynamicLibraryRegistry::RegistryItem>
-        DynamicLibraryRegistry::registery_;
+        DynamicLibraryRegistry::registry_;
 
 const DynamicLibraryRegistry::RegistryItem&
 DynamicLibraryRegistry::register_dynamic_library(const std::string& name) {
     typedef std::unordered_set<RegistryItem> Collection_t;
     RegistryItem item(name);
-    Collection_t::iterator find_it = registery_.find(item);
-    Collection_t::iterator ret = registery_.end();
-    if (find_it == registery_.end()) {
-        auto find_pair_it = registery_.insert(item);
+    Collection_t::iterator find_it = registry_.find(item);
+    Collection_t::iterator ret = registry_.end();
+    if (find_it == registry_.end()) {
+        auto find_pair_it = registry_.insert(item);
         ret = find_pair_it.first;
     } else {
         ret = find_it;
@@ -63,5 +71,4 @@ bool DynamicLibraryRegistry::RegistryItem::operator==(
         const RegistryItem& item) const {
     return library_name_ == item.library_name_;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

@@ -1,9 +1,17 @@
-#include "dag_scheduler/task_stage.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/TaskStage.h"
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 TaskStage::TaskStage() : TaskStage("") { label_ = uuid_.as_string(); }
 
 TaskStage::TaskStage(const std::string& label) : label_(label) {}
@@ -12,11 +20,11 @@ TaskStage::~TaskStage() {}
 
 TaskStage::TaskStage(TaskStage&& other)
         : label_(std::move(other.label_)), uuid_(std::move(other.uuid_)) {
-    assert(not other.is_running() && "You cannot move a running TaskStage");
+    assert(!other.is_running() && "You cannot move a running TaskStage");
 }
 
 TaskStage& TaskStage::operator=(TaskStage&& other) {
-    assert(not other.is_running() && "You cannot move a running TaskStage");
+    assert(!other.is_running() && "You cannot move a running TaskStage");
 
     label_ = std::move(other.label_);
     uuid_ = std::move(other.uuid_);
@@ -56,5 +64,4 @@ std::stringstream& operator<<(std::stringstream& out, const TaskStage& t) {
 
 TaskStage::TaskStage(const std::string& label, const UUID& uuid)
         : label_(label), uuid_(uuid.as_string()) {}
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

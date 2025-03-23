@@ -19,9 +19,9 @@
 #include <string>
 #include <vector>
 
-#include "dag_scheduler/dag_vertex.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/DagVertex.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Uuid.h"
 
 // NOTE: Pragmas added for YCM.
 #ifdef __clang__

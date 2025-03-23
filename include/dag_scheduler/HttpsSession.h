@@ -1,15 +1,23 @@
-#ifndef HTTPS_SESSION_H_INCLUDED
-#define HTTPS_SESSION_H_INCLUDED
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#ifndef DAG_SCHEDULER_HTTPS_SESSION_H_INCLUDED
+#define DAG_SCHEDULER_HTTPS_SESSION_H_INCLUDED
 
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <memory>
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/workflow_service.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/WorkflowService.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class HTTPSSession : public LoggedClass<HTTPSSession>,
                      public std::enable_shared_from_this<HTTPSSession> {
 private:
@@ -55,6 +63,5 @@ private:
     WorkflowService::HTTPSListener& owner_;
     WorkflowService::Router& router_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

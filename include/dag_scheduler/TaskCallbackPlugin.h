@@ -1,26 +1,34 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef TASK_CALLBACK_PLUGIN_H_INCLUDED
 #define TASK_CALLBACK_PLUGIN_H_INCLUDED
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Task.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TaskCallbackPlugin {
 public:
     /**
-     * @brief virtual distructor.
+     * @brief virtual destructor.
      */
     virtual ~TaskCallbackPlugin();
 
     /**
      * @brief After all possible \ref TaskStages in a \ref Task have been
      * executed, this method is called by the \ref Task itself with a
-     * non-constant referecnce \ref completed_task of itself.
+     * non-constant reference \ref completed_task of itself.
      *
      * After all possible \ref TaskStages in a \ref Task have been
      * executed, this method is called by the \ref Task itself with a
-     * non-constant referecnce \ref completed_task of itself.
+     * non-constant reference \ref completed_task of itself.
      *
      * @param[in] status Did all stages complete?
      * @param[in] completed_task The task that was completed.
@@ -38,7 +46,6 @@ public:
      */
     virtual std::unique_ptr<TaskCallbackPlugin> clone() const;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

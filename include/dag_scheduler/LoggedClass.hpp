@@ -1,15 +1,23 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef LOGGED_CLASS_H_INCLUDED
 #define LOGGED_CLASS_H_INCLUDED
 
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class that sets up stderror and stdout loggers for a derived
  *        class.
  *
- * If you inherrit from this class you will get a logger added to logging
+ * If you inherit from this class you will get a logger added to logging
  * for specific instance of this class.
  *
  * @tparam DerivedType Used in RTTI for an instance of \tref DerivedType.
@@ -48,6 +56,5 @@ private:
     LoggedClass(LoggedClass&& rhs) = delete;
     LoggedClass& operator=(LoggedClass&& rhs) = delete;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

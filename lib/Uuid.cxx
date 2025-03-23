@@ -1,10 +1,18 @@
-#include "dag_scheduler/uuid.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/Uuid.h"
 
 #include <iostream>
 #include <stdexcept>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 UUID::UUID() { uuid_generate(uuid_); }
 
 UUID::UUID(const std::string& user_defined_uuid) {
@@ -51,5 +59,4 @@ UUID& UUID::operator=(const UUID& rhs) {
 
     return (*this);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

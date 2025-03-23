@@ -1,4 +1,13 @@
-#include "dag_scheduler/https_session.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/HttpsSession.h"
 
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/placeholders.hpp>
@@ -9,10 +18,9 @@
 #include <boost/system/error_code.hpp>
 #include <utility>
 
-#include "dag_scheduler/service_helpers.h"
+#include "dag_scheduler/ServiceHelpers.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 HTTPSSession::SessionResponder::SessionResponder(HTTPSSession& self)
         : self_(self) {}
 
@@ -59,8 +67,7 @@ void HTTPSSession::run() {
 
 void HTTPSSession::on_run() {
     Logging::info(LOG_TAG, "HTTP session executing...");
-    boost::beast::get_lowest_layer(stream_);  //.expires_after(
-                                              // std::chrono::seconds(30));
+    boost::beast::get_lowest_layer(stream_);
     stream_.async_handshake(
             boost::asio::ssl::stream_base::server,
             boost::beast::bind_front_handler(&HTTPSSession::on_handshake,
@@ -79,8 +86,7 @@ void HTTPSSession::on_handshake(boost::beast::error_code ec) {
 
 void HTTPSSession::do_read() {
     req_ = {};
-    boost::beast::get_lowest_layer(stream_);  //.expires_after(
-                                              // std::chrono::seconds(120));
+    boost::beast::get_lowest_layer(stream_);
     Logging::info(LOG_TAG, "Going to read in request...");
     boost::beast::http::async_read(
             stream_,
@@ -103,13 +109,13 @@ void HTTPSSession::on_read(boost::beast::error_code ec,
         Logging::info(LOG_TAG, "Going to handle request...");
         try {
             auto& handler_ptr = router_[req_.target()];
-            if (not handler_ptr) {
+            if (!handler_ptr) {
                 throw std::runtime_error("Failed to handle " +
                                          std::string(req_.target()));
             } else {
                 EndpointHandler& handler = *(router_[req_.target()]);
                 bool status = handler(std::move(req_), std::move(responder_));
-                if (not status) {
+                if (!status) {
                     responder_->send(detail::server_error_handler(
                             "Internal Server error", req_));
                 }
@@ -156,5 +162,4 @@ void HTTPSSession::on_write(bool close,
         do_read();
     }
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef PRINT_STAGE_H_INCLUDED
 #define PRINT_STAGE_H_INCLUDED
 
@@ -6,11 +15,10 @@
 #include <ostream>
 #include <sstream>
 
-#include "dag_scheduler/task_stage.h"
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/TaskStage.h"
+#include "dag_scheduler/Uuid.h"
 
-namespace com {
-namespace stages_lib {
+namespace com::stages_lib {
 class PrintStage : public com::dag_scheduler::TaskStage {
 public:
     /**
@@ -46,7 +54,7 @@ public:
     /**
      * @brief dtor
      */
-    virtual ~PrintStage();
+    ~PrintStage() override;
 
     PrintStage(const PrintStage& other) = delete;
 
@@ -88,37 +96,37 @@ public:
      * @return true if \ref PrintStage was started successfully. false
      *         otherwise.
      */
-    virtual bool run();
+    bool run() override;
 
     /**
      * @brief A function used to check if task_stag is running.
      *
      * It is up to the derived class to define what this means, but it is
-     * recomended that it return only true if \ref run was called and
-     * the stage is still activly running.
+     * recommended that it return only true if \ref run was called and
+     * the stage is still actively running.
      *
      * @return true if \ref PrintStage was run successfully, false
      *         otherwise.
      */
-    virtual bool is_running() const;
+    bool is_running() const override;
 
     /**
      * @brief A function used to end a \ref PrintStage 's
      *        current path of execution. It is up to a running
      *        \ref PrintStage to check this flag and ensure that it
-     *        it ends what is running in a thread safe maner.
+     *        it ends what is running in a thread safe manner.
      *
-     * @return true if \ref PrintStage was ended successfully. flase
+     * @return true if \ref PrintStage was ended successfully. false
      *         otherwise.
      */
-    virtual bool end();
+    bool end() override;
 
     /**
      * @brief A function used to force users to cleanup any
-     *        memory that was alloctaed during a call to
+     *        memory that was allocated during a call to
      *        \ref PrintStage::run.
      */
-    virtual void cleanup();
+    void cleanup() override;
 
     /**
      * @brief A utility method for cloning a \ref TaskStage.
@@ -127,13 +135,13 @@ public:
      *
      * @return A cloned \ref std::unique_ptr<Stage> of \ref (*this).
      */
-    virtual std::unique_ptr<TaskStage> clone() const;
+    std::unique_ptr<TaskStage> clone() const override;
 
 public:
     /**
      * @brief Equality operator for a \ref PrintStage.
      *
-     * Two \ref PrintStage (s) are considerede equal if and only if their
+     * Two \ref PrintStage (s) are considered equal if and only if their
      * \ref uuid (s) are the equal.
      *
      * @param[in] lhs The left hand side of the equivalence operator.
@@ -205,6 +213,5 @@ public:
 private:
     std::atomic_bool running_;
 };
-}  // namespace stages_lib
-}  // namespace com
+}  // namespace com::stages_lib
 #endif

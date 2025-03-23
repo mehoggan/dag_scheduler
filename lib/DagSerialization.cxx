@@ -1,4 +1,13 @@
-#include "dag_scheduler/dag_serialization.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/DagSerialization.h"
 
 #include <algorithm>
 #include <boost/dll.hpp>
@@ -14,22 +23,20 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace com {
-namespace dag_scheduler {
-const std::string YAMLDagDeserializer::DAG_KEY = "DAG";
-const std::string YAMLDagDeserializer::VERTICES_KEY = "Vertices";
-const std::string YAMLDagDeserializer::TASK_KEY = "Task";
-const std::string YAMLDagDeserializer::STAGES_KEY = "Stages";
-const std::string YAMLDagDeserializer::CONFIGURATION_KEY = "Configuration";
-const std::string YAMLDagDeserializer::INITIAL_INPUTS_KEY = "InitialInputs";
-
-const std::string YAMLDagDeserializer::TITLE_KEY = "Title";
-const std::string YAMLDagDeserializer::NAME_KEY = "Name";
-const std::string YAMLDagDeserializer::UUID_KEY = "UUID";
-const std::string YAMLDagDeserializer::CALLBACK_KEY = "Callback";
-const std::string YAMLDagDeserializer::LIBRARY_NAME_KEY = "LibraryName";
-const std::string YAMLDagDeserializer::SYMBOL_NAME_KEY = "SymbolName";
-const std::string YAMLDagDeserializer::CALLBACK_TYPE_KEY = "Type";
+namespace com::dag_scheduler {
+const char YAMLDagDeserializer::DAG_KEY[] = "DAG";
+const char YAMLDagDeserializer::VERTICES_KEY[] = "Vertices";
+const char YAMLDagDeserializer::TASK_KEY[] = "Task";
+const char YAMLDagDeserializer::STAGES_KEY[] = "Stages";
+const char YAMLDagDeserializer::CONFIGURATION_KEY[] = "Configuration";
+const char YAMLDagDeserializer::INITIAL_INPUTS_KEY[] = "InitialInputs";
+const char YAMLDagDeserializer::TITLE_KEY[] = "Title";
+const char YAMLDagDeserializer::NAME_KEY[] = "Name";
+const char YAMLDagDeserializer::UUID_KEY[] = "UUID";
+const char YAMLDagDeserializer::CALLBACK_KEY[] = "Callback";
+const char YAMLDagDeserializer::LIBRARY_NAME_KEY[] = "LibraryName";
+const char YAMLDagDeserializer::SYMBOL_NAME_KEY[] = "SymbolName";
+const char YAMLDagDeserializer::CALLBACK_TYPE_KEY[] = "Type";
 
 YAMLDagDeserializerError::YAMLDagDeserializerError(const std::string& what)
         : std::exception(), what_(what) {}
@@ -114,7 +121,7 @@ void YAMLDagDeserializer::vertex_str(std::string& ret) {
     }
 }
 
-void YAMLDagDeserializer::verticies_str(std::string& ret) {
+void YAMLDagDeserializer::vertices_str(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("  Vertices:\n") + std::string("    ...");
     } else {
@@ -133,12 +140,12 @@ void YAMLDagDeserializer::dag_str(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("DAG:\n") +
               std::string("  Title: <optional string>\n") +
-              std::string("  Configuation: <optional YAML>\n") +
+              std::string("  Configuration: <optional YAML>\n") +
               std::string("    <valid YAML>\n") + std::string("  ...");
     } else {
         ret = std::string("DAG:\n") +
               std::string("  Title: <optional string>\n") +
-              std::string("  Configuation: <optional YAML>\n") +
+              std::string("  Configuration: <optional YAML>\n") +
               std::string("    <valid YAML>\n") + ret;
     }
 }
@@ -156,7 +163,7 @@ std::string YAMLDagDeserializer::sample_dag_output(const UpTo& upto) {
         case UpTo::VERTEX:
             vertex_str(ret);
         case UpTo::VERTICES:
-            verticies_str(ret);
+            vertices_str(ret);
         case UpTo::DAG:
             dag_str(ret);
         case UpTo::EMPTY: {
@@ -702,5 +709,4 @@ std::unique_ptr<TaskStage> YAMLDagDeserializer::dynamically_load_stage(
                 " in available symbols of --" + cb_symbols + "--.");
     }
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

@@ -1,3 +1,12 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #ifndef DAG_VERTEX_H_INCLUDED
 #define DAG_VERTEX_H_INCLUDED
 
@@ -10,11 +19,10 @@
 #include <string>
 #include <vector>
 
-#include "dag_scheduler/task.h"
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/Task.h"
+#include "dag_scheduler/Uuid.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class DAGEdge;
 class DAG;
 
@@ -283,7 +291,7 @@ public:
      *         the aforementioned function of \ref DAGEdge. If the
      *         contrary, then \ref false is returned.
      */
-    bool has_incomming_edges() const;
+    bool has_incoming_edges() const;
 
     /**
      * @brief A utility function used to get the number of \ref DAGEdge (s)
@@ -295,7 +303,7 @@ public:
      * @return A positive integer that represents the number of
      *         \ref DAGEdge (s) that point at this.
      */
-    std::size_t incomming_edge_count() const;
+    std::size_t incoming_edge_count() const;
 
     /**
      * @brief A getter for the unique id owned by a instance of
@@ -351,7 +359,7 @@ public:
      *   * First their uuid (s) are equivalent.
      *   * Second ther label (s) are equivalent.
      *   * Third their edge counts are equivalnet.
-     *   * Fourth their incomming edge counts are equivalent.
+     *   * Fourth their incoming edge counts are equivalent.
      *   * Fith their status' are the same.
      *
      * @param[in] lhs The \ref DAGVertex on the left hand side of the '=='.
@@ -370,7 +378,7 @@ public:
      *   * First their uuid (s) are equivalent.
      *   * Second ther label (s) are equivalent.
      *   * Third their edge counts are equivalnet.
-     *   * Fourth their incomming edge counts are equivalent.
+     *   * Fourth their incoming edge counts are equivalent.
      *   * Fith their status' are the same.
      *
      * @param[in] lhs The \ref DAGVertex on the left hand side of the '!='.
@@ -382,10 +390,10 @@ public:
     friend bool operator!=(const DAGVertex& lhs, const DAGVertex& rhs);
 
 protected:
-    void add_incomming_edge();
-    void sub_incomming_edge();
+    void add_incoming_edge();
+    void sub_incoming_edge();
     void clear_edges();
-    void reset_incomming_edge_count();
+    void reset_incoming_edge_count();
     const DAGEdge& get_edge_at(std::size_t i) const;
 
     DAGVertex(const DAGVertex& other);
@@ -396,7 +404,7 @@ private:
     Status current_status_;
     std::string label_;
     std::vector<std::unique_ptr<DAGEdge>> edges_;
-    std::atomic<std::size_t> incomming_edge_count_;
+    std::atomic<std::size_t> incoming_edge_count_;
     std::unique_ptr<Task> task_;
 
 private:
@@ -417,12 +425,11 @@ private:
     FRIEND_TEST(TestDagVertex, clone_all_edges_with_task);
     FRIEND_TEST(TestDagVertex, copy_ctor_with_edges_with_task);
     FRIEND_TEST(TestDagVertex, assignment_operator_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, add_incomming_edge);
-    FRIEND_TEST(TestDagVertex, sub_incomming_edge);
+    FRIEND_TEST(TestDagVertex, add_incoming_edge);
+    FRIEND_TEST(TestDagVertex, sub_incoming_edge);
     FRIEND_TEST(TestDagVertex, clear_edges);
-    FRIEND_TEST(TestDagVertex, reset_incomming_edge_count);
+    FRIEND_TEST(TestDagVertex, reset_incoming_edge_count);
     FRIEND_TEST(TestDagVertex, get_edge_at);
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

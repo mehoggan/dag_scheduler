@@ -1,4 +1,13 @@
-#include "dag_scheduler/workflow_service.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/WorkflowService.h"
 
 #include <atomic>
 #include <boost/asio/signal_set.hpp>
@@ -7,10 +16,9 @@
 #include <thread>
 #include <vector>
 
-#include "dag_scheduler/https_session.h"
+#include "dag_scheduler/HttpsSession.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 namespace {
 std::shared_ptr<com::dag_scheduler::WorkflowService::HTTPSListener>
 make_https_listener(boost::asio::io_context& ioc,
@@ -132,7 +140,7 @@ void WorkflowService::HTTPSListener::on_accept(
     } else {
         Logging::info(LOG_TAG, "Starting up session...");
         socket.set_option(boost::asio::socket_base::keep_alive(true), ec);
-        if (not ec) {
+        if (!ec) {
             std::make_shared<HTTPSSession>(
                     std::move(socket), ctx_, doc_root_, *this, router_)
                     ->run();
@@ -175,5 +183,4 @@ void WorkflowService::HTTPSListener::create_acceptor() {
         throw boost::beast::system_error(ec);
     }
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

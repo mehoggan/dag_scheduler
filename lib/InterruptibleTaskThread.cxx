@@ -1,15 +1,23 @@
-#include "dag_scheduler/interruptible_task_thread.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "dag_scheduler/InterruptibleTaskThread.h"
 
 #include <condition_variable>
 #include <functional>
 #include <vector>
 
-#include "dag_scheduler/logging.h"
-#include "dag_scheduler/task.h"
+#include "dag_scheduler/Logging.h"
+#include "dag_scheduler/Task.h"
 
 /* ✓ */
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 InterruptibleTaskThread::InterruptibleTaskThread()
         : InterruptibleTaskThread(LogTag(__FUNCTION__)) {}
 
@@ -26,14 +34,14 @@ InterruptibleTaskThread::InterruptibleTaskThread(
         : LOG_TAG(std::move(other.LOG_TAG))
         , interrupt_(false)
         , running_(false) {
-    assert(not other.is_running() && "Cannot move a running task.");
+    assert(!other.is_running() && "Cannot move a running task.");
 
     task_ = std::move(other.task_);
 }
 
 InterruptibleTaskThread& InterruptibleTaskThread::operator=(
         InterruptibleTaskThread&& rhs) {
-    assert(not rhs.is_running() && "Cannot move a running task.");
+    assert(!rhs.is_running() && "Cannot move a running task.");
 
     LOG_TAG = std::move(rhs.LOG_TAG);
     interrupt_.store(false);
@@ -74,7 +82,7 @@ bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
                         const bool this_was_interrupted =
                                 self->was_interrupted();
                         const bool cont =
-                                stage_status && (not this_was_interrupted);
+                                stage_status && (!this_was_interrupted);
 
                         if (cont) {
                             Logging::info(LOG_TAG, "Ran stage", next);
@@ -130,5 +138,4 @@ void InterruptibleTaskThread::shutdown() {
         thread_.join();
     }
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
