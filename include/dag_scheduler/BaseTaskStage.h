@@ -190,4 +190,4 @@ protected:
 };
 }  // namespace com::dag_scheduler
 
-#endif  // INCLUDE_DAG_SCHEDULER_BASE_TASK_STAGE_H_
+#endif
