@@ -65,7 +65,7 @@ PKG_CHECK_MODULES([YamlCPP], ["$yaml_cpp_pkg" >= $yaml_cpp_version])
 LT_INIT()
 
 AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
-AC_CONFIG_SRCDIR([lib/dag.cxx])
+AC_CONFIG_SRCDIR([lib/Dag.cxx])
 
 AC_CONFIG_FILES([
   Makefile
