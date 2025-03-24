@@ -8,7 +8,7 @@ if OSX
 libstages_lib_la_CPPFLAGS += -Wno-enum-constexpr-conversion
 endif
 
-libstages_lib_la_SOURCES = print_stage.cxx
+libstages_lib_la_SOURCES = PrintStage.cxx
 
 libstages_lib_la_LDFLAGS = -pthread
 
