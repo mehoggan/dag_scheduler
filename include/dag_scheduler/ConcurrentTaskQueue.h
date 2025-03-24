@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_
-#define INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_
+#ifndef DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H
+#define DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H
 
 #include <condition_variable>
 #include <deque>
@@ -183,5 +183,4 @@ private:
     std::condition_variable condition_variable_;
 };
 }  // namespace com::dag_scheduler
-
-#endif  // INCLUDE_DAG_SCHEDULER_CONCURRENT_TASK_QUEUE_H_
+#endif
