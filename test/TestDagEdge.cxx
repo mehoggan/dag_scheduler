@@ -1,17 +1,25 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <iostream>
 #include <memory>
 
-#include "dag_scheduler/dag_edge.h"
-#include "dag_scheduler/dag_vertex.h"
+#include "dag_scheduler/DagEdge.h"
+#include "dag_scheduler/DagVertex.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestDagEdge : public ::testing::Test {
 protected:
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 TEST_F(TestDagEdge, ctor) {
@@ -24,7 +32,7 @@ TEST_F(TestDagEdge, ctor) {
 TEST_F(TestDagEdge, dtor) {
     DAGEdge e;
     e.~DAGEdge();
-    EXPECT_EQ(DAGEdge::Status::non_traverable, e.current_status());
+    EXPECT_EQ(DAGEdge::Status::non_traversable, e.current_status());
     EXPECT_FALSE(e.get_uuid().is_initialized());
     EXPECT_EQ(nullptr, e.get_connection().lock().get());
 }
@@ -33,7 +41,7 @@ TEST_F(TestDagEdge, mtor) {
     DAGEdge e1;
     DAGEdge e2(std::move(e1));
 
-    EXPECT_EQ(DAGEdge::Status::non_traverable, e1.current_status());
+    EXPECT_EQ(DAGEdge::Status::non_traversable, e1.current_status());
     EXPECT_FALSE(e1.get_uuid().is_initialized());
     EXPECT_EQ(nullptr, e1.get_connection().lock().get());
 
@@ -44,7 +52,7 @@ TEST_F(TestDagEdge, mtor) {
     // Test safety of move ctor by moving an object that has already been
     // moved.
     DAGEdge e3(std::move(e1));
-    EXPECT_EQ(DAGEdge::Status::non_traverable, e3.current_status());
+    EXPECT_EQ(DAGEdge::Status::non_traversable, e3.current_status());
     EXPECT_EQ(nullptr, e3.get_connection().lock().get());
 }
 
@@ -53,7 +61,7 @@ TEST_F(TestDagEdge, massign) {
     DAGEdge e2;
     e2 = std::move(e1);
 
-    EXPECT_EQ(DAGEdge::Status::non_traverable, e1.current_status());
+    EXPECT_EQ(DAGEdge::Status::non_traversable, e1.current_status());
     EXPECT_FALSE(e1.get_uuid().is_initialized());
     EXPECT_EQ(nullptr, e1.get_connection().lock().get());
 
@@ -78,9 +86,9 @@ TEST_F(TestDagEdge, connect_and_clone) {
             std::make_shared<DAGVertex>(e.get_connection().lock()->clone());
     clone.connect_to(tmp);
     std::uintptr_t clone_connect_addr = reinterpret_cast<std::uintptr_t>(
-            &(*(clone.get_connection().lock().get())));
-    std::uintptr_t e_connect_addr = reinterpret_cast<std::uintptr_t>(
-            &(*(e.get_connection().lock().get())));
+            &(*(clone.get_connection().lock())));
+    std::uintptr_t e_connect_addr =
+            reinterpret_cast<std::uintptr_t>(&(*(e.get_connection().lock())));
 
     EXPECT_NE(clone_connect_addr, e_connect_addr);
     EXPECT_NE(nullptr, clone.get_connection().lock());
@@ -99,11 +107,11 @@ TEST_F(TestDagEdge, connect_to_null) {
     std::shared_ptr<DAGVertex> v1 = std::make_shared<DAGVertex>("to");
     EXPECT_TRUE(e.connect_to(v1));
     EXPECT_EQ(e.get_connection().lock(), v1);
-    EXPECT_EQ(1ul, v1->incomming_edge_count());
+    EXPECT_EQ(1ul, v1->incoming_edge_count());
     EXPECT_EQ(2l, e.get_connection().lock().use_count());
     EXPECT_FALSE(e.connect_to(nullptr));
     EXPECT_EQ(nullptr, e.get_connection().lock());
-    EXPECT_EQ(0ul, v1->incomming_edge_count());
+    EXPECT_EQ(0ul, v1->incoming_edge_count());
 }
 
 TEST_F(TestDagEdge, connections) {
@@ -199,5 +207,4 @@ TEST_F(TestDagEdge, equality_operators_with_connection) {
     EXPECT_FALSE(e != e_clone);
     EXPECT_FALSE(e_clone != e);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

@@ -19,7 +19,7 @@ gtest_libdag_scheduler_SOURCES = main.cxx \
     TestDagEdge.cxx \
 		TestDagSerialization.cxx \
     TestDagVertex.cxx \
-		TestDynamicLibraryRegistery.cxx \
+		TestDynamicLibraryRegistry.cxx \
     TestInterruptibleTaskThread.cxx \
     TestLogging.cxx \
     TestStopWatch.cxx \

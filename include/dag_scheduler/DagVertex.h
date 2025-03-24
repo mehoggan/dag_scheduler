@@ -235,9 +235,9 @@ public:
      *
      * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>>
      *         which contains ref counted instances of the connections
-     *         restablished by calling this function.
+     *         reestablished by calling this function.
      */
-    std::vector<std::shared_ptr<DAGVertex>> restablish_connections(
+    std::vector<std::shared_ptr<DAGVertex>> reestablish_connections(
             std::vector<DAGVertex_connection>& connections);
 
     /**
@@ -272,8 +272,8 @@ public:
      * A utility member function of \ref DAGVertex that is to be used with
      * the member function of \ref DAGVertex, \ref clone to make it
      * possible for user's code to preserve connections after a \ref clone.
-     * To restablish the connections the user would call the member function
-     * \ref restablish_connections with the return value.
+     * To reestablish the connections the user would call the member function
+     * \ref reestablish_connections with the return value.
      *
      * @return A \ref std::vector<\ref DAGVertex_connections> of the
      *         \ref DAGEdge (s) and their associate \ref DAGVertex.
@@ -355,12 +355,12 @@ public:
      * @brief Comparison operator to compare equivalence of two
      *        \ref DAGVertex(s).
      *
-     * Two \ref DAGVertexe (s) are considered equivalent if:
+     * Two \ref DAGVertex (s) are considered equivalent if:
      *   * First their uuid (s) are equivalent.
      *   * Second ther label (s) are equivalent.
-     *   * Third their edge counts are equivalnet.
+     *   * Third their edge counts are equivalent.
      *   * Fourth their incoming edge counts are equivalent.
-     *   * Fith their status' are the same.
+     *   * Fifth their status' are the same.
      *
      * @param[in] lhs The \ref DAGVertex on the left hand side of the '=='.
      * @param[in] rhs The \ref DAGVertex on the right hand side of the
@@ -374,12 +374,12 @@ public:
      * @brief Comparison operator to compare non equivalence of two
      *        \ref DAGVertex(s).
      *
-     * Two \ref DAGVertexe (s) are considered equivalent if:
+     * Two \ref DAGVertex (s) are considered equivalent if:
      *   * First their uuid (s) are equivalent.
      *   * Second ther label (s) are equivalent.
-     *   * Third their edge counts are equivalnet.
+     *   * Third their edge counts are equivalent.
      *   * Fourth their incoming edge counts are equivalent.
-     *   * Fith their status' are the same.
+     *   * Fifth their status' are the same.
      *
      * @param[in] lhs The \ref DAGVertex on the left hand side of the '!='.
      * @param[in] rhs The \ref DAGVertex on the right hand side of the
@@ -409,8 +409,8 @@ private:
 
 private:
     FRIEND_TEST(TestDagVertex, connect_and_contains_connection);
-    FRIEND_TEST(TestDagVertex, visit_all_edges_points_to_actual_verticies);
-    FRIEND_TEST(TestDagVertex, clone_all_edges_and_restablish_connections);
+    FRIEND_TEST(TestDagVertex, visit_all_edges_points_to_actual_vertices);
+    FRIEND_TEST(TestDagVertex, clone_all_edges_and_reestablish_connections);
     FRIEND_TEST(TestDagVertex, move_ctor_with_edges);
     FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges);
     FRIEND_TEST(TestDagVertex, copy_ctor_no_edges);

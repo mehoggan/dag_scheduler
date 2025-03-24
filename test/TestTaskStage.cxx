@@ -1,22 +1,21 @@
-#include "utils/test_task_stage.h"
+#include "utils/TestTaskStage.h"
 
 #include <gtest/gtest.h>
 
 #include <atomic>
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task_stage.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/TaskStage.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestTaskStage : public ::testing::Test,
                       public LoggedClass<TestTaskStage> {
 public:
     TestTaskStage() : LoggedClass<TestTaskStage>(*this) {}
 
 protected:
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 TEST_F(TestTaskStage, default_ctor) {
@@ -51,5 +50,4 @@ TEST_F(TestTaskStage, kill_if_is_running) {
     EXPECT_FALSE(tt_ptr->is_running());
     EXPECT_TRUE(tt_ptr->end());
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

@@ -332,7 +332,7 @@ TEST_F(TestDag, add_single_vertex_and_find_vertex_by_label) {
     get_dag().add_vertex(std::move(v1));
 
     std::vector<std::weak_ptr<DAGVertex>> vertices =
-            get_dag().find_all_verticies_with_label(v1_cloned.label());
+            get_dag().find_all_vertices_with_label(v1_cloned.label());
     EXPECT_EQ(1ul, vertices.size());
     EXPECT_EQ(v1_cloned, *(vertices[0].lock()));
 
@@ -387,7 +387,7 @@ TEST_F(TestDag, add_vertices_with_same_and_different_labels) {
 
     {
         std::vector<std::weak_ptr<DAGVertex>> v_weaks =
-                get_dag().find_all_verticies_with_label("2");
+                get_dag().find_all_vertices_with_label("2");
         EXPECT_EQ(3ul, v_weaks.size());
         EXPECT_EQ(vertices_cloned[4], *(v_weaks[0].lock()));
         EXPECT_EQ(vertices_cloned[5], *(v_weaks[1].lock()));
@@ -436,14 +436,14 @@ TEST_F(TestDag, connect_and_acyclic_check) {
               get_dag()
                       .find_vertex(vertices_cloned[0])
                       .lock()
-                      ->incomming_edge_count());
+                      ->incoming_edge_count());
     EXPECT_EQ(0ul,
               get_dag().find_vertex(vertices_cloned[1]).lock()->edge_count());
     EXPECT_EQ(1ul,
               get_dag()
                       .find_vertex(vertices_cloned[1])
                       .lock()
-                      ->incomming_edge_count());
+                      ->incoming_edge_count());
 
     /* cloned_vertices[1] -> cloned_vertices[2] */
     EXPECT_FALSE(get_dag().connection_would_make_cyclic(vertices_cloned[1],
@@ -697,7 +697,7 @@ TEST_F(TestDag, remove_vertex) {
     fill_dag_default();
     DAG g_clone = get_dag().clone();
 
-    auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+    auto find_v_1a = g_clone.find_all_vertices_with_label("1a");
     ASSERT_EQ(1u, find_v_1a.size());
     EXPECT_EQ("1a", find_v_1a[0].lock()->label());
     g_clone.connect_all_by_label("1a", "1");
@@ -709,18 +709,18 @@ TEST_F(TestDag, remove_vertex) {
     g_clone.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
         ASSERT_NE(nullptr, v.get());
         if (v->label() != "1a") {
-            EXPECT_EQ(1u, v->incomming_edge_count());
+            EXPECT_EQ(1u, v->incoming_edge_count());
         } else {
-            EXPECT_EQ(0u, v->incomming_edge_count());
+            EXPECT_EQ(0u, v->incoming_edge_count());
         }
     });
 
     ASSERT_TRUE(g_clone.remove_vertex(*(find_v_1a[0].lock())));
 
-    EXPECT_EQ(0u, g_clone.find_all_verticies_with_label("1a").size());
+    EXPECT_EQ(0u, g_clone.find_all_vertices_with_label("1a").size());
     g_clone.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
         ASSERT_NE(nullptr, v.get());
-        EXPECT_EQ(0u, v->incomming_edge_count());
+        EXPECT_EQ(0u, v->incoming_edge_count());
     });
 
     get_dag().reset();
@@ -732,7 +732,7 @@ TEST_F(TestDag, remove_vertex_by_uuid) {
     fill_dag_default();
     DAG g_clone = get_dag().clone();
 
-    auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+    auto find_v_1a = g_clone.find_all_vertices_with_label("1a");
     g_clone.connect_all_by_label("1a", "1");
     g_clone.connect_all_by_label("1a", "1b");
     g_clone.connect_all_by_label("1a", "2");
@@ -745,10 +745,10 @@ TEST_F(TestDag, remove_vertex_by_uuid) {
 
     ASSERT_TRUE(g_clone.remove_vertex_by_uuid(find_v_1a[0].lock()->get_uuid()));
 
-    EXPECT_EQ(0u, g_clone.find_all_verticies_with_label("1a").size());
+    EXPECT_EQ(0u, g_clone.find_all_vertices_with_label("1a").size());
     g_clone.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
         ASSERT_NE(nullptr, v.get());
-        EXPECT_EQ(0u, v->incomming_edge_count());
+        EXPECT_EQ(0u, v->incoming_edge_count());
     });
 
     get_dag().reset();
@@ -760,7 +760,7 @@ TEST_F(TestDag, remove_vertices_with_label) {
     fill_dag_default_with_tasks();
     DAG g_clone = get_dag().clone();
 
-    auto find_v_1a = g_clone.find_all_verticies_with_label("1a");
+    auto find_v_1a = g_clone.find_all_vertices_with_label("1a");
     g_clone.connect_all_by_label("1a", "1");
     g_clone.connect_all_by_label("1a", "1b");
     g_clone.connect_all_by_label("1a", "2");
@@ -775,7 +775,7 @@ TEST_F(TestDag, remove_vertices_with_label) {
 
     g_clone.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
         ASSERT_NE(nullptr, v.get());
-        EXPECT_EQ(0u, v->incomming_edge_count());
+        EXPECT_EQ(0u, v->incoming_edge_count());
     });
 }
 }  // namespace com::dag_scheduler

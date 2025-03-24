@@ -119,7 +119,7 @@ bool DAGVertex::contains_connection_to(const DAGVertex& other) {
     return ret;
 }
 
-std::vector<std::shared_ptr<DAGVertex>> DAGVertex::restablish_connections(
+std::vector<std::shared_ptr<DAGVertex>> DAGVertex::reestablish_connections(
         std::vector<DAGVertex_connection>& connections) {
     std::vector<std::shared_ptr<DAGVertex>> ret;
     ret.reserve(connections.size());

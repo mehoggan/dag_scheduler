@@ -1,14 +1,22 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <atomic>
 #include <thread>
 
-#include "dag_scheduler/task.h"
-#include "dag_scheduler/task_scheduler.h"
-#include "utils/test_task.h"
+#include "dag_scheduler/Task.h"
+#include "dag_scheduler/TaskScheduler.h"
+#include "utils/TestTask.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 namespace detail {
 class LocalTestTaskImpl : public TestTaskImpl {
 public:
@@ -113,5 +121,4 @@ TEST(TestTaskScheduler, queue_task_and_let_it_run) {
     ts.shutdown();
     ts_thread.join();
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

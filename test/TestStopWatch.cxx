@@ -1,21 +1,29 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <iostream>
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/stop_watch.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/StopWatch.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestStopWatch : public ::testing::Test,
                       public LoggedClass<TestStopWatch> {
 public:
     TestStopWatch() : LoggedClass<TestStopWatch>(*this) {}
 
 protected:
-    virtual void SetUp() {}
+    void SetUp() override {}
 
-    virtual void TearDown() {}
+    void TearDown() override {}
 };
 
 TEST_F(TestStopWatch, output_validate) {
@@ -35,5 +43,4 @@ TEST_F(TestStopWatch, output_validate) {
     sw.mark();
     sw.stop();
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

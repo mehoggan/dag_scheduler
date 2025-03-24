@@ -1,15 +1,23 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <iostream>
 
-#include "dag_scheduler/uuid.h"
+#include "dag_scheduler/Uuid.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestUUID : public ::testing::Test {
 protected:
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 TEST(U_DAG_UUID, ctor) {
@@ -20,7 +28,6 @@ TEST(U_DAG_UUID, ctor) {
 TEST(U_DAG_UUID, ctor_user_defined) {
     std::string user_defined_uuid{"8fa73f0e-e83a-4610-99bd-9a4b618addde"};
     UUID uid1(user_defined_uuid);
-    ;
     EXPECT_TRUE(uid1.is_initialized());
     const std::string& actual_uuid = uid1.as_string();
     EXPECT_EQ(user_defined_uuid, actual_uuid);
@@ -75,5 +82,4 @@ TEST(U_DAG_UUID, compare) {
     uid2.~UUID();
     EXPECT_EQ(uid1, uid2);
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

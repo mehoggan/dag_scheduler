@@ -10,6 +10,8 @@
 #ifndef DAG_SERIALIZATION_H_INCLUDED
 #define DAG_SERIALIZATION_H_INCLUDED
 
+#include <stdexcept>
+
 #include <yaml-cpp/yaml.h>
 
 #include <boost/dll.hpp>
@@ -184,10 +186,19 @@ private:
 }  // namespace com::dag_scheduler
 
 namespace YAML {
+template <typename T = char (&)[]> struct convert {
+    static bool decode(const Node& node, char (&rhs)[]) {
+        (void)node;
+        (void)rhs;
+        throw std::logic_error("This has not been implemented.");
+    }
+};
+}  // namespace YAML
+
+namespace YAML {
 template <> struct convert<std::unique_ptr<com::dag_scheduler::DAG>> {
     static bool decode(const Node& node,
                        std::unique_ptr<com::dag_scheduler::DAG>& rhs) {
-        (void)node, (void)rhs;
         com::dag_scheduler::YAMLDagDeserializer deserializer;
         rhs = deserializer.make_dag(node);
         return true;

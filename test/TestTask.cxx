@@ -1,4 +1,13 @@
-#include "utils/test_task.h"
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include "utils/TestTask.h"
 
 #include <gtest/gtest.h>
 #include <rapidjson/stringbuffer.h>
@@ -6,12 +15,11 @@
 
 #include <atomic>
 
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/task.h"
-#include "dag_scheduler/task_callback_plugin.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Task.h"
+#include "dag_scheduler/TaskCallbackPlugin.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestTask : public ::testing::Test, public LoggedClass<TestTask> {
 public:
     TestTask() : LoggedClass<TestTask>(*this) {}
@@ -64,8 +72,8 @@ public:
     }
 
 protected:
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 class TestTaskCallbackPlugin : public TaskCallbackPlugin,
@@ -74,9 +82,9 @@ class TestTaskCallbackPlugin : public TaskCallbackPlugin,
 public:
     TestTaskCallbackPlugin() : LoggedClass<TestTaskCallbackPlugin>(*this) {}
 
-    virtual ~TestTaskCallbackPlugin() {}
+    ~TestTaskCallbackPlugin() override {}
 
-    virtual void completed(bool completed, Task& task) override {
+    void completed(bool completed, Task& task) override {
         Logging::info(LOG_TAG,
                       "completed called with",
                       (completed ? "true" : "false"),
@@ -84,12 +92,12 @@ public:
                       task);
     }
 
-    virtual std::unique_ptr<TaskCallbackPlugin> clone() const override {
+    std::unique_ptr<TaskCallbackPlugin> clone() const override {
         auto cloned_callback = std::make_unique<TestTaskCallbackPlugin>();
         return cloned_callback;
     }
 
-    virtual void TestBody() override {}
+    void TestBody() override {}
 };
 
 TEST_F(TestTask, default_ctor) {
@@ -272,7 +280,7 @@ TEST_F(TestTask, label_ctor_with_initial_inputs_clone) {
 }
 
 TEST_F(TestTask,
-       call_back_ctor_sets_appropiate_callback_with_initial_inputs_empty_stages) {
+       call_back_ctor_sets_appropiate_callback_with_initial_inputs_empty_) {
     rapidjson::Document json_config;
     TestTask::get_generic_config(json_config);
     rapidjson::Document json_initial_inputs;
@@ -315,7 +323,7 @@ TEST_F(TestTask,
 }
 
 TEST_F(TestTask,
-       call_back_ctor_sets_appropiate_callback_plugin_with_config_empty_stages) {
+       call_back_ctor_sets_appropiate_callback_plugin_with_config_empty_) {
     rapidjson::Document json_config;
     TestTask::get_generic_config(json_config);
     rapidjson::Document json_initial_inputs;
@@ -390,7 +398,7 @@ TEST_F(TestTask, iterate_stages_fails_if_task_killed) {
     TestTaskImpl tt;
     bool ran_all = tt.iterate_stages([&](TaskStage& next) {
         next.end();
-        bool keep_running = (next.label() == "C") ? (not tt.kill()) : true;
+        bool keep_running = (next.label() == "C") ? (!tt.kill()) : true;
         return keep_running;
     });
     EXPECT_FALSE(ran_all);
@@ -422,5 +430,4 @@ TEST_F(TestTask, user_cannot_move_task_while_iterating_stages) {
             },
             "");
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

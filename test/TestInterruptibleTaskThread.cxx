@@ -1,14 +1,22 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <condition_variable>
 
-#include "dag_scheduler/interruptible_task_thread.h"
-#include "dag_scheduler/logged_class.hpp"
-#include "dag_scheduler/logging.h"
-#include "utils/test_task.h"
+#include "dag_scheduler/InterruptibleTaskThread.h"
+#include "dag_scheduler/LoggedClass.hpp"
+#include "dag_scheduler/Logging.h"
+#include "utils/TestTask.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestInterruptibleTaskThread
         : public ::testing::Test,
           public LoggedClass<TestInterruptibleTaskThread> {
@@ -87,5 +95,4 @@ TEST_F(TestInterruptibleTaskThread, set_task_and_run_with_interrupt) {
     ts_.set_interrupt();
     ts_.shutdown();
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

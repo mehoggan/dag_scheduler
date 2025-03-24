@@ -1,17 +1,25 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
 #include <iostream>
 
-#include "dag_scheduler/dag_algorithms.h"
-#include "dag_scheduler/logging.h"
+#include "dag_scheduler/DagAlgorithms.h"
+#include "dag_scheduler/Logging.h"
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestDagAlgorithms : public ::testing::Test {
 protected:
-    virtual void SetUp() {}
+    void SetUp() override {}
 
-    virtual void TearDown() {}
+    void TearDown() override {}
 
     DAG& get_dag() { return d_; }
 
@@ -57,7 +65,7 @@ private:
     DAG d_;
 };
 
-TEST_F(TestDagAlgorithms, dag_vertices_with_no_incomming_edges) {
+TEST_F(TestDagAlgorithms, dag_vertices_with_no_incoming_edges) {
     {
         std::vector<DAGVertex> vertices = fill_dag_default();
 
@@ -76,7 +84,7 @@ TEST_F(TestDagAlgorithms, dag_vertices_with_no_incomming_edges) {
         get_dag().connect(vertices[6], vertices[7]);  // g -> h
 
         std::vector<std::shared_ptr<DAGVertex>> actual =
-                dag_vertices_with_no_incomming_edges(get_dag());
+                dag_vertices_with_no_incoming_edges(get_dag());
 
         EXPECT_EQ(1u, actual.size());
         EXPECT_EQ("a", actual[0]->label());
@@ -232,7 +240,7 @@ TEST_F(TestDagAlgorithms, process_dag_cyclic) {
         get_dag().connect(vertices[6], vertices[7]);  // g -> h
         std::weak_ptr<DAGVertex> v7 = get_dag().find_vertex(vertices[7]);
         std::weak_ptr<DAGVertex> v0 = get_dag().find_vertex(vertices[0]);
-        v7.lock().get()->connect(v0.lock());
+        v7.lock()->connect(v0.lock());
 
         processed_order_type ordered_batches;
 
@@ -241,5 +249,4 @@ TEST_F(TestDagAlgorithms, process_dag_cyclic) {
         get_dag().reset();
     }
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler

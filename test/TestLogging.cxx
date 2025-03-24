@@ -1,4 +1,14 @@
-#include <dag_scheduler/logging.h>
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
+#include <dag_scheduler/Logging.h>
+
 #include <gtest/gtest.h>
 
 #include <boost/filesystem/operations.hpp>
@@ -8,13 +18,12 @@
 #include <streambuf>
 #include <string>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TestLogging : public ::testing::Test {
 protected:
-    virtual void SetUp() { Logging::init(); }
+    void SetUp() override { Logging::init(); }
 
-    virtual void TearDown() {}
+    void TearDown() override {}
 };
 
 TEST_F(TestLogging, add_loggers_no_duplicates) {
@@ -86,5 +95,4 @@ TEST_F(TestLogging, test_clear_all) {
     EXPECT_EQ(0u, Logging::loggers_.size());
     Logging::info(tag, "Check to see if log write to stdout.");
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
