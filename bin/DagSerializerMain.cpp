@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#include <dag_scheduler/dag_serialization.h>
-#include <dag_scheduler/logging.h>
+#include <dag_scheduler/DagSerialization.h>
+#include <dag_scheduler/Logging.h>
 #include <yaml-cpp/yaml.h>
 
 #ifdef __clang__
