@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef TEST_DAG_SCHEDULER_TEST_ENVIRONMENT_H
-#define TEST_DAG_SCHEDULER_TEST_ENVIRONMENT_H
+#ifndef USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTENVIRONMENT_H
+#define USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTENVIRONMENT_H
 
 #include <dag_scheduler/Logging.h>
 #include <gtest/gtest.h>

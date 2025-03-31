@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef TASK_CALLBACK_PLUGIN_H_INCLUDED
-#define TASK_CALLBACK_PLUGIN_H_INCLUDED
+#ifndef DAG_SCHEDULER_TASKCALLBACKPLUGIN_H  // cspell:disable-line
+#define DAG_SCHEDULER_TASKCALLBACKPLUGIN_H  // cspell:disable-line
 
 #include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/Task.h"

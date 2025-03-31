@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_EDGE_H_INCLUDED
-#define DAG_EDGE_H_INCLUDED
+#ifndef DAG_SCHEDULER_DAGEDGE_H  // cspell:disable-line
+#define DAG_SCHEDULER_DAGEDGE_H  // cspell:disable-line
 
 #include <gtest/gtest_prod.h>
 
@@ -116,21 +116,21 @@ public:
      * @brief A getter for the \ref uuid of \ref this.
      *
      * A member function of \ref DAGEdge that return the \ref uuid that
-     * uniqly identifies any clone of \ref this.
+     * uniquely identifies any clone of \ref this.
      *
-     * @return A \ref uuid that uniqly identifies any clone of \ref this.
+     * @return A \ref uuid that uniquely identifies any clone of \ref this.
      */
     const UUID& get_uuid() const;
 
-    //! TODO (mhoggan): Add doc string once implemented.
+    //! TODO (mhoggan): Add doc string once implemented. // cspell:disable-line
     const Status& current_status() const;
 
-    //! TODO (mhoggan): Add doc string once implemented.
+    //! TODO (mhoggan): Add doc string once implemented. // cspell:disable-line
     std::string current_status_as_string() const;
 
 public:
     /**
-     * @brief A stream operator for writting a \ref dag_egde to a stream.
+     * @brief A stream operator for writing a \ref dag_edge to a stream.
      *
      * @param[out] out The stream to write \p e to.
      * @param[in] e The \ref DAGEdge to write to \p out.
@@ -140,7 +140,7 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const DAGEdge& e);
 
     /**
-     * @brief Comparison operator to compare equivalnce of two
+     * @brief Comparison operator to compare equivalence of two
      *        \ref DAGEdge (s).
      *
      * Two \ref DAGEdge (s) are considered equivalent if:
@@ -156,7 +156,7 @@ public:
     friend bool operator==(const DAGEdge& lhs, const DAGEdge& rhs);
 
     /**
-     * @brief Comparison operator to compare non equivalnce of two
+     * @brief Comparison operator to compare non equivalence of two
      *        \ref DAGEdge (s).
      *
      * Two \ref DAGEdge (s) are considered equivalent if:

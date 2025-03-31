@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef PRINT_STAGE_H_INCLUDED
-#define PRINT_STAGE_H_INCLUDED
+#ifndef STAGES_LIB_PRINTSTAGE_H
+#define STAGES_LIB_PRINTSTAGE_H
 
 #include <atomic>
 #include <memory>
