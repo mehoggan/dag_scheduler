@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SERIALIZATION_H_INCLUDED
-#define DAG_SERIALIZATION_H_INCLUDED
+#ifndef DAG_SCHEDULER_DAGSERIALIZATION_H  // cspell:disable-line
+#define DAG_SCHEDULER_DAGSERIALIZATION_H  // cspell:disable-line
 
 #include <stdexcept>
 
@@ -46,7 +46,8 @@ namespace com::dag_scheduler {
  *             LibraryName: <string>
  *             SymbolName: <string>
  *           ...
- *         TODO (matthew.hoggan)): Make sure these are tested.
+ *         TODO (matthew.hoggan)): Make sure these are // cspell:disable-line
+ *             tested.
  *         InitialInputs: <optional YAML>
  *           <valid YAML>
  *         Configuration: <optional YAML>

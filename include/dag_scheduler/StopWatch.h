@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_STOP_WATCH_H
-#define DAG_SCHEDULER_STOP_WATCH_H
+#ifndef DAG_SCHEDULER_STOPWATCH_H
+#define DAG_SCHEDULER_STOPWATCH_H
 
 #include <atomic>
 #include <chrono>

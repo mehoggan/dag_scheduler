@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef UUID_H_INCLUDED
-#define UUID_H_INCLUDED
+#ifndef DAG_SCHEDULER_UUID_H
+#define DAG_SCHEDULER_UUID_H
 
 #include <uuid/uuid.h>
 
@@ -16,8 +16,7 @@
 #include <sstream>
 #include <string>
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class that represents a unique identifier.
  *
@@ -77,7 +76,7 @@ public:
      * is put into an invalid state for the \ref UUID that was moved into
      * another \ref UUID.
      *
-     * @return true if (this) was maved false otherwise.
+     * @return true if (this) was moved false otherwise.
      */
     bool is_initialized() const;
 
@@ -160,6 +159,5 @@ private:
     UUID(const UUID& other);
     UUID& operator=(const UUID& rhs);
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_VERTEX_H_INCLUDED
-#define DAG_VERTEX_H_INCLUDED
+#ifndef DAG_SCHEDULER_DAGVERTEX_H  // cspell:disable-line
+#define DAG_SCHEDULER_DAGVERTEX_H  // cspell:disable-line
 
 #include <gtest/gtest_prod.h>
 
@@ -205,9 +205,9 @@ public:
     bool connect(std::shared_ptr<DAGVertex> other);
 
     /**
-     * @brief Checks for the existance of a \ref DAGEdge to \ref other.
+     * @brief Checks for the existence of a \ref DAGEdge to \ref other.
      *
-     * A member fucntion of \ref DAGVertex that checks if \ref this
+     * A member function of \ref DAGVertex that checks if \ref this
      * contains a \ref DAGEdge to \ref other.
      *
      * @param[in] other The \ref DAGVertex which we are checking for a
@@ -224,7 +224,7 @@ public:
      * A member function of \ref DAGVertex that is to be used after
      * \ref clone. Because a clone does not preserve connections users who
      * choose to use this class outside of a \ref dag will need a way to
-     * reconnect the \ref dag_eged (s) that existed from \ref this before
+     * reconnect the \ref dag_edge (s) that existed from \ref this before
      * \ref clone was called. To get the \ref connections users must call
      * \ref the member function \ref clone_all_connections before calling
      * this member function.
@@ -287,7 +287,7 @@ public:
      * value of \ref true if any \ref DAGEdge (s) point at \ref this.
      *
      * @return true if \ref DAGEdge::connect_to was called with \ref this
-     *         provided as the ref counted object proveded as an argument to
+     *         provided as the ref counted object provided as an argument to
      *         the aforementioned function of \ref DAGEdge. If the
      *         contrary, then \ref false is returned.
      */
@@ -316,10 +316,10 @@ public:
      */
     const UUID& get_uuid() const;
 
-    //*! TODO (mhoggan): Add doc string.
+    //*! TODO (mhoggan): Add doc string.  // cspell:disable-line
     const Status& current_status() const;
 
-    //*! TODO (mhoggan): Add doc string.
+    //*! TODO (mhoggan): Add doc string.  // cspell:disable-line
     std::string current_status_as_string() const;
 
     /**
@@ -342,7 +342,7 @@ public:
 
 public:
     /**
-     * @brief A stream operator for writting a \ref DAGVertex to a stream.
+     * @brief A stream operator for writing a \ref DAGVertex to a stream.
      *
      * @param[out] out The stream to write \p v to.
      * @param[in] v The \ref DAGVertex to write it \p out.

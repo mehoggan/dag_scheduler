@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_HTTPS_SESSION_H_INCLUDED
-#define DAG_SCHEDULER_HTTPS_SESSION_H_INCLUDED
+#ifndef DAG_SCHEDULER_HTTPSSESSION_H  // cspell:disable-line
+#define DAG_SCHEDULER_HTTPSSESSION_H  // cspell:disable-line
 
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>

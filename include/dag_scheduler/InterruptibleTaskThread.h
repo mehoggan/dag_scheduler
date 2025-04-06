@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
-#define INTERRUPTIBLE_TASK_THREAD_H_INCLUDED
+#ifndef DAG_SCHEDULER_INTERRUPTIBLETASKTHREAD_H  // cspell:disable-line
+#define DAG_SCHEDULER_INTERRUPTIBLETASKTHREAD_H  // cspell:disable-line
 
 #include <chrono>
 
@@ -16,35 +16,38 @@
 #include "dag_scheduler/Task.h"
 
 namespace com::dag_scheduler {
-class InterruptibleTaskThread {
+class InterruptibleTaskThread {  // cspell:disable-line
 public:
     /**
      * @brief
      */
-    InterruptibleTaskThread();
+    InterruptibleTaskThread();  // cspell:disable-line
 
     /**
      * @brief
      *
      * @param[in] tag
      */
-    explicit InterruptibleTaskThread(const LogTag& tag);
+    explicit InterruptibleTaskThread(const LogTag& tag);  // cspell:disable-line
 
     /**
      * @brief
      */
-    ~InterruptibleTaskThread();
+    ~InterruptibleTaskThread();  // cspell:disable-line
 
-    InterruptibleTaskThread(const InterruptibleTaskThread&) = delete;
+    InterruptibleTaskThread(                           // cspell:disable-line
+            const InterruptibleTaskThread&) = delete;  // cspell:disable-line
 
-    InterruptibleTaskThread& operator=(const InterruptibleTaskThread&) = delete;
+    InterruptibleTaskThread& operator=(                // cspell:disable-line
+            const InterruptibleTaskThread&) = delete;  // cspell:disable-line
 
     /**
      * @brief
      *
      * @param[out] other
      */
-    InterruptibleTaskThread(InterruptibleTaskThread&& other);
+    InterruptibleTaskThread(                   // cspell:disable-line
+            InterruptibleTaskThread&& other);  // cspell:disable-line
 
     /**
      * @brief
@@ -53,7 +56,8 @@ public:
      *
      * @return
      */
-    InterruptibleTaskThread& operator=(InterruptibleTaskThread&& rhs);
+    InterruptibleTaskThread& operator=(      // cspell:disable-line
+            InterruptibleTaskThread&& rhs);  // cspell:disable-line
 
     /**
      * @brief
