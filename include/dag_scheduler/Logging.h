@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef COM_VISUALIZATION_LOGGING_H_INCLUDED
-#define COM_VISUALIZATION_LOGGING_H_INCLUDED
+#ifndef DAG_SCHEDULER_LOGGING_H
+#define DAG_SCHEDULER_LOGGING_H
 
 #define BOOST_LOG_DYN_LINK 1
 
@@ -33,10 +33,9 @@
 #define DAG_SCHEDULER_ERROR boost::log::trivial::severity_level::error
 #define DAG_SCHEDULER_FATAL boost::log::trivial::severity_level::fatal
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
- * @brief A class used to uniqlly identify a specific log.
+ * @brief A class used to uniquely identify a specific log.
  *
  * A generic class used to identify a specific log and its source.
  */
@@ -46,7 +45,7 @@ public:
      * @brief ctor for a \ref LogTag.
      *
      * @param[in] tag A string used in the logs to identify the source and
-     *                to uniquly identify a log.
+     *                to uniquely identify a log.
      */
     explicit LogTag(const std::string& tag);
 
@@ -104,8 +103,7 @@ public:
 private:
     std::string tag_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 namespace std {
 template <> struct hash<com::dag_scheduler::LogTag> {
@@ -115,8 +113,7 @@ template <> struct hash<com::dag_scheduler::LogTag> {
 };
 }  // namespace std
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 /**
  * @brief A class used to log to various sinks or sources.based on a tag.
  *
@@ -252,7 +249,7 @@ public:
      * the call to \ref Logging::add_std_cout_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param[in] tag A \ref LogTag used in filtering.
      * @param[in] args A variadic list of args that can be written to a
                        \ref std::ostream.
@@ -273,7 +270,7 @@ public:
      * the call to \ref Logging::add_std_cout_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param[in] tag A \ref LogTag used in filtering.
      * @param[in] args A variadic list of args that can be written to a
      *                 \ref std::ostream.
@@ -294,7 +291,7 @@ public:
      * the call to \ref Logging::add_std_cout_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param[in] tag A \ref LogTag used in filtering.
      * @param[in] args A variadic list of args that can be written to a
      *                 \ref std::ostream.
@@ -315,7 +312,7 @@ public:
      * the call to \ref Logging::add_std_cout_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param[in] tag A \ref LogTag used in filtering.
      * @param[in] args A variadic list of args that can be written to a
      *                 \ref std::ostream.
@@ -336,7 +333,7 @@ public:
      * the call to \ref Logging::add_std_cerr_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param[in] tag A \ref LogTag used in filtering.
      * @param[in] args A variadic list of args that can be written to a
      *             \ref std::ostream.
@@ -357,7 +354,7 @@ public:
      * the call to \ref Logging::add_std_cerr_logger.
      *
      * @tparam ...Ts A list of mixed types which all must have support for
-     *               writting to a string stream.
+     *               writing to a string stream.
      * @param tag A \ref LogTag used in filtering.
      * @param args A variadic list of args that can be written to a
      *             \ref std::ostream.
@@ -417,6 +414,5 @@ LogTag add_std_cout_std_err_logger_for_type_instance(
     Logging::add_std_cerr_logger(LOG_TAG, cerr_level);
     return LOG_TAG;
 }
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 #endif

@@ -14,8 +14,8 @@
 
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wsign-conversion"  // cspell:disable-line
+#pragma clang diagnostic ignored "-Wshadow"           // cspell:disable-line
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <boost/beast.hpp>

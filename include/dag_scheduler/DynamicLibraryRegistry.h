@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_DYNAMIC_LIBRARY_REGISTRY_H
-#define DAG_SCHEDULER_DYNAMIC_LIBRARY_REGISTRY_H
+#ifndef DAG_SCHEDULER_DYNAMICLIBRARYREGISTRY_H  // cspell:disable-line
+#define DAG_SCHEDULER_DYNAMICLIBRARYREGISTRY_H  // cspell:disable-line
 #include <boost/dll/shared_library.hpp>
 #include <cstddef>
 #include <unordered_set>
@@ -65,7 +65,8 @@ public:
      * @brief A struct that associates a path or a library name to an
      * underlying boost::dll::shared_library.
      *
-     * TODO (mehoggan): Add in the ability to deregister a \ref
+     * TODO (mehoggan): Add in the ability to  // cspell:disable-line
+     *     deregister a \ref
      * RegistryItem.
      */
     struct RegistryItem {

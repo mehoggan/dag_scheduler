@@ -45,6 +45,33 @@
 > echo "export CPPFLAGS=\"-I[BoostBuild Prefix]/include -I${HOMEBREW_PREFIX}/include\"" >> ~/.bash_profile
 ```
 
+## Ubuntu 22.04 System Setup
+
+```sh
+> sudo apt install -y autoconf                                                                                                                                                                                                                                                                                                                   
+> sudo apt install -y libtool
+> sudo apt install -y rapidjson-dev libyaml-cpp-dev autoconf-archive uuid-dev \
+   libgmock-dev 
+```
+
+```sh
+> cd [Path to Where You Want To Build Boost From]
+> mkdir boostorg
+> cd boostorg
+> git clone https://github.com/boostorg/boost.git
+> cd boost
+> git checkout tags/boost-1.87.0 -b boost-1.87.0
+> git submodule update --init --recursive
+> ./bootstrap.sh --prefix=/opt/boost
+> ./b2 clean
+> sudo mkdir /opt/boost
+> sudo ./b2 --prefix=/opt/boost install
+> echo "export PKG_CONFIG_PATH=$(which pkg-config)" >> [Your RC file]
+> echo "export PKG_CONFIG=$(which pkg-config)" >> [Your RC file]
+> echo "export LDFLAGS=\"-L/opt/boost/lib\"" >> [Your RC file]
+> echo "export CPPFLAGS=\"-I/opt/boost/include\"" >> [Your RC file]
+```
+
 ## Build file generation and compiling library and executable Unix Systems
 
 ```sh

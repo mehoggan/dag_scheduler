@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_BASE_TASK_STAGE_H
-#define DAG_SCHEDULER_BASE_TASK_STAGE_H
+#ifndef DAG_SCHEDULER_BASETASKSTAGE_H
+#define DAG_SCHEDULER_BASETASKSTAGE_H
 
 #include <ostream>
 #include <sstream>

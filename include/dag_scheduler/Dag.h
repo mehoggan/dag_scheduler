@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_DAG_H_INCLUDED
-#define DAG_SCHEDULER_DAG_H_INCLUDED
+#ifndef DAG_SCHEDULER_DAG_H
+#define DAG_SCHEDULER_DAG_H
 
 #include <gtest/gtest_prod.h>
 #include <rapidjson/document.h>
@@ -26,8 +26,8 @@
 // NOTE: Pragmas added for YCM.
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wsign-conversion"  // cspell:disable-line
+#pragma clang diagnostic ignored "-Wshadow"           // cspell:disable-line
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <boost/beast.hpp>
@@ -270,7 +270,7 @@ public:
      *
      * A member function of \ref DAG that checks if adding a \ref DAGEdge
      * between \ref DAGVertex \ref v1 and \ref DAGVertex \ref v2 would
-     * make \ref this a cylical grph.
+     * make \ref this a cyclical graph.
      *
      * @param[in] v1 A \ref DAGVertex where the edge begins.
      * @param[in] v2 A \ref DAGVertex where the edge ends.
@@ -286,7 +286,7 @@ public:
      *
      * A member function of \ref DAG that checks if adding a \ref DAGEdge
      * between \ref UUID \p u1 and \ref UUID \p u2 would make \ref this a
-     * cylical graph based on \ref UUID of v1 and v2.
+     * cyclical graph based on \ref UUID of v1 and v2.
      *
      * @param[in] u1 A \ref UUID of a \ref DAGVertex where the edge begins.
      * @param[in] u2 A \ref UUID of a \ref DAGVertex where the edge begins.
@@ -302,7 +302,7 @@ public:
      *
      * A member function of \ref DAG that checks if adding a \ref DAGEdge
      * between \ref DAGVertex v1 and \ref DAGVertex v2 would
-     * make \ref this a cylical grph based on the labels \p l1 and \p l2.
+     * make \ref this a cyclical graph based on the labels \p l1 and \p l2.
      *
      * @param[in] l1 A string held by a \ref DAGVertex where the edge
      *               begins.
@@ -348,8 +348,7 @@ public:
     bool connect_by_uuid(const UUID& u1, const UUID& u2);
 
     /**
-     * @brief A function to make mutliple connections between
-     *        \ref DAGVertex.
+     * @brief A function to make multiple connections between \ref DAGVertex.
      *
      * A member function of \ref DAG that connects multiple \ref DAGVertex
      * based on labels. It will create a \ref DAGEdge from any
@@ -553,7 +552,7 @@ public:
      * A member function of \ref DAG that assists in visualizing the
      * configuration document passed in at construction time.
      *
-     * @param[out] out_str A \ref std::string that represests the \ref
+     * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
     void json_config_str(std::string& out_str) const;
@@ -592,4 +591,4 @@ private:
     FRIEND_TEST(TestDag, assignment_operator);
 };
 }  // namespace com::dag_scheduler
-#endif  // DAG_SCHEDULER
+#endif  // DAG_SCHEDULER_DAG_H

@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef TASK_H_INCLUDED
-#define TASK_H_INCLUDED
+#ifndef DAG_SCHEDULER_TASK_H
+#define DAG_SCHEDULER_TASK_H
 
 #include <rapidjson/document.h>
 
@@ -25,10 +25,9 @@
 #include "dag_scheduler/Uuid.h"
 
 #define API extern "C" BOOST_SYMBOL_EXPORT
-API void default_task_callback(bool) noexcept;
+API void default_task_callback(bool complete) noexcept;
 
-namespace com {
-namespace dag_scheduler {
+namespace com::dag_scheduler {
 class TaskCallbackPlugin;
 
 class Task : public LoggedClass<Task> {
@@ -51,7 +50,7 @@ public:
     explicit Task(std::vector<std::unique_ptr<TaskStage>>& stages);
 
     /**
-     * @brief ctor that assisgns stages to Tasks.
+     * @brief ctor that assigns stages to Tasks.
      *
      * A constructor for a \ref Task that assigns a set of
      * \ref TaskStage (s) to a \ref Task.
@@ -59,7 +58,7 @@ public:
      * @param[in] stages A collection of \ref TaskStages to be run when
      *                   Task is run. Its purpose is to make interrupting
      * the Task easier at well defined user boundaries.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -90,7 +89,7 @@ public:
      * @param[in] stages A collection of \ref TaskStage (s) to be run when
      *                   this's run member function is called.
      * @param[in] label A descriptive user defined label for (this).
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -127,7 +126,7 @@ public:
      * @param[in] label A descriptive user defined label for (this).
      * @param[in] complete_callback An optional function to call at the end
      *                              of a Task.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -167,7 +166,7 @@ public:
      * @param[in] complete_callback An optional \ref TaskCallbackPlugin that
      *                              is called when as many as \ref TaskStage
      *                              are completed by the \ref Task.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -177,7 +176,7 @@ public:
          const rapidjson::Document& json_initial_inputs);
 
     /**
-     * @brief ctor that assisgns stages to Tasks.
+     * @brief ctor that assigns stages to Tasks.
      *
      * A constructor for a \ref Task that assigns a set of
      * \ref TaskStage (s) to a \ref Task.
@@ -187,7 +186,7 @@ public:
      * the Task easier at well defined user boundaries.
      * @param[in] json_config The json document to be used for
      * configuration.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -207,7 +206,7 @@ public:
      * @param[in] label A descriptive user defined label for (this).
      * @param[in] json_config The json document to be used for
      * configuration.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -230,7 +229,7 @@ public:
      * of a Task.
      * @param[in] json_config The json document to be used for
      * configuration.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -255,7 +254,7 @@ public:
      *                              are completed by the \ref Task.
      * @param[in] json_config The json document to be used for
      * configuration.
-     * @param[in] json_initial_inputs A json body that defines an intial set
+     * @param[in] json_initial_inputs A json body that defines an initial set
      *                                of inputs to be provided to all \ref
      *                                TaskStage (s) owned by \ref (*this).
      */
@@ -268,7 +267,7 @@ public:
     /**
      * @brief dtor
      */
-    virtual ~Task();
+    ~Task() override;
 
     Task(const Task& other) = delete;
 
@@ -300,9 +299,9 @@ public:
     Task& operator=(Task&& other);
 
     /**
-     * @brief Getter for the user firendly label that identifies this Task.
+     * @brief Getter for the user friendly label that identifies this Task.
      *
-     * Each \ref Task should be easily identifed by users. This is done
+     * Each \ref Task should be easily identified by users. This is done
      * by allowing users to assign a label to a Task. This member function
      * returns that label.
      *
@@ -313,7 +312,7 @@ public:
     /**
      * @brief Getter for the uuid that identifies a \ref Task.
      *
-     * Each \ref Task should be easily identifed. The \ref uuid owned by
+     * Each \ref Task should be easily identified. The \ref uuid owned by
      * a \ref Task does exactly that, and this is how you get it.
      *
      * @return The \ref uuid owned by (this).
@@ -387,7 +386,7 @@ public:
      * A member function of \ref Vertex that assists in visualizing the
      * configuration document passed in at construction time.
      *
-     * @param[out] out_str A \ref std::string that represests the \ref
+     * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
     virtual void json_config_str(std::string& out_str) const;
@@ -399,7 +398,7 @@ public:
      * A member function of \ref Vertex that assists in visualizing the
      * initial inputs document passed in at construction time.
      *
-     * @param[out] out_str A \ref std::string that represests the \ref
+     * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
     virtual void json_initial_inputs_str(std::string& out_str) const;
@@ -475,7 +474,6 @@ protected:
     std::unique_ptr<rapidjson::Document> json_config_;
     std::unique_ptr<rapidjson::Document> json_initial_inputs_;
 };
-}  // namespace dag_scheduler
-}  // namespace com
+}  // namespace com::dag_scheduler
 
 #endif

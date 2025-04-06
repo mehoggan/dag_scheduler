@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef LOGGED_CLASS_H_INCLUDED
-#define LOGGED_CLASS_H_INCLUDED
+#ifndef DAG_SCHEDULER_LOGGEDCLASS_HPP  // cspell:disable-line
+#define DAG_SCHEDULER_LOGGEDCLASS_HPP  // cspell:disable-line
 
 #include "dag_scheduler/Logging.h"
 

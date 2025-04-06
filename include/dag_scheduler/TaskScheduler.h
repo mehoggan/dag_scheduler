@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef TASK_SCHEDULER_H_INCLUDED
-#define TASK_SCHEDULER_H_INCLUDED
+#ifndef DAG_SCHEDULER_TASKSCHEDULER_H  // cspell:disable-line
+#define DAG_SCHEDULER_TASKSCHEDULER_H  // cspell:disable-line
 
 #include <gtest/gtest_prod.h>
 
@@ -24,7 +24,7 @@
 
 namespace com::dag_scheduler {
 class TaskScheduler : public LoggedClass<TaskScheduler>,
-                      public boost::noncopyable {
+                      public boost::noncopyable {  // cspell:disable-line
 public:
     /**
      * @brief
@@ -99,7 +99,9 @@ private:
     ConcurrentTaskQueue queue_;
     volatile std::atomic_bool pause_;
     volatile std::atomic_bool kill_;
-    std::array<std::unique_ptr<InterruptibleTaskThread>, 10> thread_pool_;
+    std::array<std::unique_ptr<InterruptibleTaskThread>,  // cspell:disable-line
+               10>
+            thread_pool_;
     std::mutex thread_pool_lock_;
 };
 }  // namespace com::dag_scheduler

@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_ALGORITHMS_H_INCLUDED
-#define DAG_ALGORITHMS_H_INCLUDED
+#ifndef DAG_SCHEDULER_DAGALGORITHMS_H
+#define DAG_SCHEDULER_DAGALGORITHMS_H
 
 #include <list>
 

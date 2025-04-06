@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef TEST_TASK_STAGE_H_INCLUDED
-#define TEST_TASK_STAGE_H_INCLUDED
+#ifndef USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASKSTAGE_H
+#define USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASKSTAGE_H
 
 #include <atomic>
 #include <chrono>

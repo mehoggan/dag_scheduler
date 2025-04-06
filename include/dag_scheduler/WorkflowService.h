@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_WORKFLOW_ORCHESTRATOR_H
-#define DAG_SCHEDULER_WORKFLOW_ORCHESTRATOR_H
+#ifndef DAG_SCHEDULER_WORKFLOWSERVICE_H
+#define DAG_SCHEDULER_WORKFLOWSERVICE_H
 
 #include <yaml-cpp/yaml.h>
 

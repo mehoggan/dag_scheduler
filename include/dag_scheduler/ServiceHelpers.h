@@ -7,15 +7,15 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_SERVICE_HELPERS_H
-#define DAG_SCHEDULER_SERVICE_HELPERS_H
+#ifndef DAG_SCHEDULER_SERVICEHELPERS_H  // cspell:disable-line
+#define DAG_SCHEDULER_SERVICEHELPERS_H  // cspell:disable-line
 
 #include "dag_scheduler/Logging.h"
 
 #ifdef __clang__
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshadow"
+#pragma clang diagnostic ignored "-Wsign-conversion"  // cspell:disable-line
+#pragma clang diagnostic ignored "-Wshadow"           // cspell:disable-line
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <boost/asio/ssl.hpp>
