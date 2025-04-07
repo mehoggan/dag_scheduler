@@ -60,7 +60,7 @@ DAG::~DAG() {}
 DAG::DAG(DAG&& other)
         : LoggedClass(*this)
         , graph_(std::move(other.graph_))
-        , title_(other.title_)
+        , title_(std::move(other.title_))
         , json_config_(std::move(other.json_config_)) {
     Logging::info(LOG_TAG, "Moved DAG with title=", title_);
 }
@@ -106,7 +106,7 @@ std::weak_ptr<DAGVertex> DAG::find_vertex_by_uuid(const UUID& u) {
 
     auto it = std::find_if(
             graph_.begin(), graph_.end(), [&](std::shared_ptr<DAGVertex> vi) {
-                const DAGVertex& rhs = (*(vi.get()));
+                const DAGVertex& rhs = (*vi);
 
                 std::string u_str = u.as_string();
                 std::string rhs_str = rhs.get_uuid().as_string();
@@ -211,10 +211,10 @@ bool DAG::connection_would_make_cyclic_by_label(const std::string& l1,
     std::vector<std::weak_ptr<DAGVertex>> v2;
     v2 = find_all_vertices_with_label(l2);
 
-    for (auto v : v1) {
+    for (const auto& v : v1) {
         bool good = true;
 
-        for (auto u : v2) {
+        for (const auto& u : v2) {
             ret &= (!connection_would_make_cyclic(*(v.lock()), *(u.lock())));
             if (!ret) {
                 good = false;
@@ -239,8 +239,7 @@ bool DAG::connect(const DAGVertex& v1, const DAGVertex& v2) {
         auto v2_it = std::find(graph_.begin(), graph_.end(), v2_tmp.lock());
 
         if (v1_it != graph_.end() && v2_it != graph_.end()) {
-            if (!connection_would_make_cyclic(*(v1_it->get()),
-                                              *(v2_it->get()))) {
+            if (!connection_would_make_cyclic(**v1_it, **v2_it)) {
                 v1_it->get()->connect(*v2_it);
                 ret = true;
             } else {
@@ -277,8 +276,8 @@ bool DAG::connect_all_by_label(const std::string l1, const std::string l2) {
     std::vector<std::weak_ptr<DAGVertex>> v2;
     v2 = find_all_vertices_with_label(l2);
 
-    for (auto v : v1) {
-        for (auto u : v2) {
+    for (const auto& v : v1) {
+        for (const auto& u : v2) {
             ret &= connect(*(v.lock()), *(u.lock()));
         }
     }
@@ -298,7 +297,7 @@ bool DAG::add_and_connect(DAGVertex&& v1, DAGVertex&& v2) {
     std::weak_ptr<DAGVertex> v1_ptr = find_vertex(v1_clone);
     std::weak_ptr<DAGVertex> v2_ptr = find_vertex(v2_clone);
 
-    ret = connect(*(v1_ptr.lock().get()), *(v2_ptr.lock().get()));
+    ret = connect(*(v1_ptr.lock()), *(v2_ptr.lock()));
 
     return ret;
 }
@@ -309,11 +308,11 @@ bool DAG::are_connected(const DAGVertex& v1, const DAGVertex& v2) {
     std::weak_ptr<DAGVertex> v1_tmp = find_vertex(v1);
     std::weak_ptr<DAGVertex> v2_tmp = find_vertex(v2);
 
-    DAGVertex& v2_ref = *(v2_tmp.lock().get());
+    DAGVertex& v2_ref = *(v2_tmp.lock());
     std::uintptr_t v2_addr = reinterpret_cast<std::uintptr_t>(&v2_ref);
     v1_tmp.lock()->visit_all_edges([&](const DAGEdge& e) {
         DAGEdge& e_tmp = *const_cast<DAGEdge*>(&e);
-        DAGVertex& c_ref = *(e_tmp.get_connection().lock().get());
+        DAGVertex& c_ref = *(e_tmp.get_connection().lock());
         std::uintptr_t c_addr = reinterpret_cast<std::uintptr_t>(&c_ref);
         if (c_addr == v2_addr) {
             ret = true;
@@ -329,7 +328,7 @@ bool DAG::are_connected_by_uuid(const UUID& u1, const UUID& u2) {
     std::weak_ptr<DAGVertex> v1_tmp = find_vertex_by_uuid(u1);
     std::weak_ptr<DAGVertex> v2_tmp = find_vertex_by_uuid(u2);
 
-    ret = are_connected(*(v1_tmp.lock().get()), *(v2_tmp.lock().get()));
+    ret = are_connected(*(v1_tmp.lock()), *(v2_tmp.lock()));
 
     return ret;
 }
@@ -345,8 +344,8 @@ bool DAG::all_are_connected_by_label(const std::string l1,
 
     ret &= (!v1.empty() && !v2.empty());
 
-    for (auto vfrom : v1) {
-        for (auto vto : v2) {
+    for (const auto& vfrom : v1) {
+        for (const auto& vto : v2) {
             ret &= are_connected(*(vfrom.lock()), *(vto.lock()));
         }
     }
@@ -381,8 +380,7 @@ bool DAG::remove_vertex(const DAGVertex& v) {
                     graph_.begin(),
                     graph_.end(),
                     [&](std::shared_ptr<DAGVertex> o) {
-                        bool found =
-                                ((o.get() != nullptr) && (*(o.get()) == v));
+                        bool found = (o != nullptr && (*o == v));
                         if (found) {
                             o->visit_all_edges([&](const DAGEdge& e) {
                                 if (e.connection_.lock() != nullptr) {
@@ -474,7 +472,7 @@ void DAG::override_initial_input_for_vertex_task(
     if (vertex_to_update->get_task()) {
         Logging::info(LOG_TAG,
                       "Going to update inputs for",
-                      *(vertex_to_update->get_task().get()),
+                      *(vertex_to_update->get_task()),
                       "...");
         const UUID& task_uuid = vertex_to_update->get_task()->get_uuid();
         UUID clone(task_uuid.as_string());
@@ -484,7 +482,8 @@ void DAG::override_initial_input_for_vertex_task(
         json_input.CopyFrom(initial_input, json_input.GetAllocator());
 
         if (vertex_to_update->get_task()) {
-            // TODO (mehoggan): Implement this method in task.h/cxx
+            // TODO (mehoggan): Implement this method in // cspell:disable-line
+            // task.h/cxx
             throw std::logic_error(__FUNCTION__ +
                                    std::string(" not implemented."));
             // vertex_to_update->override_inputs();
@@ -494,10 +493,10 @@ void DAG::override_initial_input_for_vertex_task(
 
 std::ostream& operator<<(std::ostream& out, const DAG& g) {
     out << "Title: \"" << g.title_ << "\"";
-    if (not g.graph_.empty()) {
+    if (!g.graph_.empty()) {
         out << std::endl;
     }
-    for (std::shared_ptr<DAGVertex> v : g.graph_) {
+    for (const std::shared_ptr<DAGVertex>& v : g.graph_) {
         out << (*v) << std::endl;
     }
     std::string json_config_string;
@@ -527,7 +526,8 @@ bool operator==(const DAG& lhs, const DAG& rhs) {
               });
 
     std::size_t index = 0;
-    for (auto v : lhs.graph_) {
+    // Careful here, making this a const reference breaks the code.
+    for (std::shared_ptr<DAGVertex> v : lhs.graph_) {
         ret &= ((*v) == (*(rhs.graph_[index])));
         auto o = rhs.graph_[index];  // Force use count up.
         ret &= (v.use_count() == o.use_count());

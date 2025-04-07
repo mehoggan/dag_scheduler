@@ -109,8 +109,8 @@ std::ostream& operator<<(std::ostream& out, const std::nullptr_t n) {
 }
 
 std::ostream& operator<<(std::ostream& out, const DAGEdge& e) {
-    out << "uuid_ = " << e.uuid_ << " current_status_ = "
-        << "(" << e.current_status_as_string() << ") connection = ";
+    out << "uuid_ = " << e.uuid_ << " current_status_ = " << "("
+        << e.current_status_as_string() << ") connection = ";
 
     if (e.connection_.lock() == nullptr) {
         out << "nullptr";

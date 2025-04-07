@@ -29,4 +29,4 @@ CheckOptions:
   - key:             llvm-namespace-comment.SpacesBeforeComments
     value:           2
   - key:             readability-identifier-length.MinimumVariableNameLength
-    value:           3
+    value:           5

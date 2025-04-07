@@ -74,10 +74,10 @@ void ConcurrentTaskQueue::remove_task_from_queue(
     Logging::add_std_cout_logger(lt);
 
     std::unique_lock<std::mutex> lock(mutex_);
-    if (not queue_.empty()) {
+    if (!queue_.empty()) {
         auto iterator = std::remove_if(
                 queue_.begin(), queue_.end(), [&](std::unique_ptr<Task>& task) {
-                    auto ret = task.get()->get_uuid().as_string() ==
+                    auto ret = task->get_uuid().as_string() ==
                                to_remove.as_string();
                     if (ret) {
                         ret_ptr = std::move(task);
