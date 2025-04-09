@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////////////
 #include "dag_scheduler/TaskStage.h"
 
-#include "dag_scheduler/Logging.h"
+#include <cassert>
 
 namespace com::dag_scheduler {
 TaskStage::TaskStage() : TaskStage("") { label_ = uuid_.as_string(); }

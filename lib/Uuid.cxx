@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////////////////////////////
 #include "dag_scheduler/Uuid.h"
 
-#include <iostream>
 #include <stdexcept>
 
 namespace com::dag_scheduler {

@@ -92,7 +92,7 @@ bool DocRootEndpoint::handle_request(
                 body_str.resize(body.size());
                 boost::beast::error_code read_ec;
                 body.file().read(&body_str[0], body.size(), read_ec);
-                if (not read_ec) {
+                if (!read_ec) {
                     com::dag_scheduler::Logging::info(
                             LOG_TAG, "Returning", body_str);
                     response = boost::beast::http::response<
