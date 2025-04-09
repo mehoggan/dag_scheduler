@@ -200,8 +200,8 @@ std::unique_ptr<DAG> YAMLDagDeserializer::make_dag(
     if (dag_node[DAG_KEY]) {
         // Not sure if this will ever get triggered. But better to
         // communicate more than less to users.
-        if (not dag_node[DAG_KEY].IsMap()) {
-            auto error = std::string("\"DAG\" the root elment must be a ") +
+        if (!dag_node[DAG_KEY].IsMap()) {
+            auto error = std::string("\"DAG\" the root element must be a ") +
                          std::string("YAML map.");
             throw_wrong_type(UpTo::DAG, error);
         }
@@ -334,7 +334,7 @@ void YAMLDagDeserializer::make_vertices(const YAML::Node& vertices_node,
             }
         } else {
             Logging::warn(LOG_TAG,
-                          "Empty verticies node specified to",
+                          "Empty vertices node specified to",
                           typeid(*this).name());
         }
     } else {
@@ -471,7 +471,7 @@ void YAMLDagDeserializer::make_task_callback(
                         shared_library,
                         callback_node[SYMBOL_NAME_KEY].as<std::string>(),
                         task_callback_plugin);
-                if (not task_callback_plugin) {
+                if (!task_callback_plugin) {
                     std::stringstream error_stream;
                     error_stream << "Unable to properly deserialize"
                                  << callback_node;
@@ -485,7 +485,7 @@ void YAMLDagDeserializer::make_task_callback(
                                               json_initial_inputs);
             } else {
                 throw YAMLDagDeserializerNonSupportedCallbackType(
-                        std::string("Unspported callback type specified. "
+                        std::string("Unsupported callback type specified. "
                                     "Currently ") +
                         std::string("only \"FUNCTION\" or \"PLUGIN\" are "
                                     "accepted. ") +
@@ -515,7 +515,7 @@ std::function<void(bool)> YAMLDagDeserializer::make_task_function_callback(
     std::function<void(bool)> ret;
     bool symbol_present = verify_symbol_present(
             shared_library, symbol_name, "TaskCb", cb_symbols);
-    if (symbol_present && not cb_symbols.empty()) {
+    if (symbol_present && !cb_symbols.empty()) {
         Logging::info(
                 LOG_TAG, "Found", symbol_name, "in", shared_library.get_name());
         ret = shared_library.get_shared_lib().get_alias<void(bool)>(
@@ -536,7 +536,7 @@ void YAMLDagDeserializer::make_task_function_callback_plugin(
     std::string cb_symbols;
     bool symbol_present = verify_symbol_present(
             shared_library, symbol_name, "TaskCb", cb_symbols);
-    if (symbol_present && not cb_symbols.empty()) {
+    if (symbol_present && !cb_symbols.empty()) {
         Logging::info(
                 LOG_TAG, "Found", symbol_name, "in", shared_library.get_name());
         boost::shared_ptr<TaskCallbackPlugin> callback_plugin =
@@ -544,7 +544,7 @@ void YAMLDagDeserializer::make_task_function_callback_plugin(
                         shared_library.get_name(),
                         symbol_name,
                         boost::dll::load_mode::append_decorations);
-        ret = std::make_unique<TaskCallbackPlugin>(*(callback_plugin.get()));
+        ret = std::make_unique<TaskCallbackPlugin>(*(callback_plugin));
     } else {
         throw YAMLDagDeserializerError(
                 "Failed to load " + symbol_name + " from " +
@@ -690,7 +690,7 @@ std::unique_ptr<TaskStage> YAMLDagDeserializer::dynamically_load_stage(
     std::string cb_symbols;
     bool symbol_present = verify_symbol_present(
             shared_library, symbol_name, "Stages", cb_symbols);
-    if (symbol_present && not cb_symbols.empty()) {
+    if (symbol_present && !cb_symbols.empty()) {
         Logging::info(
                 LOG_TAG, "Found", symbol_name, "in", shared_library.get_name());
         typedef std::unique_ptr<TaskStage>(task_stage_creator_t)(

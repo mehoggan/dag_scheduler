@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////////////
 #include "dag_scheduler/BaseTaskStage.h"
 
-#include "dag_scheduler/Logging.h"
+#include <cassert>
 
 namespace com::dag_scheduler {
 BaseTaskStage::BaseTaskStage() : BaseTaskStage("") {

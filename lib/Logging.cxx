@@ -60,8 +60,8 @@ boost::log::formatter fmt =
         << "] "
         << boost::log::expressions::if_(boost::log::expressions::has_attr(
                    tag_attr))[boost::log::expressions::stream << tag_attr]
-        << " " << severity << "(" << line_id << ")"
-        << " - \'" << boost::log::expressions::smessage << "\'";
+        << " " << severity << "(" << line_id << ")" << " - \'"
+        << boost::log::expressions::smessage << "\'";
 
 boost::shared_ptr<Logging::TextSink> make_sink() {
     boost::shared_ptr<Logging::TextSink> sink =
