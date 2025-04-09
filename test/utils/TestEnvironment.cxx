@@ -54,9 +54,11 @@ std::filesystem::path Pathing::get_stages_lib_dir_path() const {
 
 std::filesystem::path Pathing::get_stages_lib_path() const {
 #ifdef __linux__
+    std::cout << "Linux!!!" << std::endl;
     return executable_path().parent_path().parent_path().parent_path() /
            "stages_lib" / "lib" / ".libs" / "libstages_lib.so";
 #elif __APPLE__ && __MACH__
+    std::cout << "Mac!!!" << std::endl;
     return executable_path().parent_path().parent_path().parent_path() /
            "stages_lib" / "lib" / ".libs" / "libstages_lib.dylib";
 #else

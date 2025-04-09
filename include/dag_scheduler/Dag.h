@@ -166,11 +166,11 @@ public:
      * graph data structure. If the insertion fails then this function
      * returns false otherwise it returns true.
      *
-     * @param[in] v A \ref DAGVertex to be added to the \ref DAG.
+     * @param[in] vertex A \ref DAGVertex to be added to the \ref DAG.
      *
-     * @return true if \ref v is inserted or false other wise.
+     * @return true if \ref vertex is inserted or false other wise.
      */
-    bool add_vertex(DAGVertex&& v);
+    bool addVertex(DAGVertex&& vertex);
 
     /**
      * @brief Finds a \ref DAGVertex in the graph.
@@ -179,13 +179,13 @@ public:
      * data structure and returns a \ref std::weak_ptr<DAGVertex> to
      * the original \ref DAGVertex stored in the graph.
      *
-     * @param[in] v A \ref DAGVertex used to find the the \ref dag.
+     * @param[in] vertex A \ref DAGVertex used to find the the \ref dag.
      *
      * @return A \ref std::weak_ptr<DAGVertex> to the original
-     *         \ref DAGVertex stored in the graph. If \ref v is not found
+     *         \ref DAGVertex stored in the graph. If \ref vertex is not found
      *         then an expired \ref std::weak_ptr<DAGVertex> is returned.
      */
-    std::weak_ptr<DAGVertex> find_vertex(const DAGVertex& v);
+    std::weak_ptr<DAGVertex> findVertex(const DAGVertex& vertex);
 
     /**
      * @brief Finds a \ref DAGVertex in the graph
@@ -195,14 +195,14 @@ public:
      * the original \ref DAGVertex stored in the graph based on its
      * \ref UUID..
      *
-     * @param[in] u A \ref UUID used to find the the \ref DAG.
+     * @param[in] uuid A \ref UUID used to find the the \ref DAG.
      *
      * @return A \ref std::weak_ptr<DAGVertex> to the original
      *         \ref DAGVertex stored in the graph. If a \ref DAGVertex
-     *         \ref v is not found then an expired
+     *         \ref DAGVertex is not found then an expired
      *         \ref std::weak_ptr<DAGVertex> is returned.
      */
-    std::weak_ptr<DAGVertex> find_vertex_by_uuid(const UUID& u);
+    std::weak_ptr<DAGVertex> findVertexByUuid(const UUID& uuid);
 
     /**
      * @brief Finds all \ref DAGVertex (s) in the graph from a \ref label.
@@ -211,15 +211,15 @@ public:
      * the graph and returns a \ref std::vector<std::weak_ptr<DAGVertex>>
      * of those \ref DAGVertex (s).
      *
-     * @param[in] l A \ref std::string that contains the label of the
-     *              \ref DAGVertex (s) that you are interested in.
+     * @param[in] label A \ref std::string that contains the label of the
+     *                  \ref DAGVertex (s) that you are interested in.
      *
      * @return A \ref std::vector<std::weak_ptr<DAGVertex>> that contains
      *         a \ref std::weak_ptr to a collection of \ref DAGVertex (s)
      *         contained within the graph.
      */
-    std::vector<std::weak_ptr<DAGVertex>> find_all_vertices_with_label(
-            const std::string& l);
+    std::vector<std::weak_ptr<DAGVertex>> findAllVerticesWithLabel(
+            const std::string& label);
 
     /**
      * @brief Returns true if the \ref DAGVertex \ref v is in the graph.
@@ -233,7 +233,7 @@ public:
      * @return true if \ref v is in an instance of \ref this, false if
      *         \ref v is not in an instance of \ref this.
      */
-    bool contains_vertex(const DAGVertex& v);
+    bool containsVertex(const DAGVertex& vertex);
 
     /**
      * @brief Returns true if the \ref DAGVertex \ref v is in the graph.
@@ -241,14 +241,14 @@ public:
      * A member function of \ref DAG that check if a \ref DAGVertex
      * is contained in the graph base on its \ref UUID.
      *
-     * @param[in] u A \ref DAGVertex to check for in an instance of
-     *              \ref this based on its \ref UUID.
+     * @param[in] uuid A \ref DAGVertex to check for in an instance of
+     *                 \ref this based on its \ref UUID.
      *
      * @return true if \ref v is in an instance of \ref this, false if
      *         \ref v is not in an instance of \ref this based on its
      *         \ref UUID.
      */
-    bool contains_vertex_by_uuid(const UUID& u);
+    bool containsVertexByUuid(const UUID& uuid);
 
     /**
      * @brief Returns true if the \ref DAGVertex \ref v is in the graph.
@@ -256,13 +256,13 @@ public:
      * A member function of \ref DAG that check if a \ref DAGVertex
      * is contained in the graph base on its label
      *
-     * @param[in] l The label owned by one or more \ref DAGVertex.
+     * @param[in] label The label owned by one or more \ref DAGVertex.
      *
      * @return true if \ref v is in an instance of \ref this, false if
      *         \ref v is not in an instance of \ref this based on its
      *         label.
      */
-    bool contains_vertex_by_label(const std::string& l);
+    bool containsVertexByLabel(const std::string& label);
 
     /**
      * @brief Returns true if connecting \ref v1 to \ref v2 makes graph
@@ -272,13 +272,14 @@ public:
      * between \ref DAGVertex \ref v1 and \ref DAGVertex \ref v2 would
      * make \ref this a cyclical graph.
      *
-     * @param[in] v1 A \ref DAGVertex where the edge begins.
-     * @param[in] v2 A \ref DAGVertex where the edge ends.
+     * @param[in] vertex1 A \ref DAGVertex where the edge begins.
+     * @param[in] vertex2 A \ref DAGVertex where the edge ends.
      *
      * @return true if connecting \ref v2 to \ref v1 would make \ref this
                a cyclic graph.
      */
-    bool connection_would_make_cyclic(const DAGVertex& v1, const DAGVertex& v2);
+    bool connectionWouldMakeCyclic(const DAGVertex& vertex1,
+                                   const DAGVertex& vertex2);
 
     /**
      * @brief Returns true if connecting v1 to v2 makes graph
@@ -288,13 +289,13 @@ public:
      * between \ref UUID \p u1 and \ref UUID \p u2 would make \ref this a
      * cyclical graph based on \ref UUID of v1 and v2.
      *
-     * @param[in] u1 A \ref UUID of a \ref DAGVertex where the edge begins.
-     * @param[in] u2 A \ref UUID of a \ref DAGVertex where the edge begins.
+     * @param[in] uuid1 A \ref UUID of a \ref DAGVertex where the edge begins.
+     * @param[in] uuid2 A \ref UUID of a \ref DAGVertex where the edge begins.
      *
      * @return true if connecting \ref v2 to \ref v1 would make \ref this
      *         a cyclic graph based on \ref UUIDs of \ref v1 and \ref v2.
      */
-    bool connection_would_make_cyclic_by_uuid(const UUID& u1, const UUID& u2);
+    bool connectionWouldMakeCyclicByUuid(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief Returns true if connecting any v1 to any v2 with a label \p l1
@@ -304,15 +305,15 @@ public:
      * between \ref DAGVertex v1 and \ref DAGVertex v2 would
      * make \ref this a cyclical graph based on the labels \p l1 and \p l2.
      *
-     * @param[in] l1 A string held by a \ref DAGVertex where the edge
-     *               begins.
-     * @param[in] l2 A string held by a \ref DAGVertex where the edge ends.
+     * @param[in] label1 A string held by a \ref DAGVertex where the edge
+     *                   begins.
+     * @param[in] label2 A string held by a \ref DAGVertex where the edge ends.
      *
      * @return true if connecting v2 to v1 based on \p l2 and \pl1 would
      *         make \ref this a cyclic graph.
      */
-    bool connection_would_make_cyclic_by_label(const std::string& l1,
-                                               const std::string& l2);
+    bool connectionWouldMakeCyclicByLabel(const std::string& label1,
+                                          const std::string& label2);
 
     /**
      * @brief A function to make a directed connection between to \ref
@@ -321,14 +322,14 @@ public:
      * A member function of \ref DAG that connects two \ref DAGVertex
      * with a directed \ref DAGEdge from \ref v1 to \ref v2.
      *
-     * @param[in] v1 The start \ref DAGVertex from where the \ref DAGEdge
-                     begins.
-     * @param[in] v2 The end \ref DAGVertex from where the \ref DAGEdge
-                     ends.
+     * @param[in] vertex1 The start \ref DAGVertex from where the \ref DAGEdge
+                          begins.
+     * @param[in] vertex2 The end \ref DAGVertex from where the \ref DAGEdge
+                          ends.
      *
      * @return true if the \ref DAGVertex were found and connected.
      */
-    bool connect(const DAGVertex& v1, const DAGVertex& v2);
+    bool connect(const DAGVertex& vertex1, const DAGVertex& vertex2);
 
     /**
      * @brief A function to make a directed connection between to \ref
@@ -338,14 +339,14 @@ public:
      * with a directed \ref DAGEdge from v1 to v2 based on their \ref
      * UUID.
      *
-     * @param[in] u1 The start \ref UUID of a \ref DAGVertex from where the
-     *               \ref DAGEdge begins.
-     * @param[in] u2 The end \ref UUID of a \ref DAGVertex from where the
-     *               \ref DAGEdge ends.
+     * @param[in] uuid1 The start \ref UUID of a \ref DAGVertex from where the
+     *                  \ref DAGEdge begins.
+     * @param[in] uuid2 The end \ref UUID of a \ref DAGVertex from where the
+     *                  \ref DAGEdge ends.
      *
      * @return true if the \ref DAGVertex were found and connected.
      */
-    bool connect_by_uuid(const UUID& u1, const UUID& u2);
+    bool connectByUuid(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief A function to make multiple connections between \ref DAGVertex.
@@ -356,14 +357,14 @@ public:
      * \ref l2. It will not make a connection if any \ref DAGEdge would
      * cause \ref this to become cyclic.
      *
-     * @param[in] l1 The label to be used to find all \ref DAGVertex from
-     *               which the directed \ref DAGEdge leaves.
-     * @param[in] l2 The label to be used to find all \ref DAGVertex to
-     *               which the directed \ref DAGEdge connects.
+     * @param[in] label1 The label to be used to find all \ref DAGVertex from
+     *                   which the directed \ref DAGEdge leaves.
+     * @param[in] label2 The label to be used to find all \ref DAGVertex to
+     *                   which the directed \ref DAGEdge connects.
      *
      * @return true if all connections are made false if just one failed.
      */
-    bool connect_all_by_label(const std::string l1, const std::string l2);
+    bool connectAllByLabel(const std::string label1, const std::string label2);
 
     /**
      * @brief A function that adds upto two \ref DAGVertex and then
@@ -375,15 +376,15 @@ public:
      * then they will not be added to \ref this. Also if they are already
      * connected a connection will not be made.
      *
-     * @param[in] v1 The start \ref DAGVertex from where the \ref DAGEdge
-     *               begins.
-     * @param[in] v2 The end \ref DAGVertex to where the \ref DAGEdge is
-     *               drawn to.
+     * @param[in] vertex1 The start \ref DAGVertex from where the \ref DAGEdge
+     *                    begins.
+     * @param[in] vertex2 The end \ref DAGVertex to where the \ref DAGEdge is
+     *                    drawn to.
      *
      * @return true if both \ref DAGVertex are added and a \ref DAGEdge
      *         is created between \ref v1 and \ref v2.
      */
-    bool add_and_connect(DAGVertex&& v1, DAGVertex&& v2);
+    bool addAndConnect(DAGVertex&& vertex1, DAGVertex&& vertex2);
 
     /**
      * @brief A function that checks if \ref DAGVertex share a \ref
@@ -392,15 +393,15 @@ public:
      * A member function of \ref DAG that checks if there exists
      * a \ref DAGEdge from \ref v1 to \ref v2.
      *
-     * @param[in] v1 The start \ref DAGVertex from where the \ref DAGEdge
-     *               begins.
-     * @param[in] v2 The end \ref DAGVertex to where the \ref DAGEdge is
-     *               drawn to.
+     * @param[in] vertex1 The start \ref DAGVertex from where the \ref DAGEdge
+     *                    begins.
+     * @param[in] vertex2 The end \ref DAGVertex to where the \ref DAGEdge is
+     *                    drawn to.
      *
      * @return true if both \ref v1 had a \ref DAGEdge that points to
      *         \ref v2.
      */
-    bool are_connected(const DAGVertex& v1, const DAGVertex& v2);
+    bool areConnected(const DAGVertex& vertex1, const DAGVertex& vertex2);
 
     /**
      * @brief A function that checks if \ref DAGVertex share a
@@ -409,15 +410,15 @@ public:
      * A member function of \ref DAG that checks if there exists
      * a \ref DAGEdge from \ref v1 to \ref v2 based on \ref UUID (s).
      *
-     * @param[in] u1 The start \ref DAGVertex from where the \ref DAGEdge
-     *               begins. \p u1 is owned by 1st the \ref DAGVertex.
-     * @param[in] u2 The end \ref DAGVertex to where the \ref DAGEdge
-     *               ends. \p u1 is owned by 2nd the \ref DAGVertex.
+     * @param[in] uuid1 The start \ref DAGVertex from where the \ref DAGEdge
+     *                  begins. \p u1 is owned by 1st the \ref DAGVertex.
+     * @param[in] uuid2 The end \ref DAGVertex to where the \ref DAGEdge
+     *                  ends. \p u1 is owned by 2nd the \ref DAGVertex.
      *
      * @return true if both \ref v1 had a \ref DAGEdge that points to
      *         \ref v2 based on \ref UUID (s).
      */
-    bool are_connected_by_uuid(const UUID& u1, const UUID& u2);
+    bool areConnectedByUuid(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief A function that checks for a single connection between two
@@ -427,16 +428,17 @@ public:
      * single connection between \ref DAGVertex (s) that have \ref l1 to
      * \ref l2.
      *
-     * @param[in] l1 The start label for a \ref DAGVertex from which the
-     *               \ref DAGEdge leaves.
-     * @param[in] l2 The end label for a \ref DAGVertex from which the
-     *               \ref DAGEdge goes into.
+     * @param[in] label1 The start label for a \ref DAGVertex from which the
+     *                   \ref DAGEdge leaves.
+     * @param[in] label2 The end label for a \ref DAGVertex from which the
+     *                   \ref DAGEdge goes into.
      *
      * @return true if there exists a \ref DAGEdge from a \ref DAGVertex
      *         with a label of \ref l1 to a \ref DAGVertex with label
      *         \ref l2. If there exists no \ref DAGEdge then false.
      */
-    bool all_are_connected_by_label(const std::string l1, const std::string l2);
+    bool allAreConnectedByLabel(const std::string label1,
+                                const std::string label2);
 
     /**
      * @brief A function that calls user function with each \ref DAGVertex
@@ -446,11 +448,12 @@ public:
      * a user defined function \ref cb is called with a ref counted
      * instance of the \ref DAGVertex.
      *
-     * @param[in] cb A \ref std::function which takes a instance of a
-     *               \ref std::shared_ptr<\ref DAGVertex> contained in
-     *               \ref this.
+     * @param[in] call_back A \ref std::function which takes a instance of a
+     *                      \ref std::shared_ptr<\ref DAGVertex> contained in
+     *                      \ref this.
      */
-    void linear_traversal(std::function<void(std::shared_ptr<DAGVertex>)> cb);
+    void linearTraversal(
+            std::function<void(std::shared_ptr<DAGVertex>)> call_back);
 
     /**
      * @brief A function to get the number of \ref DAGVertex in \ref this.
@@ -461,7 +464,7 @@ public:
      * @return A positive integer count of the number of \ref DAGVertex
      *         store in \ref this.
      */
-    std::size_t vertex_count() const;
+    std::size_t vertexCount() const;
 
     /**
      * @brief A function to get the number of \ref DAGEdge in \ref this.
@@ -472,7 +475,7 @@ public:
      * @return A positive integer count of the number of \ref DAGVertex
                store in \ref this.
      */
-    std::size_t edge_count() const;
+    std::size_t edgeCount() const;
 
     /**
      * @brief A function that returns an optional title of \ref this.
@@ -491,11 +494,11 @@ public:
      * A member function of \ref DAG that removes a \ref DAGVertex \ref v
      * and all its \ref DAGEdge from an instance of \ref dag.
      *
-     * @param[in] v The \ref DAGVertex to find and remove.
+     * @param[in] vertex The \ref DAGVertex to find and remove.
      *
-     * @return true if \ref v was found and removed. False otherwise.
+     * @return true if \ref vertex was found and removed. False otherwise.
      */
-    bool remove_vertex(const DAGVertex& v);
+    bool removeVertex(const DAGVertex& vertex);
 
     /**
      * @brief A function that removes a \ref DAGVertex and its
@@ -509,7 +512,7 @@ public:
      *
      * @return true if \ref v was found and removed. False otherwise.
      */
-    bool remove_vertex_by_uuid(const UUID& id);
+    bool removeVertexByUuid(const UUID& uuid);
 
     /**
      * @brief  A function that removes a \ref DAGVertex (s) and their
@@ -525,7 +528,7 @@ public:
      * @return true if any \ref DAGVertex was found with \ref label and
      *         removed. False otherwise.
      */
-    bool remove_all_vertex_with_label(const std::string& label);
+    bool removeAllVertexWithLabel(const std::string& label);
 
     /**
      * @brief A function that clears a instance of \ref dag.
@@ -543,7 +546,7 @@ public:
      *
      * @return A const reference to the member \ref json_config_.
      */
-    const rapidjson::Document& json_config() const;
+    const rapidjson::Document& jsonConfig() const;
 
     /**
      * @brief A helper method to visualize the configuration owned by \ref
@@ -555,7 +558,7 @@ public:
      * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
-    void json_config_str(std::string& out_str) const;
+    void jsonConfigStr(std::string& out_str) const;
 
     /*
      * @brief As a \ref DAG is built the user might not know all of the
@@ -563,17 +566,17 @@ public:
      * allows users to override any initial config specified at
      * construction.
      */
-    void override_initial_input_for_vertex_task(
+    void overrideInitialInputForVertexTask(
             const UUID& vertex_uuid, const rapidjson::Document& initial_input);
 
 public:
-    friend std::ostream& operator<<(std::ostream& out, const DAG& g);
+    friend std::ostream& operator<<(std::ostream& out, const DAG& graph);
     friend bool operator==(const DAG& lhs, const DAG& rhs);
     friend bool operator!=(const DAG& lhs, const DAG& rhs);
 
 protected:
-    std::shared_ptr<DAGVertex> get_vertex_at(std::size_t i);
-    void clone_connections(DAGVertex& from, DAGVertex& to);
+    std::shared_ptr<DAGVertex> getVertexAt(std::size_t index);
+    void cloneConnections(DAGVertex& fromVertex, DAGVertex& toVertex);
 
     DAG(const DAG& other);
     DAG& operator=(const DAG& rhs);

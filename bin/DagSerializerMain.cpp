@@ -11,23 +11,13 @@
 #include <dag_scheduler/Logging.h>
 #include <yaml-cpp/yaml.h>
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshadow"
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 #include <cstdlib>
-#include <iostream>
 #include <string>
 
 int main(int argc, char* argv[]) {
@@ -61,7 +51,8 @@ int main(int argc, char* argv[]) {
             const auto service_yaml_file = vm["dag_yaml"].as<std::string>();
             YAML::Node yaml_node = YAML::LoadFile(service_yaml_file);
             com::dag_scheduler::Logging::info(LOG_TAG, "Loaded YAML file.");
-            auto ci = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+            std::unique_ptr<com::dag_scheduler::DAG> ci =
+                    yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
             com::dag_scheduler::Logging::info(LOG_TAG,
                                               "Deserialized YAML file.");
             com::dag_scheduler::Logging::info(LOG_TAG, (*ci));

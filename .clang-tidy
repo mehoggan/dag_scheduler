@@ -19,14 +19,17 @@ Checks: >
     performance-move-constructor-init,
     performance-unnecessary-copy-initialization,
     readability-const-return-type,
-    readability-identifier-length
     readability-redundant-preprocessor,
     readability-redundant-smartptr-get,
-    readability-static-accessed-through-instance
+    readability-static-accessed-through-instance,
+    readability-identifier-naming,
+    readability-identifier-length
 CheckOptions:
   - key:             llvm-namespace-comment.ShortNamespaceLines
     value:           40
   - key:             llvm-namespace-comment.SpacesBeforeComments
     value:           2
   - key:             readability-identifier-length.MinimumVariableNameLength
-    value:           5
+    value:           4
+  - key:             readability-identifier-naming.FunctionCase
+    value:           camelBack

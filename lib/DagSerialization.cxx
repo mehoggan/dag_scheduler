@@ -632,6 +632,11 @@ void YAMLDagDeserializer::load_stages(
                 if (stage_node[LIBRARY_NAME_KEY]) {
                     library_name =
                             stage_node[LIBRARY_NAME_KEY].as<std::string>();
+
+                    library_name.erase(std::remove_if(library_name.begin(),
+                                                      library_name.end(),
+                                                      ::isspace),
+                                       library_name.end());
                 } else {
                     std::stringstream error_stream;
                     error_stream << std::string("The required key of \"")
@@ -656,6 +661,8 @@ void YAMLDagDeserializer::load_stages(
                 }
 
                 try {
+                    Logging::info(
+                            LOG_TAG, "Going to try and load", library_name);
                     const DynamicLibraryRegistry::RegistryItem& shared_library =
                             DynamicLibraryRegistry::register_dynamic_library(
                                     library_name);

@@ -4,3 +4,6 @@ sggz
 mehoggan
 winpty
 sslv
+libstages
+libdag
+TESTENVIRONMENT
