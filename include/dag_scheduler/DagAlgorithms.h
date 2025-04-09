@@ -24,13 +24,13 @@ typedef std::vector<std::vector<DAGVertex>> processed_order_type;
  * Takes in a dag and returns all \ref DAGVertex with no incoming
  * \ref dag_edge (s).
  *
- * @param[in] g The \ref dag for which to apply the search.
+ * @param[in] dag The \ref dag for which to apply the search.
  *
  * @return A \ref std::vector<\ref std::shared_ptr<\ref DAGVertex>> of
  *         all the \ref DAGVertex (s) which have no incoming edges.
  */
-std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incoming_edges(
-        DAG& g);
+std::vector<std::shared_ptr<DAGVertex>> dagVerticesWithNoIncomingEdges(
+        DAG& dag);
 
 /**
  * @brief Takes a dag and returns a list of \ref DAGVertex (s) in
@@ -47,7 +47,7 @@ std::vector<std::shared_ptr<DAGVertex>> dag_vertices_with_no_incoming_edges(
  *
  * @return true \ref dag has a cycle, false otherwise.
  */
-bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices);
+bool dagTopologicalSort(DAG& dag, std::list<DAGVertex>& sorted_vertices);
 
 /**
  * @brief Takes a dag and processes in parallel all \ref DAGVertex that
@@ -60,7 +60,7 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices);
  * \ref dag_edge (s). Subsequently it removes them and continues on
  * until not \ref DAGVertex (s) are left in \ref g.
  *
- * @param[in] g The \ref dag to sort.
+ * @param[in] dag The \ref dag to sort.
  * @param[out] out A \ref std::vector<\ref std::vector<\ref DAGVertex>>
  *                 which is an ordered set of collections that contain
  *                 a set of \ref DAGVertex which represents batches
@@ -69,7 +69,7 @@ bool dag_topological_sort(DAG& g, std::list<DAGVertex>& sorted_vertices);
  * @return False if \ref g could not have all \ref DAGVertex (s)
  *         visited.
  */
-bool process_dag(DAG& g, processed_order_type& out, TaskScheduler& scheduler);
+bool processDAG(DAG& dag, processed_order_type& out, TaskScheduler& scheduler);
 }  // namespace com::dag_scheduler
 
 #endif
