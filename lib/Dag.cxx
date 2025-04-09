@@ -526,11 +526,10 @@ bool operator==(const DAG& lhs, const DAG& rhs) {
               });
 
     std::size_t index = 0;
-    // Careful here, making this a const reference breaks the code.
-    for (std::shared_ptr<DAGVertex> v : lhs.graph_) {
-        ret &= ((*v) == (*(rhs.graph_[index])));
+    for (std::weak_ptr<DAGVertex> v : lhs.graph_) {
+        ret &= ((*v.lock()) == (*(rhs.graph_[index])));
         auto o = rhs.graph_[index];  // Force use count up.
-        ret &= (v.use_count() == o.use_count());
+        ret &= (v.lock().use_count() == o.use_count());
 
         if (!ret) {
             break;

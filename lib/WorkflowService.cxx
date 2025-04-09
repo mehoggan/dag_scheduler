@@ -9,7 +9,6 @@
 /////////////////////////////////////////////////////////////////////////
 #include "dag_scheduler/WorkflowService.h"
 
-#include <atomic>
 #include <boost/asio/signal_set.hpp>
 #include <boost/asio/strand.hpp>
 #include <memory>

@@ -11,7 +11,6 @@
 
 #include <condition_variable>
 #include <functional>
-#include <vector>
 
 #include "dag_scheduler/Logging.h"
 #include "dag_scheduler/Task.h"

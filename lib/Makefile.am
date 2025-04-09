@@ -30,8 +30,8 @@ libdag_scheduler_la_SOURCES = BaseTaskStage.cxx \
     Uuid.cxx \
     WorkflowService.cxx
 
-libdag_scheduler_la_LIBADD = -lboost_filesystem -lboost_log -lboost_system -lboost_thread \
-		-lssl -lcrypto
+libdag_scheduler_la_LIBADD = -lboost_filesystem -lboost_log -lboost_system \
+	  -lboost_thread -lssl -lcrypto
 
 if LINUX
 libdag_scheduler_la_LIBADD += $(INIT_LIBS) -lm

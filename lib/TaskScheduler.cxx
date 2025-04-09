@@ -10,7 +10,6 @@
 #include "dag_scheduler/TaskScheduler.h"
 
 #include <string>
-#include <vector>
 
 #include "dag_scheduler/Logging.h"
 
