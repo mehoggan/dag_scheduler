@@ -33,11 +33,11 @@ public:
      * @param[in] cerr_level The level at which to log to std::cerr.
      */
     explicit LoggedClass(
-            const DerivedType& d,
+            const DerivedType& derived,
             boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
             boost::log::trivial::severity_level cerr_level =
                     DAG_SCHEDULER_ERROR)
-            : LOG_TAG(Logging::LogTag_for_this(d)) {
+            : LOG_TAG(Logging::LogTag_for_this(derived)) {
         Logging::add_std_cout_logger(LOG_TAG, cout_level);
         Logging::add_std_cerr_logger(LOG_TAG, cerr_level);
     }

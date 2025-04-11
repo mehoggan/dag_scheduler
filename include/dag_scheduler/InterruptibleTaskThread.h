@@ -10,44 +10,41 @@
 #ifndef DAG_SCHEDULER_INTERRUPTIBLETASKTHREAD_H  // cspell:disable-line
 #define DAG_SCHEDULER_INTERRUPTIBLETASKTHREAD_H  // cspell:disable-line
 
-#include <chrono>
-
 #include "dag_scheduler/Logging.h"
 #include "dag_scheduler/Task.h"
 
+#include <thread>
+
 namespace com::dag_scheduler {
-class InterruptibleTaskThread {  // cspell:disable-line
+class InterruptibleTaskThread {
 public:
     /**
      * @brief
      */
-    InterruptibleTaskThread();  // cspell:disable-line
+    InterruptibleTaskThread();
 
     /**
      * @brief
      *
      * @param[in] tag
      */
-    explicit InterruptibleTaskThread(const LogTag& tag);  // cspell:disable-line
+    explicit InterruptibleTaskThread(const LogTag& tag);
 
     /**
      * @brief
      */
-    ~InterruptibleTaskThread();  // cspell:disable-line
+    ~InterruptibleTaskThread();
 
-    InterruptibleTaskThread(                           // cspell:disable-line
-            const InterruptibleTaskThread&) = delete;  // cspell:disable-line
+    InterruptibleTaskThread(const InterruptibleTaskThread&) = delete;
 
-    InterruptibleTaskThread& operator=(                // cspell:disable-line
-            const InterruptibleTaskThread&) = delete;  // cspell:disable-line
+    InterruptibleTaskThread& operator=(const InterruptibleTaskThread&) = delete;
 
     /**
      * @brief
      *
      * @param[out] other
      */
-    InterruptibleTaskThread(                   // cspell:disable-line
-            InterruptibleTaskThread&& other);  // cspell:disable-line
+    InterruptibleTaskThread(InterruptibleTaskThread&& other);
 
     /**
      * @brief
@@ -56,8 +53,7 @@ public:
      *
      * @return
      */
-    InterruptibleTaskThread& operator=(      // cspell:disable-line
-            InterruptibleTaskThread&& rhs);  // cspell:disable-line
+    InterruptibleTaskThread& operator=(InterruptibleTaskThread&& rhs);
 
     /**
      * @brief
@@ -68,7 +64,7 @@ public:
      *
      * @return
      */
-    bool set_task_and_run(std::unique_ptr<Task>&& task);
+    bool setTaskAndRun(std::unique_ptr<Task>&& task);
 
     /**
      * @brief
@@ -77,28 +73,28 @@ public:
      *
      * @return
      */
-    void set_interrupt(bool should_interrupt = true);
+    void setInterrupt(bool should_interrupt = true);
 
     /**
      * @brief
      *
      * @return
      */
-    bool was_interrupted() const;
+    bool wasInterrupted() const;
 
     /**
      * @brief
      *
      * @return
      */
-    bool is_running() const;
+    bool isRunning() const;
 
     /**
      * @brief
      *
      * @return
      */
-    bool has_task() const;
+    bool hasTask() const;
 
     /**
      * @brief

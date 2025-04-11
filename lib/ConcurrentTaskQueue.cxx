@@ -47,16 +47,16 @@ void ConcurrentTaskQueue::clear() {
     condition_variable_.notify_all();
 }
 
-bool ConcurrentTaskQueue::try_pop(std::unique_ptr<Task>& popped_value) {
+bool ConcurrentTaskQueue::tryPop(std::unique_ptr<Task>& popped_value) {
     std::lock_guard<std::mutex> lock(mutex_);
-    bool ret = false;
+    bool ret_value = false;
     if (!queue_.empty()) {
         popped_value = std::move(queue_.front());
         queue_.pop_front();
-        ret = true;
+        ret_value = true;
     }
 
-    return ret;
+    return ret_value;
 }
 
 std::unique_ptr<Task> ConcurrentTaskQueue::wait_and_pop() {

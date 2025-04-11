@@ -20,7 +20,6 @@
 
 #include "dag_scheduler/Endpoints.h"
 #include "dag_scheduler/LoggedClass.hpp"
-#include "dag_scheduler/ServiceHelpers.h"
 
 /*
  * Code in this module borrowed from:
@@ -41,8 +40,8 @@ public:
 
     struct Router {
     public:
-        bool register_endpoint(const boost::beast::string_view& endpoint,
-                               std::unique_ptr<EndpointHandler> handler);
+        bool registerEndpoint(const boost::beast::string_view& endpoint,
+                              std::unique_ptr<EndpointHandler> handler);
 
         std::unique_ptr<EndpointHandler>& operator[](
                 const boost::beast::string_view& endpoint);
@@ -69,12 +68,12 @@ public:
         void reset();
 
     private:
-        void do_accept();
+        void doAccept();
 
-        void on_accept(boost::beast::error_code ec,
-                       boost::asio::ip::tcp::socket socket);
+        void onAccept(boost::beast::error_code error_code,
+                      boost::asio::ip::tcp::socket socket);
 
-        void create_acceptor();
+        void createAcceptor();
 
     private:
         boost::asio::io_context& ioc_;
@@ -89,7 +88,7 @@ public:
     /**
      * @brief default ctor
      */
-    explicit WorkflowService(const ConnectionInfo& ci);
+    explicit WorkflowService(const ConnectionInfo& connectionInfo);
 
 private:
     boost::asio::io_context ioc_;

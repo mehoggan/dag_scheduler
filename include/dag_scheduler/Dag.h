@@ -202,7 +202,7 @@ public:
      *         \ref DAGVertex is not found then an expired
      *         \ref std::weak_ptr<DAGVertex> is returned.
      */
-    std::weak_ptr<DAGVertex> findVertexByUuid(const UUID& uuid);
+    std::weak_ptr<DAGVertex> findVertexByUUID(const UUID& uuid);
 
     /**
      * @brief Finds all \ref DAGVertex (s) in the graph from a \ref label.
@@ -248,7 +248,7 @@ public:
      *         \ref v is not in an instance of \ref this based on its
      *         \ref UUID.
      */
-    bool containsVertexByUuid(const UUID& uuid);
+    bool containsVertexByUUID(const UUID& uuid);
 
     /**
      * @brief Returns true if the \ref DAGVertex \ref v is in the graph.
@@ -295,7 +295,7 @@ public:
      * @return true if connecting \ref v2 to \ref v1 would make \ref this
      *         a cyclic graph based on \ref UUIDs of \ref v1 and \ref v2.
      */
-    bool connectionWouldMakeCyclicByUuid(const UUID& uuid1, const UUID& uuid2);
+    bool connectionWouldMakeCyclicByUUID(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief Returns true if connecting any v1 to any v2 with a label \p l1
@@ -346,7 +346,7 @@ public:
      *
      * @return true if the \ref DAGVertex were found and connected.
      */
-    bool connectByUuid(const UUID& uuid1, const UUID& uuid2);
+    bool connectByUUID(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief A function to make multiple connections between \ref DAGVertex.
@@ -418,7 +418,7 @@ public:
      * @return true if both \ref v1 had a \ref DAGEdge that points to
      *         \ref v2 based on \ref UUID (s).
      */
-    bool areConnectedByUuid(const UUID& uuid1, const UUID& uuid2);
+    bool areConnectedByUUID(const UUID& uuid1, const UUID& uuid2);
 
     /**
      * @brief A function that checks for a single connection between two
@@ -512,7 +512,7 @@ public:
      *
      * @return true if \ref v was found and removed. False otherwise.
      */
-    bool removeVertexByUuid(const UUID& uuid);
+    bool removeVertexByUUID(const UUID& uuid);
 
     /**
      * @brief  A function that removes a \ref DAGVertex (s) and their
@@ -588,10 +588,10 @@ private:
     std::unique_ptr<rapidjson::Document> json_config_;
 
 private:
-    FRIEND_TEST(TestDag, get_vertex_at);
-    FRIEND_TEST(TestDag, clone_connections);
-    FRIEND_TEST(TestDag, copy_ctor);
-    FRIEND_TEST(TestDag, assignment_operator);
+    FRIEND_TEST(TestDAG, get_vertex_at);
+    FRIEND_TEST(TestDAG, clone_connections);
+    FRIEND_TEST(TestDAG, copy_ctor);
+    FRIEND_TEST(TestDAG, assignment_operator);
 };
 }  // namespace com::dag_scheduler
 #endif  // DAG_SCHEDULER_DAG_H

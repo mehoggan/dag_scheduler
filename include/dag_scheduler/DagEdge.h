@@ -33,7 +33,7 @@ class DAGEdge {
 private:
     friend class DAG;
     friend class DAGVertex;
-    friend struct DAGVertex::DAGVertex_connection;
+    friend struct DAGVertex::DAGVertexConnection;
     friend bool dagTopologicalSort(DAG& dag,
                                    std::list<DAGVertex>& sorted_vertices);
 

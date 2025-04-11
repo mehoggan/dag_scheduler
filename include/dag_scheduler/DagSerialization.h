@@ -7,8 +7,8 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef DAG_SCHEDULER_DAGSERIALIZATION_H  // cspell:disable-line
-#define DAG_SCHEDULER_DAGSERIALIZATION_H  // cspell:disable-line
+#ifndef DAG_SCHEDULER_DAGSERIALIZATION_H
+#define DAG_SCHEDULER_DAGSERIALIZATION_H
 
 #include <stdexcept>
 
@@ -136,53 +136,52 @@ public:
      * @return A \ref std::unique_ptr<DAG> that contains the deserialized \ref
      *         DAG.
      */
-    std::unique_ptr<DAG> make_dag(const YAML::Node& dag_node) const;
+    std::unique_ptr<DAG> makeDAG(const YAML::Node& dag_node) const;
 
 private:
-    void make_vertices(const YAML::Node& vertices_node,
-                       std::unique_ptr<DAG>& dag) const;
-    void make_task(const YAML::Node& task_node,
-                   std::unique_ptr<Task>& task) const;
-    void throw_wrong_type(const UpTo& upto, const std::string& error) const;
-    void make_task_callback(
-            const std::string& task_name,
-            std::vector<std::unique_ptr<TaskStage>>& stages,
-            const YAML::Node& callback_node,
-            std::unique_ptr<Task>& task,
-            const rapidjson::Document& json_config,
-            const rapidjson::Document& json_initial_inputs) const;
-    std::function<void(bool)> make_task_function_callback(
+    void makeVertices(const YAML::Node& vertices_node,
+                      std::unique_ptr<DAG>& dag) const;
+    void makeTask(const YAML::Node& task_node,
+                  std::unique_ptr<Task>& task) const;
+    void throwWrongType(const UpTo& upto, const std::string& error) const;
+    void makeTaskCallback(const std::string& task_name,
+                          std::vector<std::unique_ptr<TaskStage>>& stages,
+                          const YAML::Node& callback_node,
+                          std::unique_ptr<Task>& task,
+                          const rapidjson::Document& json_config,
+                          const rapidjson::Document& json_initial_inputs) const;
+    std::function<void(bool)> makeTaskFunctionCallback(
             const DynamicLibraryRegistry::RegistryItem& shared_library,
             const std::string& symbol_name) const;
-    void make_task_function_callback_plugin(
+    void makeTaskFunctionCallbackPlugin(
             const DynamicLibraryRegistry::RegistryItem& shared_library,
             const std::string& symbol_name,
             std::unique_ptr<TaskCallbackPlugin>& ret) const;
-    bool verify_symbol_present(
+    bool verifySymbolPresent(
             const DynamicLibraryRegistry::RegistryItem& shared_library,
             const std::string& symbol_name,
             const std::string& section_name,
             std::string& cb_symbols) const;
-    void load_stages(const YAML::Node& stages_node,
-                     std::vector<std::unique_ptr<TaskStage>>& out_stages) const;
-    std::unique_ptr<TaskStage> dynamically_load_stage(
+    void loadStages(const YAML::Node& stages_node,
+                    std::vector<std::unique_ptr<TaskStage>>& out_stages) const;
+    std::unique_ptr<TaskStage> dynamicallyLoadStage(
             const DynamicLibraryRegistry::RegistryItem& shared_library,
             const std::string& symbol_name,
             const std::string& stage_name) const;
 
 public:
-    static std::string sample_dag_output(const UpTo& upto);
-    static std::string full_sample_output();
-    static CallbackType callback_type_from_string(const std::string& enum_str);
+    static std::string sampleDAGOutput(const UpTo& upto);
+    static std::string fullSampleOutput();
+    static CallbackType callbackTypeFromString(const std::string& enum_str);
 
 private:
-    static void stage_str(std::string& ret);
-    static void stages_str(std::string& ret);
-    static void task_str(std::string& ret);
-    static void vertex_str(std::string& ret);
-    static void vertices_str(std::string& ret);
-    static void connections_str(std::string& ret);
-    static void dag_str(std::string& ret);
+    static void stageStr(std::string& ret);
+    static void stagesStr(std::string& ret);
+    static void taskStr(std::string& ret);
+    static void vertexStr(std::string& ret);
+    static void verticesStr(std::string& ret);
+    static void connectionsStr(std::string& ret);
+    static void dagStr(std::string& ret);
 };
 }  // namespace com::dag_scheduler
 
@@ -201,7 +200,7 @@ template <> struct convert<std::unique_ptr<com::dag_scheduler::DAG>> {
     static bool decode(const Node& node,
                        std::unique_ptr<com::dag_scheduler::DAG>& rhs) {
         com::dag_scheduler::YAMLDagDeserializer deserializer;
-        rhs = deserializer.make_dag(node);
+        rhs = deserializer.makeDAG(node);
         return true;
     }
 };

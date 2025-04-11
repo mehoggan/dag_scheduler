@@ -33,3 +33,5 @@ CheckOptions:
     value:           4
   - key:             readability-identifier-naming.FunctionCase
     value:           camelBack
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case

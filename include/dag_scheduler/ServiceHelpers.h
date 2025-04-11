@@ -26,33 +26,32 @@
 
 namespace std {
 template <> struct hash<boost::beast::string_view> {
-    std::size_t operator()(const boost::beast::string_view& sv) const {
-        return std::hash<string>()(sv);
+    std::size_t operator()(const boost::beast::string_view& stringView) const {
+        return std::hash<string>()(stringView);
     }
 };
 }  // namespace std
 
 namespace detail {
-boost::beast::string_view mime_type(boost::beast::string_view path);
+boost::beast::string_view mimeType(boost::beast::string_view path);
 
-std::string path_cat(boost::beast::string_view base,
-                     boost::beast::string_view path);
+std::string pathCat(boost::beast::string_view base,
+                    boost::beast::string_view path);
 
-void load_server_cert(boost::asio::ssl::context& ctx,
-                      const boost::filesystem::path& pem_path_,
-                      com::dag_scheduler::LogTag& LOG_TAG);
+void loadServerCert(boost::asio::ssl::context& ctx,
+                    const boost::filesystem::path& pem_path_,
+                    com::dag_scheduler::LogTag& LOG_TAG);
 
-boost::beast::http::response<boost::beast::http::string_body>
-bad_request_handler(
+boost::beast::http::response<boost::beast::http::string_body> badRequestHandler(
         boost::beast::string_view why,
         boost::beast::http::request<boost::beast::http::string_body>& req);
 
-boost::beast::http::response<boost::beast::http::string_body> not_found_handler(
+boost::beast::http::response<boost::beast::http::string_body> notFoundHandler(
         boost::beast::string_view target,
         boost::beast::http::request<boost::beast::http::string_body>& req);
 
 boost::beast::http::response<boost::beast::http::string_body>
-server_error_handler(
+serverErrorHandler(
         boost::beast::string_view what,
         boost::beast::http::request<boost::beast::http::string_body>& req);
 }  // namespace detail

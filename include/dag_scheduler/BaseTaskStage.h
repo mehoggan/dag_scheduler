@@ -90,7 +90,7 @@ public:
      *
      * @return The \ref uuid owned by (this).
      */
-    const UUID& getUuid() const;
+    const UUID& getUUID() const;
 
     /**
      * @brief A virtual function used to run a \ref BaseTaskStage.

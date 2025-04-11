@@ -25,7 +25,7 @@
 #include "dag_scheduler/Uuid.h"
 
 #define API extern "C" BOOST_SYMBOL_EXPORT
-API void default_task_callback(bool complete) noexcept;
+API void defaultTaskCallback(bool complete) noexcept;
 
 namespace com::dag_scheduler {
 class TaskCallbackPlugin;
@@ -317,7 +317,7 @@ public:
      *
      * @return The \ref uuid owned by (this).
      */
-    const UUID& get_uuid() const;
+    const UUID& getUUID() const;
 
     /**
      * @brief The interface for iterating over the stages stored in a
@@ -333,7 +333,7 @@ public:
      *
      * @return
      */
-    bool iterate_stages(const std::function<bool(TaskStage&)>& next_stage);
+    bool iterateStages(const std::function<bool(TaskStage&)>& next_stage);
 
     /**
      * @brief Function used to kill a \ref Task and all its
@@ -359,7 +359,7 @@ public:
      *
      * @return true if \ref (*this) has a callback set.
      */
-    virtual bool callback_is_set() const;
+    virtual bool callbackIsSet() const;
 
     /**
      * @brief Plugin used by user of class of a \ref Task to check if
@@ -367,7 +367,7 @@ public:
      *
      * @return true if \ref (*this) has a callback plugin set.
      */
-    virtual bool callback_plugin_is_set() const;
+    virtual bool callbackPluginIsSet() const;
 
     /**
      * @brief A getter for the json configuration passed into the \ref ctor.
@@ -377,7 +377,7 @@ public:
      *
      * @return A const reference to the member \ref json_config_.
      */
-    virtual const rapidjson::Document& json_config() const;
+    virtual const rapidjson::Document& jsonConfig() const;
 
     /**
      * @brief A helper method to visualize the configuration owned by \ref
@@ -389,7 +389,7 @@ public:
      * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
-    virtual void json_config_str(std::string& out_str) const;
+    virtual void jsonConfigStr(std::string& out_str) const;
 
     /**
      * @brief A helper method to visualize the initial inputs owned by \ref
@@ -401,7 +401,7 @@ public:
      * @param[out] out_str A \ref std::string that represents the \ref
      *                     rapidjson::Document owned by this.
      */
-    virtual void json_initial_inputs_str(std::string& out_str) const;
+    virtual void jsonInitialInputsStr(std::string& out_str) const;
 
     /**
      * @brief A clone method to acquire a copy of the internal task.
@@ -442,7 +442,7 @@ public:
      *
      * @return The std::ostream \p out after \p t was written to it.
      */
-    friend std::ostream& operator<<(std::ostream& out, const Task& t);
+    friend std::ostream& operator<<(std::ostream& out, const Task& task);
 
     /**
      * @brief A utility function to print a Task to a stream.
@@ -452,16 +452,16 @@ public:
      *
      * @return The std::stringstream \p out after \p t was written to it.
      */
-    friend std::stringstream& operator<<(std::stringstream& out, const Task& t);
+    friend std::stringstream& operator<<(std::stringstream& out,
+                                         const Task& task);
 
 protected:
-    void set_json_config(const rapidjson::Document& json_config);
+    void setJsonConfig(const rapidjson::Document& json_config);
 
-    void set_json_initial_inputs(
-            const rapidjson::Document& json_initial_inputs);
+    void setJsonInitialInputs(const rapidjson::Document& json_initial_inputs);
 
 private:
-    void update_uuid(const UUID& uuid);
+    void updateUUID(const UUID& uuid);
 
 protected:
     std::atomic_bool iterating_;

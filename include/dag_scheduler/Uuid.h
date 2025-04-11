@@ -78,14 +78,14 @@ public:
      *
      * @return true if (this) was moved false otherwise.
      */
-    bool is_initialized() const;
+    bool isInitialized() const;
 
     /**
      * @brief Get a string representation of a \ref UUID.
      *
      * @return A string representation of the \ref UUID.
      */
-    std::string as_string() const;
+    std::string asString() const;
 
     /**
      * @brief A utility function used to write a \ref UUID to a stream.
@@ -95,8 +95,8 @@ public:
      *
      * @return The stream \p out after \p u was written to it.
      */
-    friend std::ostream& operator<<(std::ostream& out, const UUID& u) {
-        out << u.as_string();
+    friend std::ostream& operator<<(std::ostream& out, const UUID& uuid) {
+        out << uuid.asString();
         return out;
     }
 
@@ -109,8 +109,8 @@ public:
      * @return The stream \p out after \p u was written to it.
      */
     friend std::stringstream& operator<<(std::stringstream& out,
-                                         const UUID& u) {
-        out << u.as_string();
+                                         const UUID& uuid) {
+        out << uuid.asString();
         return out;
     }
 
