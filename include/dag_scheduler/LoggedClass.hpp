@@ -37,9 +37,9 @@ public:
             boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
             boost::log::trivial::severity_level cerr_level =
                     DAG_SCHEDULER_ERROR)
-            : LOG_TAG(Logging::LogTag_for_this(derived)) {
-        Logging::add_std_cout_logger(LOG_TAG, cout_level);
-        Logging::add_std_cerr_logger(LOG_TAG, cerr_level);
+            : LOG_TAG(Logging::logTagForThis(derived)) {
+        Logging::addStdCoutLogger(LOG_TAG, cout_level);
+        Logging::addStdCerrLogger(LOG_TAG, cerr_level);
     }
 
     /**

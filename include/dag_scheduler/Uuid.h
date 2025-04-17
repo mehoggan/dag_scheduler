@@ -124,19 +124,19 @@ public:
      *         if the string representation of \p rhs equals that of
      *         \p rhs, false otherwise.
      */
-    friend bool operator==(const UUID& lhs, const UUID& rhs) {
-        bool ret = true;
+    friend bool operator==(const UUID& left, const UUID& right) {
+        bool ret_val = true;
 
-        if (!lhs.is_initialized() && !rhs.is_initialized()) {
-            ret = true;
-        } else if (!lhs.is_initialized() || !rhs.is_initialized()) {
-            ret = false;
+        if (!left.isInitialized() && !right.isInitialized()) {
+            ret_val = true;
+        } else if (!left.isInitialized() || !right.isInitialized()) {
+            ret_val = false;
         } else {
             // Returns 0 on true.
-            ret = (lhs.as_string() == rhs.as_string());
+            ret_val = (left.asString() == right.asString());
         }
 
-        return ret;
+        return ret_val;
     }
 
     /**
@@ -149,8 +149,8 @@ public:
      *         if the string representation of \p rhs equals that of
      *         \p rhs, true otherwise.
      */
-    friend bool operator!=(const UUID& lhs, const UUID& rhs) {
-        return !(lhs == rhs);
+    friend bool operator!=(const UUID& left, const UUID& right) {
+        return !(left == right);
     }
 
 private:

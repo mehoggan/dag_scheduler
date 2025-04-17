@@ -59,7 +59,7 @@ bool ConcurrentTaskQueue::tryPop(std::unique_ptr<Task>& popped_value) {
     return ret_value;
 }
 
-std::unique_ptr<Task> ConcurrentTaskQueue::wait_and_pop() {
+std::unique_ptr<Task> ConcurrentTaskQueue::waitAndPop() {
     std::unique_lock<std::mutex> lock(mutex_);
     condition_variable_.wait(lock, QueueNotEmpty(queue_));
     assert(!queue_.empty());
@@ -68,21 +68,21 @@ std::unique_ptr<Task> ConcurrentTaskQueue::wait_and_pop() {
     return popped_value;
 }
 
-void ConcurrentTaskQueue::remove_task_from_queue(
-        const UUID& to_remove, std::unique_ptr<Task>& ret_ptr) {
-    LogTag lt(__FUNCTION__);
-    Logging::add_std_cout_logger(lt);
+void ConcurrentTaskQueue::removeTaskFromQueue(const UUID& to_remove,
+                                              std::unique_ptr<Task>& ret_ptr) {
+    LogTag log_tag(__FUNCTION__);
+    Logging::addStdCoutLogger(log_tag);
 
     std::unique_lock<std::mutex> lock(mutex_);
     if (!queue_.empty()) {
         auto iterator = std::remove_if(
                 queue_.begin(), queue_.end(), [&](std::unique_ptr<Task>& task) {
-                    auto ret = task->get_uuid().as_string() ==
-                               to_remove.as_string();
-                    if (ret) {
+                    auto ret_val =
+                            task->getUUID().asString() == to_remove.asString();
+                    if (ret_val) {
                         ret_ptr = std::move(task);
                     }
-                    return ret;
+                    return ret_val;
                 });
         queue_.resize(std::size_t(iterator - queue_.begin()));
     }
