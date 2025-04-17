@@ -431,30 +431,30 @@ bool DAG::removeVertexByUUID(const UUID& uuid) {
 }
 
 bool DAG::removeAllVertexWithLabel(const std::string& label) {
-    bool ret = false;
+    bool ret_val = false;
 
     std::vector<std::shared_ptr<DAGVertex>> found_with_label;
 
     std::copy_if(graph_.begin(),
                  graph_.end(),
                  std::back_inserter(found_with_label),
-                 [&](std::shared_ptr<DAGVertex> v) {
-                     return (v.get() && (v->label() == label));
+                 [&](std::shared_ptr<DAGVertex> vertex) {
+                     return (vertex.get() && (vertex->label() == label));
                  });
 
-    ret = !(found_with_label.empty());
+    ret_val = !(found_with_label.empty());
 
-    if (ret) {
+    if (ret_val) {
         std::for_each(found_with_label.begin(),
                       found_with_label.end(),
-                      [&](std::shared_ptr<DAGVertex> v) {
-                          if (v != nullptr) {
-                              removeVertex(*v);
+                      [&](std::shared_ptr<DAGVertex> vertex) {
+                          if (vertex != nullptr) {
+                              removeVertex(*vertex);
                           }
                       });
     }
 
-    return ret;
+    return ret_val;
 }
 
 void DAG::reset() { graph_.clear(); }
@@ -515,90 +515,92 @@ std::ostream& operator<<(std::ostream& out, const DAG& graph) {
 }
 
 bool operator==(const DAG& lhs, const DAG& rhs) {
-    bool ret = true;
+    bool ret_val = true;
 
-    ret &= (lhs.graph_.size() == rhs.graph_.size());
+    ret_val &= (lhs.graph_.size() == rhs.graph_.size());
 
     DAG lhs_clone = (*const_cast<DAG*>(&lhs)).clone();
     DAG rhs_clone = (*const_cast<DAG*>(&rhs)).clone();
 
     std::sort(lhs_clone.graph_.begin(),
               lhs_clone.graph_.end(),
-              [](std::shared_ptr<DAGVertex> a, std::shared_ptr<DAGVertex> b) {
-                  return a->label() < b->label();
+              [](std::shared_ptr<DAGVertex> vertex_a,
+                 std::shared_ptr<DAGVertex> vertex_b) {
+                  return vertex_a->label() < vertex_b->label();
               });
     std::sort(rhs_clone.graph_.begin(),
               rhs_clone.graph_.end(),
-              [](std::shared_ptr<DAGVertex> a, std::shared_ptr<DAGVertex> b) {
-                  return a->label() < b->label();
+              [](std::shared_ptr<DAGVertex> vertex_a,
+                 std::shared_ptr<DAGVertex> vertex_b) {
+                  return vertex_a->label() < vertex_b->label();
               });
 
     std::size_t index = 0;
-    for (std::weak_ptr<DAGVertex> v : lhs.graph_) {
-        ret &= ((*v.lock()) == (*(rhs.graph_[index])));
-        auto o = rhs.graph_[index];  // Force use count up.
-        ret &= (v.lock().use_count() == o.use_count());
+    for (std::weak_ptr<DAGVertex> vertex : lhs.graph_) {
+        ret_val &= ((*vertex.lock()) == (*(rhs.graph_[index])));
+        auto other = rhs.graph_[index];  // Force use count up.
+        ret_val &= (vertex.lock().use_count() == other.use_count());
 
-        if (!ret) {
+        if (!ret_val) {
             break;
         }
 
         ++index;
     }
-    ret &= (lhs.vertexCount() == rhs.vertexCount());
-    ret &= (lhs.edgeCount() == rhs.edgeCount());
-    ret &= (lhs.jsonConfig() == rhs.jsonConfig());
+    ret_val &= (lhs.vertexCount() == rhs.vertexCount());
+    ret_val &= (lhs.edgeCount() == rhs.edgeCount());
+    ret_val &= (lhs.jsonConfig() == rhs.jsonConfig());
 
-    return ret;
+    return ret_val;
 }
 
 bool operator!=(const DAG& lhs, const DAG& rhs) { return !(lhs == rhs); }
 
-std::shared_ptr<DAGVertex> DAG::get_vertex_at(std::size_t i) {
-    assert(i < graph_.size() && "Index out of bounds.");
-    return graph_[i];
+std::shared_ptr<DAGVertex> DAG::getVertexAt(std::size_t index) {
+    assert(index < graph_.size() && "Index out of bounds.");
+    return graph_[index];
 }
 
-void DAG::clone_connections(DAGVertex& from, DAGVertex& to) {
-    assert(from.get_uuid() == to.get_uuid() &&
+void DAG::cloneConnections(DAGVertex& from_vertex, DAGVertex& to_vertex) {
+    assert(from_vertex.getUUID() == to_vertex.getUUID() &&
            "Cloning connections on dag_vertices that are not the same is not "
            "permitted.");
 
-    std::vector<DAGVertex::DAGVertex_connection> from_connections =
-            from.clone_all_connections();
+    std::vector<DAGVertex::DAGVertexConnection> from_connections =
+            from_vertex.cloneAllConnections();
 
     for (auto& connection : from_connections) {
-        std::weak_ptr<DAGVertex> find = find_vertex(connection.vertex());
+        std::weak_ptr<DAGVertex> find = findVertex(connection.vertex());
         assert(!find.expired() && "This should never happen.");
-        to.connect(find.lock());
+        to_vertex.connect(find.lock());
     }
 }
 
 DAG::DAG(const DAG& other)
         : LoggedClass(*this)
         , json_config_(std::make_unique<rapidjson::Document>()) {
-    DAG* o = (const_cast<DAG*>(&other));
-    o->linear_traversal([&](std::shared_ptr<DAGVertex> v) {
-        DAGVertex tmp = v->clone();
-        add_vertex(std::move(tmp));
+    DAG* other_ptr = (const_cast<DAG*>(&other));
+    other_ptr->linearTraversal([&](std::shared_ptr<DAGVertex> vertex) {
+        DAGVertex tmp_vertex = vertex->clone();
+        addVertex(std::move(tmp_vertex));
     });
 
     for (std::size_t i = 0; i < graph_.size(); ++i) {
-        clone_connections(*other.graph_[i], *graph_[i]);
+        cloneConnections(*other.graph_[i], *graph_[i]);
     }
     title_ = other.title_;
     json_config_->CopyFrom((*other.json_config_), json_config_->GetAllocator());
 }
 
 DAG& DAG::operator=(const DAG& rhs) {
-    DAG& o = *(const_cast<DAG*>(&rhs));
-    o.linear_traversal([&](std::shared_ptr<DAGVertex> v) {
-        DAGVertex tmp = v->clone();
-        add_vertex(std::move(tmp));
+    DAG& other = *(const_cast<DAG*>(&rhs));
+    other.linearTraversal([&](std::shared_ptr<DAGVertex> vertex) {
+        DAGVertex tmp_vertex = vertex->clone();
+        addVertex(std::move(tmp_vertex));
     });
 
     for (std::size_t i = 0; i < graph_.size(); ++i) {
-        clone_connections(*rhs.graph_[i], *graph_[i]);
+        cloneConnections(*rhs.graph_[i], *graph_[i]);
     }
 
     title_ = rhs.title_;
