@@ -27,10 +27,11 @@ int main(int argc, char* argv[]) {
              com::dag_scheduler::YAMLDagDeserializer::fullSampleOutput());
 
     boost::program_options::options_description desc("Allowed options");
-    desc.add_options()("dag_yaml",
-                       boost::program_options::value<std::string>()->required(),
-                       "Absolute path to dag.yml (dag.yaml) file.")(
-            "help", help_string.c_str());
+    desc.add_options()(
+            "dag_yaml",
+            boost::program_options::value<std::string>()->required(),
+            "Absolute path to dag.yml (dag.yaml) file.")("help",
+                                                         help_string.c_str());
 
     boost::program_options::variables_map variable_map;
     boost::program_options::store(

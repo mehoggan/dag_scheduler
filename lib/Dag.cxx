@@ -129,7 +129,8 @@ std::vector<std::weak_ptr<DAGVertex>> DAG::findAllVerticesWithLabel(
         const std::string& label) {
     std::vector<std::weak_ptr<DAGVertex>> ret_val;
 
-    for (auto graph_it = graph_.begin(); graph_it != graph_.end(); ++graph_it) {
+    for (auto graph_it = graph_.begin(); graph_it != graph_.end();
+         ++graph_it) {
         if ((*graph_it)->label() == label) {
             std::weak_ptr<DAGVertex> tmp_v = (*graph_it);
             ret_val.push_back(tmp_v);
@@ -351,7 +352,8 @@ bool DAG::allAreConnectedByLabel(const std::string label1,
 
     for (const auto& from_vertex : vertex1) {
         for (const auto& to_vertex : vertex2) {
-            ret_val &= areConnected(*(from_vertex.lock()), *(to_vertex.lock()));
+            ret_val &=
+                    areConnected(*(from_vertex.lock()), *(to_vertex.lock()));
         }
     }
 
@@ -589,7 +591,8 @@ DAG::DAG(const DAG& other)
         cloneConnections(*other.graph_[i], *graph_[i]);
     }
     title_ = other.title_;
-    json_config_->CopyFrom((*other.json_config_), json_config_->GetAllocator());
+    json_config_->CopyFrom((*other.json_config_),
+                           json_config_->GetAllocator());
 }
 
 DAG& DAG::operator=(const DAG& rhs) {

@@ -115,21 +115,21 @@ protected:
 
         std::vector<DAGVertex> vertices_cloned;
         vertices_cloned.reserve(vertices_to_add.size());
-        std::for_each(
-                vertices_to_add.begin(),
-                vertices_to_add.end(),
-                [&](DAGVertex& v) {
-                    DAGVertex v_clone_1 = v.clone();
-                    DAGVertex v_clone_2 = v.clone();
-                    DAGVertex v_clone_3 = v.clone();
+        std::for_each(vertices_to_add.begin(),
+                      vertices_to_add.end(),
+                      [&](DAGVertex& v) {
+                          DAGVertex v_clone_1 = v.clone();
+                          DAGVertex v_clone_2 = v.clone();
+                          DAGVertex v_clone_3 = v.clone();
 
-                    vertices_cloned.push_back(std::move(v_clone_1));
-                    get_dag().add_vertex(std::move(v_clone_2));
+                          vertices_cloned.push_back(std::move(v_clone_1));
+                          get_dag().add_vertex(std::move(v_clone_2));
 
-                    std::weak_ptr<DAGVertex> v_weak =
-                            get_dag().find_vertex_by_uuid(v_clone_3.get_uuid());
-                    EXPECT_FALSE(v_weak.expired());
-                });
+                          std::weak_ptr<DAGVertex> v_weak =
+                                  get_dag().find_vertex_by_uuid(
+                                          v_clone_3.get_uuid());
+                          EXPECT_FALSE(v_weak.expired());
+                      });
         EXPECT_EQ(vertices_to_add.size(), get_dag().vertex_count());
         vertices_to_add.clear();
 
@@ -491,8 +491,8 @@ TEST_F(TestDag, add_and_connect_and_acyclic_check) {
     {
         DAGVertex clone0 = vertices_cloned[0].clone();
         DAGVertex clone1 = vertices_cloned[1].clone();
-        EXPECT_TRUE(
-                test_dag.add_and_connect(std::move(clone0), std::move(clone1)));
+        EXPECT_TRUE(test_dag.add_and_connect(std::move(clone0),
+                                             std::move(clone1)));
     }
 
     {
@@ -506,8 +506,8 @@ TEST_F(TestDag, add_and_connect_and_acyclic_check) {
     {
         DAGVertex clone0 = vertices_cloned[2].clone();
         DAGVertex clone1 = vertices_cloned[3].clone();
-        EXPECT_TRUE(
-                test_dag.add_and_connect(std::move(clone0), std::move(clone1)));
+        EXPECT_TRUE(test_dag.add_and_connect(std::move(clone0),
+                                             std::move(clone1)));
     }
 
     get_dag().reset();
@@ -524,8 +524,8 @@ TEST_F(TestDag, connect_by_uuid) {
         DAGVertex clone1 = vertices_cloned[1].clone();
         test_dag.add_vertex(vertices_cloned[0].clone());
         test_dag.add_vertex(vertices_cloned[1].clone());
-        EXPECT_TRUE(
-                test_dag.connect_by_uuid(clone0.get_uuid(), clone1.get_uuid()));
+        EXPECT_TRUE(test_dag.connect_by_uuid(clone0.get_uuid(),
+                                             clone1.get_uuid()));
 
         std::weak_ptr<DAGVertex> clone0_confirm = test_dag.find_vertex(clone0);
         EXPECT_NE(nullptr, clone0_confirm.lock());
@@ -743,7 +743,8 @@ TEST_F(TestDag, remove_vertex_by_uuid) {
     ASSERT_EQ(1u, find_v_1a.size());
     EXPECT_EQ("1a", find_v_1a[0].lock()->label());
 
-    ASSERT_TRUE(g_clone.remove_vertex_by_uuid(find_v_1a[0].lock()->get_uuid()));
+    ASSERT_TRUE(
+            g_clone.remove_vertex_by_uuid(find_v_1a[0].lock()->get_uuid()));
 
     EXPECT_EQ(0u, g_clone.find_all_vertices_with_label("1a").size());
     g_clone.linear_traversal([&](std::shared_ptr<DAGVertex> v) {

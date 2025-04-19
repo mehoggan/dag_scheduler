@@ -22,10 +22,10 @@
 
 int main(int argc, char* argv[]) {
     boost::program_options::options_description desc("Allowed options");
-    desc.add_options()("server_yaml",
-                       boost::program_options::value<std::string>()->required(),
-                       "Absolute path to server.yml file.")("help",
-                                                            "Help menu.");
+    desc.add_options()(
+            "server_yaml",
+            boost::program_options::value<std::string>()->required(),
+            "Absolute path to server.yml file.")("help", "Help menu.");
 
     boost::program_options::variables_map variable_map;
     boost::program_options::store(

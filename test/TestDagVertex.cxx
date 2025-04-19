@@ -73,7 +73,8 @@ TEST_F(TestDagVertex, string_task_ctor) {
 
 TEST_F(TestDagVertex, string_task_uuid_ctor) {
     class UUID user_generated_uuid;
-    const std::string user_generated_uuid_str = user_generated_uuid.as_string();
+    const std::string user_generated_uuid_str =
+            user_generated_uuid.as_string();
     std::vector<std::unique_ptr<TaskStage>> stages{};
     auto task = std::make_unique<Task>(stages, "1 Task");
     std::string task_uuid = task->get_uuid().as_string();

@@ -27,7 +27,8 @@ make_https_listener(boost::asio::io_context& ioc,
                     const uint16_t port,
                     WorkflowService::Router& router) {
     auto endpoint = boost::asio::ip::tcp::endpoint(address, port);
-    return std::make_shared<com::dag_scheduler::WorkflowService::HTTPSListener>(
+    return std::make_shared<
+            com::dag_scheduler::WorkflowService::HTTPSListener>(
             ioc, ctx, endpoint, doc_root, router);
 }
 }  // namespace

@@ -37,7 +37,8 @@ public:
 
     InterruptibleTaskThread(const InterruptibleTaskThread&) = delete;
 
-    InterruptibleTaskThread& operator=(const InterruptibleTaskThread&) = delete;
+    InterruptibleTaskThread& operator=(const InterruptibleTaskThread&) =
+            delete;
 
     /**
      * @brief

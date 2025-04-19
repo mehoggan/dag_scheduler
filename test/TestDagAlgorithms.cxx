@@ -24,8 +24,8 @@ protected:
     DAG& get_dag() { return d_; }
 
     std::vector<DAGVertex> fill_dag_default() {
-        DAGVertex v0("a"), v1("b"), v2("c"), v3("d"), v4("e"), v5("f"), v6("g"),
-                v7("h"), v8("i"), v9("j");
+        DAGVertex v0("a"), v1("b"), v2("c"), v3("d"), v4("e"), v5("f"),
+                v6("g"), v7("h"), v8("i"), v9("j");
         std::vector<DAGVertex> vertices_to_add;
         vertices_to_add.push_back(std::move(v0));
         vertices_to_add.push_back(std::move(v1));
@@ -40,21 +40,21 @@ protected:
 
         std::vector<DAGVertex> vertices_cloned;
         vertices_cloned.reserve(vertices_to_add.size());
-        std::for_each(
-                vertices_to_add.begin(),
-                vertices_to_add.end(),
-                [&](DAGVertex& v) {
-                    DAGVertex v_clone_1 = v.clone();
-                    DAGVertex v_clone_2 = v.clone();
-                    DAGVertex v_clone_3 = v.clone();
+        std::for_each(vertices_to_add.begin(),
+                      vertices_to_add.end(),
+                      [&](DAGVertex& v) {
+                          DAGVertex v_clone_1 = v.clone();
+                          DAGVertex v_clone_2 = v.clone();
+                          DAGVertex v_clone_3 = v.clone();
 
-                    vertices_cloned.push_back(std::move(v_clone_1));
-                    get_dag().add_vertex(std::move(v_clone_2));
+                          vertices_cloned.push_back(std::move(v_clone_1));
+                          get_dag().add_vertex(std::move(v_clone_2));
 
-                    std::weak_ptr<DAGVertex> v_weak =
-                            get_dag().find_vertex_by_uuid(v_clone_3.get_uuid());
-                    EXPECT_FALSE(v_weak.expired());
-                });
+                          std::weak_ptr<DAGVertex> v_weak =
+                                  get_dag().find_vertex_by_uuid(
+                                          v_clone_3.get_uuid());
+                          EXPECT_FALSE(v_weak.expired());
+                      });
         EXPECT_EQ(vertices_to_add.size(), get_dag().vertex_count());
         vertices_to_add.clear();
 

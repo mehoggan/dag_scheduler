@@ -60,7 +60,8 @@ TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data) {
     std::thread t([&]() {
         for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
             std::vector<std::unique_ptr<TaskStage>> stages;
-            std::unique_ptr<Task> task_ptr(new Task(stages, std::to_string(i)));
+            std::unique_ptr<Task> task_ptr(
+                    new Task(stages, std::to_string(i)));
             uuids.push_back(task_ptr->get_uuid().as_string());
             queue.push(std::move(task_ptr));
         }
@@ -82,7 +83,8 @@ TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data) {
     std::thread t([&]() {
         for (auto i : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
             std::vector<std::unique_ptr<TaskStage>> stages;
-            std::unique_ptr<Task> task_ptr(new Task(stages, std::to_string(i)));
+            std::unique_ptr<Task> task_ptr(
+                    new Task(stages, std::to_string(i)));
             ASSERT_TRUE(task_ptr.get() != nullptr);
             auto uuid_str = task_ptr->get_uuid().as_string();
             uuids.push_back(uuid_str);

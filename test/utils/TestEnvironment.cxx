@@ -38,11 +38,11 @@ std::filesystem::path Pathing::get_lib_dir_path() const {
 
 std::filesystem::path Pathing::get_lib_path() const {
 #ifdef __linux__
-    return executable_path().parent_path().parent_path().parent_path() / "lib" /
-           ".libs" / "libdag_scheduler.so";
+    return executable_path().parent_path().parent_path().parent_path() /
+           "lib" / ".libs" / "libdag_scheduler.so";
 #elif __APPLE__ && __MACH__
-    return executable_path().parent_path().parent_path().parent_path() / "lib" /
-           ".libs" / "libdag_scheduler.dylib";
+    return executable_path().parent_path().parent_path().parent_path() /
+           "lib" / ".libs" / "libdag_scheduler.dylib";
 #else
   throw NotImplementedException(std::string(__FUNCTION__);
 #endif

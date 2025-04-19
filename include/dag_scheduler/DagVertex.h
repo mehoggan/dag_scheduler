@@ -349,7 +349,8 @@ public:
      *
      * @return A reference to \p out after it was streamed to.
      */
-    friend std::ostream& operator<<(std::ostream& out, const DAGVertex& vertex);
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const DAGVertex& vertex);
 
     /**
      * @brief Comparison operator to compare equivalence of two

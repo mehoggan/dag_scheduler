@@ -77,10 +77,11 @@ std::string get_base_task_configuration_as_json_str() {
 
 void get_base_dag_configuration(YAML::Node& out_config_node) {
     out_config_node = YAML::Node();
-    out_config_node[DUMMY_CONFIG_STR_KEY_1] = std::map<std::string, YAML::Node>(
-            {{DUMMY_CONFIG_INT_KEY, YAML::Node(1)},
-             {DUMMY_CONFIG_FLT_KEY, YAML::Node(2.0)},
-             {DUMMY_CONFIG_BOL_KEY, YAML::Node(false)}});
+    out_config_node[DUMMY_CONFIG_STR_KEY_1] =
+            std::map<std::string, YAML::Node>(
+                    {{DUMMY_CONFIG_INT_KEY, YAML::Node(1)},
+                     {DUMMY_CONFIG_FLT_KEY, YAML::Node(2.0)},
+                     {DUMMY_CONFIG_BOL_KEY, YAML::Node(false)}});
     out_config_node[DUMMY_CONFIG_STR_KEY_2] = 10;
     out_config_node[DUMMY_CONFIG_STR_KEY_3] = 20.0;
     out_config_node[DUMMY_CONFIG_STR_KEY_4] = true;
@@ -307,7 +308,8 @@ TEST(TestYAMLDagDeserializer, make_dag_title_dag_config) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
@@ -332,7 +334,8 @@ TEST(TestYAMLDagDeserializer, make_dag_dag_config) {
     get_base_dag_configuration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("", test_dag->title());
@@ -370,7 +373,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_config) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
              [std::string(YAMLDagDeserializer::VERTICES_KEY)] =
                      std::vector<YAML::Node>{};
@@ -414,7 +418,8 @@ TEST(TestYAMLDagDeserializer, make_dag_title_dag_config_vertices) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     YAML::Node second_vertex;
@@ -623,7 +628,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_named_task) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -656,7 +662,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -702,7 +709,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -749,7 +757,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -949,7 +958,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -978,7 +988,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1020,7 +1031,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1063,7 +1075,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1124,7 +1137,8 @@ TEST(TestYAMLDagDeserializer, make_dag_title_vertices_bad_task_callback) {
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::vector<YAML::Node> vertices = {first_vertex};
     yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
              [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
@@ -1132,9 +1146,9 @@ TEST(TestYAMLDagDeserializer, make_dag_title_vertices_bad_task_callback) {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
     } catch (const YAML::InvalidNode& excep) {
-        EXPECT_EQ(
-                std::string("invalid node; first invalid key: \"LibraryName\""),
-                std::string(excep.what()));
+        EXPECT_EQ(std::string(
+                          "invalid node; first invalid key: \"LibraryName\""),
+                  std::string(excep.what()));
     }
 }
 
@@ -1152,7 +1166,8 @@ TEST(TestYAMLDagDeserializer,
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -1190,7 +1205,8 @@ TEST(TestYAMLDagDeserializer,
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1232,7 +1248,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_callback) {
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1280,7 +1297,8 @@ TEST(TestYAMLDagDeserializer,
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1334,7 +1352,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1395,7 +1414,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1442,7 +1462,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1451,7 +1472,8 @@ TEST(TestYAMLDagDeserializer,
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1489,7 +1511,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1505,7 +1528,8 @@ TEST(TestYAMLDagDeserializer,
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1549,7 +1573,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1565,7 +1590,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1610,7 +1636,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1632,7 +1659,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1689,7 +1717,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_callback_plugin) {
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1737,7 +1766,8 @@ TEST(TestYAMLDagDeserializer,
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1791,7 +1821,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1852,7 +1883,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1899,7 +1931,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1908,7 +1941,8 @@ TEST(TestYAMLDagDeserializer,
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -1946,7 +1980,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -1962,7 +1997,8 @@ TEST(TestYAMLDagDeserializer,
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -2006,7 +2042,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2022,7 +2059,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -2067,7 +2105,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2089,7 +2128,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -2147,7 +2187,8 @@ TEST(TestYAMLDagDeserializer,
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
@@ -2223,7 +2264,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages) {
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2268,7 +2310,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages) {
     EXPECT_EQ(1, stage_count);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages_task_config) {
+TEST(TestYAMLDagDeserializer,
+     make_dag_label_vertices_task_stages_task_config) {
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
     std::string stages_lib_path =
             testing::TestEnvironment::PATHING.get_stages_lib_path();
@@ -2292,7 +2335,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages_task_config) {
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2368,7 +2412,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2451,7 +2496,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2519,7 +2565,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task_stages) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2528,7 +2575,8 @@ TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task_stages) {
                 [std::string(YAMLDagDeserializer::NAME_KEY)] =
                         YAML::Node(uuid1_task_label);
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2588,7 +2636,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2604,7 +2653,8 @@ TEST(TestYAMLDagDeserializer,
                         task_config;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2670,7 +2720,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2686,7 +2737,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
@@ -2753,7 +2805,8 @@ TEST(TestYAMLDagDeserializer,
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
             {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+             {YAMLDagDeserializer::CONFIGURATION_KEY,
+              dag_configuration_node}});
     YAML::Node first_vertex;
     first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
@@ -2775,7 +2828,8 @@ TEST(TestYAMLDagDeserializer,
                         task_initial_inputs;
 
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] =
+                        YAML::Node();
     first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
                 [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
                 [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =

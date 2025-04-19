@@ -48,7 +48,8 @@ YAMLDagDeserializerNonSupportedCallbackType::
         YAMLDagDeserializerNonSupportedCallbackType(const std::string& what)
         : std::exception(), what_(what) {}
 
-const char* YAMLDagDeserializerNonSupportedCallbackType::what() const noexcept {
+const char* YAMLDagDeserializerNonSupportedCallbackType::what()
+        const noexcept {
     return what_.c_str();
 }
 
@@ -129,7 +130,8 @@ void YAMLDagDeserializer::verticesStr(std::string& ret) {
 }
 
 void YAMLDagDeserializer::connectionsStr(std::string& ret) {
-    ret = std::string("  Connections:\n") + std::string("    - Connection:\n") +
+    ret = std::string("  Connections:\n") +
+          std::string("    - Connection:\n") +
           std::string("      From: <valid uuid4 string from vertex>\n") +
           std::string("      To: <valid uuid4 string from vertex>\n") +
           std::string("    ...");
@@ -488,7 +490,8 @@ void YAMLDagDeserializer::makeTaskCallback(
                                     "Currently ") +
                         std::string("only \"FUNCTION\" or \"PLUGIN\" are "
                                     "accepted. ") +
-                        std::string("Note these values are case insensitive."));
+                        std::string(
+                                "Note these values are case insensitive."));
             }
         } else {
             std::stringstream error_builder;
@@ -520,10 +523,11 @@ std::function<void(bool)> YAMLDagDeserializer::makeTaskFunctionCallback(
         ret_val = shared_library.getSharedLib().get_alias<void(bool)>(
                 symbol_name);
     } else {
-        throw YAMLDagDeserializerError("Failed to load " + symbol_name +
-                                       " from " + shared_library.getName() +
-                                       ". It could not be found in available " +
-                                       " symbols of " + cb_symbols);
+        throw YAMLDagDeserializerError(
+                "Failed to load " + symbol_name + " from " +
+                shared_library.getName() +
+                ". It could not be found in available " + " symbols of " +
+                cb_symbols);
     }
     return ret_val;
 }
@@ -648,7 +652,8 @@ void YAMLDagDeserializer::loadStages(
 
                 std::string symbol_name;
                 if (stage_node[SYMBOL_NAME_KEY]) {
-                    symbol_name = stage_node[SYMBOL_NAME_KEY].as<std::string>();
+                    symbol_name =
+                            stage_node[SYMBOL_NAME_KEY].as<std::string>();
                 } else {
                     std::stringstream error_stream;
                     error_stream << std::string("The required key of \"")
@@ -662,9 +667,9 @@ void YAMLDagDeserializer::loadStages(
                 try {
                     Logging::info(
                             LOG_TAG, "Going to try and load", library_name);
-                    const DynamicLibraryRegistry::RegistryItem& shared_library =
-                            DynamicLibraryRegistry::registerDynamicLibrary(
-                                    library_name);
+                    const DynamicLibraryRegistry::RegistryItem&
+                            shared_library = DynamicLibraryRegistry::
+                                    registerDynamicLibrary(library_name);
                     std::unique_ptr<TaskStage> next_stage =
                             dynamicallyLoadStage(
                                     shared_library, symbol_name, stage_name);

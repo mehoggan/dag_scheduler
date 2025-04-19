@@ -56,7 +56,8 @@ bool dagTopologicalSort(DAG& dag, std::list<DAGVertex>& sorted_vertices) {
             std::shared_ptr<DAGVertex> vertex_lock =
                     e_ref.getConnection().lock();
             e_ref.connectTo(nullptr);
-            assert(vertex_lock && "Removing connection got rid of shared_ptr.");
+            assert(vertex_lock &&
+                   "Removing connection got rid of shared_ptr.");
             if (!(vertex_lock->hasIncomingEdges())) {
                 start_nodes_list.push_back(vertex_lock);
             }
@@ -79,7 +80,9 @@ bool dagTopologicalSort(DAG& dag, std::list<DAGVertex>& sorted_vertices) {
 }
 
 // TODO (mehoggan@gmail.com): Verify that this is tested.
-bool processDag(DAG& dag, processed_order_type& out, TaskScheduler& scheduler) {
+bool processDag(DAG& dag,
+                processed_order_type& out,
+                TaskScheduler& scheduler) {
     bool ret_val = false;
     LogTag log_tag(__FUNCTION__);
     Logging::addStdCoutLogger(log_tag);
@@ -97,14 +100,15 @@ bool processDag(DAG& dag, processed_order_type& out, TaskScheduler& scheduler) {
 
         std::vector<DAGVertex> vertices_to_process;
         while (!curr_dag_vertices_with_no_incoming_edges.empty()) {
-            std::for_each(curr_dag_vertices_with_no_incoming_edges.begin(),
-                          curr_dag_vertices_with_no_incoming_edges.end(),
-                          [&](std::shared_ptr<DAGVertex> vertex) {
-                              DAGVertex v_clone = vertex->clone();
-                              assert(g_clone.removeVertex(*(vertex.get())) &&
-                                     "Failed to remove vertex from graph.");
-                              vertices_to_process.push_back(std::move(v_clone));
-                          });
+            std::for_each(
+                    curr_dag_vertices_with_no_incoming_edges.begin(),
+                    curr_dag_vertices_with_no_incoming_edges.end(),
+                    [&](std::shared_ptr<DAGVertex> vertex) {
+                        DAGVertex v_clone = vertex->clone();
+                        assert(g_clone.removeVertex(*(vertex.get())) &&
+                               "Failed to remove vertex from graph.");
+                        vertices_to_process.push_back(std::move(v_clone));
+                    });
 
             out.push_back({});
             for (DAGVertex& vertex : vertices_to_process) {

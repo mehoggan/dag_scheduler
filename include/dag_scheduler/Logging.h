@@ -131,7 +131,7 @@ private:
                                  T&& arg,
                                  Ts&&... args) {
         sstream << std::forward<T>(arg) << " ";
-        log_string_builder(sstream, args...);
+        logStringBuilder(sstream, args...);
     }
 
 public:

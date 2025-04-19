@@ -27,6 +27,7 @@ TEST(TestDynamicLibraryRegistry, register_dynamic_library_dne) {
 
 TEST(TestDynamicLibraryRegistry, register_dynamic_library_exists) {
     std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    ASSERT_NO_THROW(DynamicLibraryRegistry::register_dynamic_library(lib_path));
+    ASSERT_NO_THROW(
+            DynamicLibraryRegistry::register_dynamic_library(lib_path));
 }
 }  // namespace com::dag_scheduler

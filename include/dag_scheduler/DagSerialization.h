@@ -144,12 +144,13 @@ private:
     void makeTask(const YAML::Node& task_node,
                   std::unique_ptr<Task>& task) const;
     void throwWrongType(const UpTo& upto, const std::string& error) const;
-    void makeTaskCallback(const std::string& task_name,
-                          std::vector<std::unique_ptr<TaskStage>>& stages,
-                          const YAML::Node& callback_node,
-                          std::unique_ptr<Task>& task,
-                          const rapidjson::Document& json_config,
-                          const rapidjson::Document& json_initial_inputs) const;
+    void makeTaskCallback(
+            const std::string& task_name,
+            std::vector<std::unique_ptr<TaskStage>>& stages,
+            const YAML::Node& callback_node,
+            std::unique_ptr<Task>& task,
+            const rapidjson::Document& json_config,
+            const rapidjson::Document& json_initial_inputs) const;
     std::function<void(bool)> makeTaskFunctionCallback(
             const DynamicLibraryRegistry::RegistryItem& shared_library,
             const std::string& symbol_name) const;

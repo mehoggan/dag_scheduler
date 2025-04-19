@@ -34,7 +34,8 @@ Task::Task() : LoggedClass<Task>(*this), iterating_(false), kill_(false) {
     set_json_initial_inputs(json_empty);
 }
 
-Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages) : Task(stages, "") {
+Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages)
+        : Task(stages, "") {
     label_ = uuid_.as_string();
     rapidjson::Document json_empty;
     set_json_config(json_empty);
@@ -275,7 +276,9 @@ bool Task::callback_plugin_is_set() const {
     return complete_callback_plugin_ != nullptr;
 }
 
-const rapidjson::Document& Task::json_config() const { return (*json_config_); }
+const rapidjson::Document& Task::json_config() const {
+    return (*json_config_);
+}
 
 void Task::json_config_str(std::string& out_str) const {
     if (json_config_) {

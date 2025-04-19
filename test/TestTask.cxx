@@ -121,7 +121,8 @@ TEST_F(TestTask, default_ctor_clone) {
     std::unique_ptr<Task> test(new TestTaskImpl);
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     {
         std::string empty_config;
         test->json_config_str(empty_config);
@@ -179,7 +180,8 @@ TEST_F(TestTask, label_ctor_clone) {
     std::unique_ptr<Task> test(new TestTaskImpl("test_label"));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     std::string empty_config;
     test_clone->json_config_str(empty_config);
@@ -209,7 +211,8 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_clone) {
             new TestTaskImpl("test_label", complete_callback));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     test_clone->complete(true);
     std::string empty_config;
@@ -239,7 +242,8 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin_clone) {
             "test_label", std::move(complete_callback_plugin)));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     EXPECT_TRUE(test_clone->callback_plugin_is_set());
     test_clone->complete(true);
@@ -270,7 +274,8 @@ TEST_F(TestTask, label_ctor_with_initial_inputs_clone) {
             new TestTaskImpl("test_label", json_initial_inputs));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     std::string actual_initial_inputs;
     test_clone->json_initial_inputs_str(actual_initial_inputs);
@@ -288,8 +293,10 @@ TEST_F(TestTask,
     std::function<void(bool)> complete_callback = [](bool status) {
         EXPECT_TRUE(status);
     };
-    std::unique_ptr<Task> test(new TestTaskImpl(
-            "test_label", json_initial_inputs, json_config, complete_callback));
+    std::unique_ptr<Task> test(new TestTaskImpl("test_label",
+                                                json_initial_inputs,
+                                                json_config,
+                                                complete_callback));
     EXPECT_NE(nullptr, test);
     EXPECT_NE(test->get_uuid().as_string(), test->label());
     EXPECT_EQ("test_label", test->label());
@@ -309,11 +316,14 @@ TEST_F(TestTask,
     std::function<void(bool)> complete_callback = [](bool status) {
         EXPECT_TRUE(status);
     };
-    std::unique_ptr<Task> test(new TestTaskImpl(
-            "test_label", json_initial_inputs, json_config, complete_callback));
+    std::unique_ptr<Task> test(new TestTaskImpl("test_label",
+                                                json_initial_inputs,
+                                                json_config,
+                                                complete_callback));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     test_clone->complete(true);
     std::string actual_config;
@@ -361,7 +371,8 @@ TEST_F(TestTask,
                              std::move(complete_callback_plugin)));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->get_uuid().as_string(),
+              test->get_uuid().as_string());
     EXPECT_EQ("test_label", test_clone->label());
     EXPECT_TRUE(test_clone->callback_plugin_is_set());
     test_clone->complete(true);

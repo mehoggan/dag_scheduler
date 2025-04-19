@@ -7,86 +7,90 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#include "dag_scheduler/ServiceHelpers.h"
+#include <boost/asio/ssl.hpp>
+#include <boost/beast.hpp>
+#include <boost/filesystem/path.hpp>
+
+#include "dag_scheduler/Logging.h"
 
 namespace detail {
-boost::beast::string_view mime_type(boost::beast::string_view path) {
-    const auto ext = [&path] {
-        const auto pos = path.rfind(".");
-        boost::beast::string_view ret;
-        if (pos != boost::beast::string_view::npos) {
-            ret = path.substr(pos);
+boost::beast::string_view mimeType(boost::beast::string_view path) {
+    const auto extension = [&path] {
+        const auto position = path.rfind(".");
+        boost::beast::string_view ret_val;
+        if (position != boost::beast::string_view::npos) {
+            ret_val = path.substr(position);
         }
-        return ret;
+        return ret_val;
     }();
-    boost::beast::string_view ret;
-    if (boost::beast::iequals(ext, ".htm")) {
-        ret = "text/html";
-    } else if (boost::beast::iequals(ext, ".html")) {
-        ret = "text/html";
-    } else if (boost::beast::iequals(ext, ".php")) {
-        ret = "text/html";
-    } else if (boost::beast::iequals(ext, ".css")) {
-        ret = "text/css";
-    } else if (boost::beast::iequals(ext, ".txt")) {
-        ret = "text/plain";
-    } else if (boost::beast::iequals(ext, ".js")) {
-        ret = "application/javascript";
-    } else if (boost::beast::iequals(ext, ".json")) {
-        ret = "application/json";
-    } else if (boost::beast::iequals(ext, ".xml")) {
-        ret = "application/xml";
-    } else if (boost::beast::iequals(ext, ".swf")) {
-        ret = "application/x-shockwave-flash";
-    } else if (boost::beast::iequals(ext, ".flv")) {
-        ret = "video/x-flv";
-    } else if (boost::beast::iequals(ext, ".png")) {
-        ret = "image/png";
-    } else if (boost::beast::iequals(ext, ".jpe")) {
-        ret = "image/jpeg";
-    } else if (boost::beast::iequals(ext, ".jpeg")) {
-        ret = "image/jpeg";
-    } else if (boost::beast::iequals(ext, ".jpg")) {
-        ret = "image/jpeg";
-    } else if (boost::beast::iequals(ext, ".gif")) {
-        ret = "image/gif";
-    } else if (boost::beast::iequals(ext, ".bmp")) {
-        ret = "image/bmp";
-    } else if (boost::beast::iequals(ext, ".ico")) {
-        ret = "image/vnd.microsoft.icon";
-    } else if (boost::beast::iequals(ext, ".tiff")) {
-        ret = "image/tiff";
-    } else if (boost::beast::iequals(ext, ".tif")) {
-        ret = "image/tiff";
-    } else if (boost::beast::iequals(ext, ".svg")) {
-        ret = "image/svg+xml";
-    } else if (boost::beast::iequals(ext, ".sggz")) {
-        ret = "image/svg+xml";
+    boost::beast::string_view ret_val;
+    if (boost::beast::iequals(extension, ".htm")) {
+        ret_val = "text/html";
+    } else if (boost::beast::iequals(extension, ".html")) {
+        ret_val = "text/html";
+    } else if (boost::beast::iequals(extension, ".php")) {
+        ret_val = "text/html";
+    } else if (boost::beast::iequals(extension, ".css")) {
+        ret_val = "text/css";
+    } else if (boost::beast::iequals(extension, ".txt")) {
+        ret_val = "text/plain";
+    } else if (boost::beast::iequals(extension, ".js")) {
+        ret_val = "application/javascript";
+    } else if (boost::beast::iequals(extension, ".json")) {
+        ret_val = "application/json";
+    } else if (boost::beast::iequals(extension, ".xml")) {
+        ret_val = "application/xml";
+    } else if (boost::beast::iequals(extension, ".swf")) {
+        ret_val = "application/x-shockwave-flash";
+    } else if (boost::beast::iequals(extension, ".flv")) {
+        ret_val = "video/x-flv";
+    } else if (boost::beast::iequals(extension, ".png")) {
+        ret_val = "image/png";
+    } else if (boost::beast::iequals(extension, ".jpe")) {
+        ret_val = "image/jpeg";
+    } else if (boost::beast::iequals(extension, ".jpeg")) {
+        ret_val = "image/jpeg";
+    } else if (boost::beast::iequals(extension, ".jpg")) {
+        ret_val = "image/jpeg";
+    } else if (boost::beast::iequals(extension, ".gif")) {
+        ret_val = "image/gif";
+    } else if (boost::beast::iequals(extension, ".bmp")) {
+        ret_val = "image/bmp";
+    } else if (boost::beast::iequals(extension, ".ico")) {
+        ret_val = "image/vnd.microsoft.icon";
+    } else if (boost::beast::iequals(extension, ".tiff")) {
+        ret_val = "image/tiff";
+    } else if (boost::beast::iequals(extension, ".tif")) {
+        ret_val = "image/tiff";
+    } else if (boost::beast::iequals(extension, ".svg")) {
+        ret_val = "image/svg+xml";
+    } else if (boost::beast::iequals(extension, ".sggz")) {
+        ret_val = "image/svg+xml";
     } else {
-        ret = "application/text";
+        ret_val = "application/text";
     }
-    return ret;
+    return ret_val;
 }
 
-std::string path_cat(boost::beast::string_view base,
-                     boost::beast::string_view path) {
-    std::string ret;
+std::string pathCat(boost::beast::string_view base,
+                    boost::beast::string_view path) {
+    std::string ret_val;
     if (base.empty()) {
-        ret = std::string(path);
+        ret_val = std::string(path);
     } else {
-        ret = std::string(base);
+        ret_val = std::string(base);
         constexpr char path_separator = '/';
-        if (ret.back() == path_separator) {
-            ret.resize(ret.size() - 1);
+        if (ret_val.back() == path_separator) {
+            ret_val.resize(ret_val.size() - 1);
         }
-        ret.append(path.data(), path.size());
+        ret_val.append(path.data(), path.size());
     }
-    return ret;
+    return ret_val;
 }
 
-void load_server_cert(boost::asio::ssl::context& ctx,
-                      const boost::filesystem::path& pem_path_,
-                      com::dag_scheduler::LogTag& LOG_TAG) {
+void loadServerCert(boost::asio::ssl::context& ctx,
+                    const boost::filesystem::path& pem_path_,
+                    com::dag_scheduler::LogTag& LOG_TAG) {
     /*
      * The certificate was generated from CMD.EXE on Windows 10 using:
      * winpty openssl dhparam -out dh.pem 2048
@@ -111,42 +115,47 @@ void load_server_cert(boost::asio::ssl::context& ctx,
 }
 
 boost::beast::http::response<boost::beast::http::string_body>
-bad_request_handler(
+badRequestHandler(
         boost::beast::string_view why,
         boost::beast::http::request<boost::beast::http::string_body>& req) {
-    boost::beast::http::response<boost::beast::http::string_body> res(
+    boost::beast::http::response<boost::beast::http::string_body> resource(
             boost::beast::http::status::bad_request, req.version());
-    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(boost::beast::http::field::content_script_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = std::string(why);
-    res.prepare_payload();
-    return res;
+    resource.set(boost::beast::http::field::server,
+                 BOOST_BEAST_VERSION_STRING);
+    resource.set(boost::beast::http::field::content_script_type, "text/html");
+    resource.keep_alive(req.keep_alive());
+    resource.body() = std::string(why);
+    resource.prepare_payload();
+    return resource;
 }
 
-boost::beast::http::response<boost::beast::http::string_body> not_found_handler(
+boost::beast::http::response<boost::beast::http::string_body> notFoundHandler(
         boost::beast::string_view target,
-        boost::beast::http::request<boost::beast::http::string_body>& req) {
-    boost::beast::http::response<boost::beast::http::string_body> res(
-            boost::beast::http::status::not_found, req.version());
-    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(boost::beast::http::field::content_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = "The resource '" + std::string(target) + "' was not found.\n";
-    res.prepare_payload();
-    return res;
+        boost::beast::http::request<boost::beast::http::string_body>&
+                request) {
+    boost::beast::http::response<boost::beast::http::string_body> response(
+            boost::beast::http::status::not_found, request.version());
+    response.set(boost::beast::http::field::server,
+                 BOOST_BEAST_VERSION_STRING);
+    response.set(boost::beast::http::field::content_type, "text/html");
+    response.keep_alive(request.keep_alive());
+    response.body() =
+            "The resource '" + std::string(target) + "' was not found.\n";
+    response.prepare_payload();
+    return response;
 }
 
 boost::beast::http::response<boost::beast::http::string_body>
-server_error_handler(
+serverErrorHandler(
         boost::beast::string_view what,
         boost::beast::http::request<boost::beast::http::string_body>& req) {
-    boost::beast::http::response<boost::beast::http::string_body> res(
+    boost::beast::http::response<boost::beast::http::string_body> response(
             boost::beast::http::status::internal_server_error, req.version());
-    res.set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
-    res.set(boost::beast::http::field::content_type, "text/html");
-    res.keep_alive(req.keep_alive());
-    res.body() = "An error occurred: '" + std::string(what) + "'\n";
-    return res;
+    response.set(boost::beast::http::field::server,
+                 BOOST_BEAST_VERSION_STRING);
+    response.set(boost::beast::http::field::content_type, "text/html");
+    response.keep_alive(req.keep_alive());
+    response.body() = "An error occurred: '" + std::string(what) + "'\n";
+    return response;
 }
 }  // namespace detail

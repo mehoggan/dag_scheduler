@@ -73,7 +73,9 @@ void TaskScheduler::queue_task(std::unique_ptr<Task>&& t) {
     queue_.push(std::move(t));
 }
 
-bool TaskScheduler::kill_task(const Task& t) { return kill_task(t.get_uuid()); }
+bool TaskScheduler::kill_task(const Task& t) {
+    return kill_task(t.get_uuid());
+}
 
 bool TaskScheduler::kill_task(const UUID& u) {
     std::unique_ptr<Task> to_kill;

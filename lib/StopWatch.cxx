@@ -18,7 +18,7 @@ StopWatch::StopWatch(const LogTag& tag,
         , was_stopped_(true)
         , was_started_(false)
         , start_(std::chrono::high_resolution_clock::now()) {
-    Logging::add_std_cout_logger(LOG_TAG);
+    Logging::addStdCoutLogger(LOG_TAG);
 
     if (start_on_construction) {
         start();
@@ -78,8 +78,8 @@ void StopWatch::start() {
 
 std::chrono::nanoseconds StopWatch::stop() {
     if (was_started_.load()) {
-        auto now = std::chrono::high_resolution_clock::now();
-        return print(now);
+        auto time_now = std::chrono::high_resolution_clock::now();
+        return print(time_now);
         was_stopped_.store(true);
         was_started_.store(false);
     } else {
@@ -89,8 +89,8 @@ std::chrono::nanoseconds StopWatch::stop() {
 
 std::chrono::nanoseconds StopWatch::mark() {
     if (was_started_.load()) {
-        auto now = std::chrono::high_resolution_clock::now();
-        return print(now);
+        auto time_now = std::chrono::high_resolution_clock::now();
+        return print(time_now);
     } else {
         return print(start_);
     }
@@ -104,8 +104,8 @@ std::chrono::nanoseconds StopWatch::print(
     auto print_d =
             std::chrono::duration_cast<std::chrono::nanoseconds>(duration)
                     .count();
-    auto log = std::string("Operation [") + memo_ + std::string("] took");
-    Logging::info(LOG_TAG, log, print_d, "nanoseconds.");
+    auto log_str = std::string("Operation [") + memo_ + std::string("] took");
+    Logging::info(LOG_TAG, log_str, print_d, "nanoseconds.");
 
     return duration;
 }
