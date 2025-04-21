@@ -30,7 +30,7 @@ bool TaskScheduler::startup() {
         bool should_get_next = !(kill_.load() || pause_.load());
         if (should_get_next) {
             std::unique_ptr<Task> next_task = nullptr;
-            queue_.wait_for_and_pop(next_task, refresh_time);
+            queue_.waitForAndPop(next_task, refresh_time);
             if (next_task) {
                 Logging::info(LOG_TAG, "next task =", (*next_task));
                 while (true) {
@@ -41,7 +41,7 @@ bool TaskScheduler::startup() {
                         break;
                     }
                     if (!pause_.load()) {
-                        std::size_t unused_index = first_unused_thread();
+                        std::size_t unused_index = firstUnusedThread();
                         if (unused_index != static_cast<std::size_t>(-1)) {
                             if (kill_.load()) {
                                 if (next_task) {
@@ -54,9 +54,8 @@ bool TaskScheduler::startup() {
                                 std::lock_guard<std::mutex> lock(
                                         thread_pool_lock_);
                                 if (next_task) {
-                                    thread_pool_[unused_index]
-                                            ->set_task_and_run(
-                                                    std::move(next_task));
+                                    thread_pool_[unused_index]->setTaskAndRun(
+                                            std::move(next_task));
                                 }
                             }
                         }
@@ -69,17 +68,17 @@ bool TaskScheduler::startup() {
     return true;
 }
 
-void TaskScheduler::queue_task(std::unique_ptr<Task>&& t) {
-    queue_.push(std::move(t));
+void TaskScheduler::queueTask(std::unique_ptr<Task>&& task) {
+    queue_.push(std::move(task));
 }
 
-bool TaskScheduler::kill_task(const Task& t) {
-    return kill_task(t.get_uuid());
+bool TaskScheduler::killTask(const Task& task) {
+    return killTask(task.getUUID());
 }
 
-bool TaskScheduler::kill_task(const UUID& u) {
+bool TaskScheduler::killTask(const UUID& uuid) {
     std::unique_ptr<Task> to_kill;
-    queue_.remove_task_from_queue(u, to_kill);
+    queue_.removeTaskFromQueue(uuid, to_kill);
     return true;
 }
 
@@ -87,20 +86,20 @@ void TaskScheduler::pause() { pause_.store(true); }
 
 void TaskScheduler::resume() { pause_.store(false); }
 
-bool TaskScheduler::is_paused() { return pause_.load(); }
+bool TaskScheduler::isPaused() { return pause_.load(); }
 
 void TaskScheduler::shutdown() {
     pause();
     kill_.store(true);
 }
 
-bool TaskScheduler::is_shutdown() { return kill_.load(); }
+bool TaskScheduler::isShutdown() { return kill_.load(); }
 
-std::size_t TaskScheduler::first_unused_thread() {
+std::size_t TaskScheduler::firstUnusedThread() {
     std::lock_guard<std::mutex> lock(thread_pool_lock_);
     std::size_t first_unused_index = static_cast<std::size_t>(-1);
     for (std::size_t i = 0; i < thread_pool_.size(); ++i) {
-        if (!thread_pool_[i]->is_running()) {
+        if (!thread_pool_[i]->isRunning()) {
             first_unused_index = i;
             break;
         }

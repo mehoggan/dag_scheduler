@@ -16,10 +16,20 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
+#include <boost/functional/hash.hpp>
 #include <memory>
 
 #include "dag_scheduler/Endpoints.h"
 #include "dag_scheduler/LoggedClass.hpp"
+
+class StringViewHasher {
+public:
+    std::size_t operator()(
+            const boost::beast::string_view& string_view) const {
+        std::string hash_string(string_view.data(), string_view.size());
+        return boost::hash_range(hash_string.begin(), hash_string.end());
+    }
+};
 
 /*
  * Code in this module borrowed from:
@@ -48,7 +58,8 @@ public:
 
     private:
         std::unordered_map<boost::beast::string_view,
-                           std::unique_ptr<EndpointHandler>>
+                           std::unique_ptr<EndpointHandler>,
+                           StringViewHasher>
                 router_;
     };
 

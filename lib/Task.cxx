@@ -19,36 +19,36 @@
 #include "dag_scheduler/Logging.h"
 #include "dag_scheduler/TaskCallbackPlugin.h"
 
-void default_task_callback(bool _) noexcept {
-    (void)_;
+void defaultTaskCallback(bool dummy) noexcept {
+    (void)dummy;
     std::cout << "Default task callback called." << std::endl;
 }
 
-BOOST_DLL_ALIAS_SECTIONED(default_task_callback, task_callback, TaskCb)
+BOOST_DLL_ALIAS_SECTIONED(defaultTaskCallback, task_callback, TaskCb)
 
 namespace com::dag_scheduler {
 Task::Task() : LoggedClass<Task>(*this), iterating_(false), kill_(false) {
-    label_ = uuid_.as_string();
+    label_ = uuid_.asString();
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_empty);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_empty);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages)
         : Task(stages, "") {
-    label_ = uuid_.as_string();
+    label_ = uuid_.asString();
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_empty);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_empty);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
            const rapidjson::Document& json_initial_inputs)
         : Task(stages, "") {
-    label_ = uuid_.as_string();
+    label_ = uuid_.asString();
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -59,8 +59,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , stages_(std::move(stages))
         , label_(label) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_empty);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_empty);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -72,8 +72,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , stages_(std::move(stages))
         , label_(label) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -86,8 +86,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , label_(label)
         , complete_callback_(complete_callback) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_empty);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_empty);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -101,8 +101,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , label_(label)
         , complete_callback_(complete_callback) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -115,8 +115,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , label_(label)
         , complete_callback_plugin_(std::move(complete_callback_plugin)) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_empty);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_empty);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -130,8 +130,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , label_(label)
         , complete_callback_plugin_(std::move(complete_callback_plugin)) {
     rapidjson::Document json_empty;
-    set_json_config(json_empty);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_empty);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -141,8 +141,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , iterating_(false)
         , kill_(false)
         , stages_(std::move(stages)) {
-    set_json_config(json_config);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_config);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -154,8 +154,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , kill_(false)
         , stages_(std::move(stages))
         , label_(label) {
-    set_json_config(json_config);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_config);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -169,8 +169,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , stages_(std::move(stages))
         , label_(label)
         , complete_callback_(complete_callback) {
-    set_json_config(json_config);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_config);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
@@ -184,8 +184,8 @@ Task::Task(std::vector<std::unique_ptr<TaskStage>>& stages,
         , stages_(std::move(stages))
         , label_(label)
         , complete_callback_plugin_(std::move(complete_callback_plugin)) {
-    set_json_config(json_config);
-    set_json_initial_inputs(json_initial_inputs);
+    setJsonConfig(json_config);
+    setJsonInitialInputs(json_initial_inputs);
 }
 
 Task::~Task() {}
@@ -222,23 +222,23 @@ Task& Task::operator=(Task&& other) {
 
 const std::string& Task::label() const { return label_; }
 
-const UUID& Task::get_uuid() const { return uuid_; }
+const UUID& Task::getUUID() const { return uuid_; }
 
-bool Task::iterate_stages(const std::function<bool(TaskStage&)>& next_stage) {
+bool Task::iterateStages(const std::function<bool(TaskStage&)>& next_stage) {
     bool ran_all = false;
 
     if (!iterating_.load()) {
         iterating_.store(true);
         {
-            ran_all = std::all_of(
-                    stages_.begin(),
-                    stages_.end(),
-                    [&](class std::unique_ptr<TaskStage>& next) {
-                        bool ran = next_stage(*next);
-                        next->cleanup();
-                        bool ret = (ran && next->end() && (!kill_.load()));
-                        return ret;
-                    });
+            ran_all = std::all_of(stages_.begin(),
+                                  stages_.end(),
+                                  [&](class std::unique_ptr<TaskStage>& next) {
+                                      bool has_ran = next_stage(*next);
+                                      next->cleanup();
+                                      bool ret_val = (has_ran && next->end() &&
+                                                      (!kill_.load()));
+                                      return ret_val;
+                                  });
         }
         iterating_.store(false);
     }
@@ -252,35 +252,33 @@ bool Task::kill() {
 }
 
 void Task::complete(bool status) {
-    if (callback_is_set()) {
+    if (callbackIsSet()) {
         Logging::info(LOG_TAG, "Going to call user specified function...");
         complete_callback_(status);
     }
 
-    if (callback_plugin_is_set()) {
+    if (callbackPluginIsSet()) {
         Logging::info(
                 LOG_TAG, "Going to call user specified callback", "plugin...");
         complete_callback_plugin_->completed(status, (*this));
     }
 }
 
-bool Task::callback_is_set() const {
-    bool ret = false;
+bool Task::callbackIsSet() const {
+    bool ret_val = false;
     if (complete_callback_) {
-        ret = true;
+        ret_val = true;
     }
-    return ret;
+    return ret_val;
 }
 
-bool Task::callback_plugin_is_set() const {
+bool Task::callbackPluginIsSet() const {
     return complete_callback_plugin_ != nullptr;
 }
 
-const rapidjson::Document& Task::json_config() const {
-    return (*json_config_);
-}
+const rapidjson::Document& Task::jsonConfig() const { return (*json_config_); }
 
-void Task::json_config_str(std::string& out_str) const {
+void Task::jsonConfigStr(std::string& out_str) const {
     if (json_config_) {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -292,7 +290,7 @@ void Task::json_config_str(std::string& out_str) const {
     }
 }
 
-void Task::json_initial_inputs_str(std::string& out_str) const {
+void Task::jsonInitialInputsStr(std::string& out_str) const {
     if (json_initial_inputs_) {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -345,7 +343,7 @@ std::unique_ptr<Task> Task::clone() const {
                                           json_initial_inputs);
     }
 
-    task_ptr->update_uuid(uuid_);
+    task_ptr->updateUUID(uuid_);
 
     return task_ptr;
 }
@@ -356,45 +354,47 @@ bool operator==(const Task& lhs, const Task& rhs) {
 
 bool operator!=(const Task& lhs, const Task& rhs) { return !(lhs == rhs); }
 
-std::ostream& operator<<(std::ostream& out, const Task& t) {
-    out << "label = " << t.label_;
-    if (t.label_ != t.uuid_.as_string()) {
-        out << " uuid = " << t.uuid_;
+std::ostream& operator<<(std::ostream& out, const Task& task) {
+    out << "label = " << task.label_;
+    if (task.label_ != task.uuid_.asString()) {
+        out << " uuid = " << task.uuid_;
     }
-    std::for_each(
-            t.stages_.begin(),
-            t.stages_.end(),
-            [&](const std::unique_ptr<TaskStage>& s) { out << (*s) << " "; });
+    std::for_each(task.stages_.begin(),
+                  task.stages_.end(),
+                  [&](const std::unique_ptr<TaskStage>& stage) {
+                      out << (*stage) << " ";
+                  });
     std::string json_config_string;
-    t.json_config_str(json_config_string);
+    task.jsonConfigStr(json_config_string);
     out << "configuration = " << json_config_string;
     std::string json_initial_inputs_string;
-    t.json_config_str(json_initial_inputs_string);
+    task.jsonConfigStr(json_initial_inputs_string);
     out << "initial_json_inputs = " << json_initial_inputs_string;
 
     return out;
 }
 
-std::stringstream& operator<<(std::stringstream& out, const Task& t) {
-    out << "label = " << t.label_;
-    if (t.label_ != t.uuid_.as_string()) {
-        out << " uuid = " << t.uuid_;
+std::stringstream& operator<<(std::stringstream& out, const Task& task) {
+    out << "label = " << task.label_;
+    if (task.label_ != task.uuid_.asString()) {
+        out << " uuid = " << task.uuid_;
     }
-    std::for_each(
-            t.stages_.begin(),
-            t.stages_.end(),
-            [&](const std::unique_ptr<TaskStage>& s) { out << (*s) << " "; });
+    std::for_each(task.stages_.begin(),
+                  task.stages_.end(),
+                  [&](const std::unique_ptr<TaskStage>& stage) {
+                      out << (*stage) << " ";
+                  });
     std::string json_config_string;
-    t.json_config_str(json_config_string);
+    task.jsonConfigStr(json_config_string);
     out << "configuration:" << json_config_string;
     std::string json_initial_inputs_string;
-    t.json_config_str(json_initial_inputs_string);
+    task.jsonConfigStr(json_initial_inputs_string);
     out << "initial_json_inputs = " << json_initial_inputs_string;
 
     return out;
 }
 
-void Task::set_json_config(const rapidjson::Document& json_config) {
+void Task::setJsonConfig(const rapidjson::Document& json_config) {
     if (json_config_) {
         json_config_.reset();
     }
@@ -402,7 +402,7 @@ void Task::set_json_config(const rapidjson::Document& json_config) {
     json_config_->CopyFrom(json_config, json_config_->GetAllocator());
 }
 
-void Task::set_json_initial_inputs(
+void Task::setJsonInitialInputs(
         const rapidjson::Document& json_initial_inputs) {
     if (json_initial_inputs_) {
         json_initial_inputs_.reset();
@@ -412,5 +412,5 @@ void Task::set_json_initial_inputs(
                                    json_initial_inputs_->GetAllocator());
 }
 
-void Task::update_uuid(const UUID& uuid) { uuid_ = UUID(uuid.as_string()); }
+void Task::updateUUID(const UUID& uuid) { uuid_ = UUID(uuid.asString()); }
 }  // namespace com::dag_scheduler

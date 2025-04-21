@@ -15,9 +15,9 @@ namespace com::dag_scheduler {
 TaskCallbackPlugin::~TaskCallbackPlugin() {}
 
 void TaskCallbackPlugin::completed(bool, Task&) {
-    LogTag CALLBACK_TAG_FOR_THIS = Logging::LogTag_for_this(*this);
-    Logging::add_std_log_logger(Logging::LogTag_for_this(*this));
-    Logging::info(CALLBACK_TAG_FOR_THIS, "Base callback plugin was called.");
+    LogTag callback_tag_for_this = Logging::logTagForThis(*this);
+    Logging::addStdLogLogger(Logging::logTagForThis(*this));
+    Logging::info(callback_tag_for_this, "Base callback plugin was called.");
 }
 
 std::unique_ptr<TaskCallbackPlugin> TaskCallbackPlugin::clone() const {

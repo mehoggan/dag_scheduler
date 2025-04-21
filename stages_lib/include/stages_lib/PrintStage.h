@@ -108,7 +108,7 @@ public:
      * @return true if \ref PrintStage was run successfully, false
      *         otherwise.
      */
-    bool is_running() const override;
+    bool isRunning() const override;
 
     /**
      * @brief A function used to end a \ref PrintStage 's
@@ -154,8 +154,8 @@ public:
     /**
      * @brief Inequality operator for a \ref PrintStage.
      *
-     * @param[in] lhs The left hand side of the inequivalence operator.
-     * @param[in] rhs The right hand side of the inequivalence operator.
+     * @param[in] lhs The left hand side of the not equals operator.
+     * @param[in] rhs The right hand side of the not equals operator.
      *
      * @return false if \p lhs has the same \ref uuid as \p rhs.
      */
@@ -172,7 +172,8 @@ public:
      *
      * @return The stream after \p t has been written to it.
      */
-    friend std::ostream& operator<<(std::ostream& out, const PrintStage& t);
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const PrintStage& stage);
 
     /**
      * @brief A utility function to print a \ref PrintStage to a stream.
@@ -186,7 +187,7 @@ public:
      * @return The stream after \p t has been written to it.
      */
     friend std::stringstream& operator<<(std::stringstream& out,
-                                         const PrintStage& t);
+                                         const PrintStage& stage);
 
 public:
     /**
@@ -207,7 +208,7 @@ public:
      * @return A \ref std::unique_ptr<TaskStage> inserted into a \ref Task's
      *         collection of stages to be executed within a \ref DAGVertex.
      */
-    static std::unique_ptr<com::dag_scheduler::TaskStage> make_stage(
+    static std::unique_ptr<com::dag_scheduler::TaskStage> makeStage(
             const std::string& name);
 
 private:

@@ -10,9 +10,6 @@
 #include <dag_scheduler/Logging.h>
 #include <gtest/gtest.h>
 
-#include <filesystem>
-#include <iostream>
-
 #include "utils/TestEnvironment.h"
 
 int main(int argc, char* argv[]) {
@@ -20,7 +17,7 @@ int main(int argc, char* argv[]) {
     com::dag_scheduler::testing::TestEnvironment::EXE_PATH = exe_path;
 
     com::dag_scheduler::LogTag main_tag("main");
-    com::dag_scheduler::Logging::add_std_cout_logger(main_tag);
+    com::dag_scheduler::Logging::addStdCoutLogger(main_tag);
 
     ::testing::AddGlobalTestEnvironment(
             new com::dag_scheduler::testing::TestEnvironment);
