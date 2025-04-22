@@ -16,7 +16,7 @@
 #include "dag_scheduler/TaskScheduler.h"
 
 namespace com::dag_scheduler {
-typedef std::vector<std::vector<DAGVertex>> processed_order_type;
+typedef std::vector<std::vector<DAGVertex>> ProcessedOrder_t;
 
 /**
  * @brief Takes a dag and finds all dag_vertices with no incoming edges.
@@ -69,7 +69,7 @@ bool dagTopologicalSort(DAG& dag, std::list<DAGVertex>& sorted_vertices);
  * @return False if \ref g could not have all \ref DAGVertex (s)
  *         visited.
  */
-bool processDAG(DAG& dag, processed_order_type& out, TaskScheduler& scheduler);
+bool processDAG(DAG& dag, ProcessedOrder_t& out, TaskScheduler& scheduler);
 }  // namespace com::dag_scheduler
 
 #endif

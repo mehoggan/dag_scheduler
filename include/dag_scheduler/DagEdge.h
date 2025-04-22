@@ -39,7 +39,7 @@ private:
 
 public:
     // TODO: Use DAG class to manage status.
-    enum class Status { initialized, traversed, non_traversable };
+    enum class Status { INITIALIZED, TRAVERSED, NON_TRAVERSABLE };
 
 public:
     /**

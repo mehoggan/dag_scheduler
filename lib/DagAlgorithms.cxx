@@ -80,9 +80,7 @@ bool dagTopologicalSort(DAG& dag, std::list<DAGVertex>& sorted_vertices) {
 }
 
 // TODO (mehoggan@gmail.com): Verify that this is tested.
-bool processDag(DAG& dag,
-                processed_order_type& out,
-                TaskScheduler& scheduler) {
+bool processDag(DAG& dag, ProcessedOrder_t& out, TaskScheduler& scheduler) {
     bool ret_val = false;
     LogTag log_tag(__FUNCTION__);
     Logging::addStdCoutLogger(log_tag);
