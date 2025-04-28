@@ -60,9 +60,9 @@ namespace com::dag_scheduler {
  *         To: <valid uuid4 string from vertex>
  *         ...
  */
-class YAMLDagDeserializerError : public std::exception {
+class YAMLDAGDeserializerError : public std::exception {
 public:
-    explicit YAMLDagDeserializerError(const std::string& what);
+    explicit YAMLDAGDeserializerError(const std::string& what);
 
     const char* what() const noexcept override;
 
@@ -70,9 +70,9 @@ private:
     std::string what_;
 };
 
-class YAMLDagDeserializerNonSupportedCallbackType : public std::exception {
+class YAMLDAGDeserializerNonSupportedCallbackType : public std::exception {
 public:
-    explicit YAMLDagDeserializerNonSupportedCallbackType(
+    explicit YAMLDAGDeserializerNonSupportedCallbackType(
             const std::string& what);
 
     const char* what() const noexcept override;
@@ -81,27 +81,27 @@ private:
     std::string what_;
 };
 
-class YAMLDagWrongTypeError : public YAMLDagDeserializerError {
+class YAMLDAGWrongTypeError : public YAMLDAGDeserializerError {
 public:
-    explicit YAMLDagWrongTypeError(const std::string& what);
+    explicit YAMLDAGWrongTypeError(const std::string& what);
 };
 
-class YAMLDagDeserializer : public LoggedClass<YAMLDagDeserializer> {
+class YAMLDAGDeserializer : public LoggedClass<YAMLDAGDeserializer> {
 public:
-    static const char DAG_KEY[];
-    static const char VERTICES_KEY[];
-    static const char TASK_KEY[];
-    static const char STAGES_KEY[];
-    static const char CONFIGURATION_KEY[];
-    static const char INITIAL_INPUTS_KEY[];
+    static const char dag_key[];
+    static const char vertices_key[];
+    static const char task_key[];
+    static const char stages_key[];
+    static const char configuration_key[];
+    static const char initial_inputs_key[];
 
-    static const char TITLE_KEY[];
-    static const char NAME_KEY[];
-    static const char UUID_KEY[];
-    static const char CALLBACK_KEY[];
-    static const char LIBRARY_NAME_KEY[];
-    static const char SYMBOL_NAME_KEY[];
-    static const char CALLBACK_TYPE_KEY[];
+    static const char title_key[];
+    static const char name_key[];
+    static const char uuid_key[];
+    static const char callback_key[];
+    static const char library_name_key[];
+    static const char symbol_name_key[];
+    static const char callback_type_key[];
 
 public:
     enum class UpTo {
@@ -121,9 +121,9 @@ public:
     /**
      * @brief ctor
      *
-     * A default constructor fo a \ref YAMLDagDeserializer which does nothing.
+     * A default constructor fo a \ref YAMLDAGDeserializer which does nothing.
      */
-    YAMLDagDeserializer();
+    YAMLDAGDeserializer();
 
     /**
      * @brief A factory method that creates a \ref DAG.
@@ -200,7 +200,7 @@ namespace YAML {
 template <> struct convert<std::unique_ptr<com::dag_scheduler::DAG>> {
     static bool decode(const Node& node,
                        std::unique_ptr<com::dag_scheduler::DAG>& rhs) {
-        com::dag_scheduler::YAMLDagDeserializer deserializer;
+        com::dag_scheduler::YAMLDAGDeserializer deserializer;
         rhs = deserializer.makeDAG(node);
         return true;
     }

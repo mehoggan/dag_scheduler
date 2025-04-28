@@ -23,41 +23,41 @@
 #include "rapidjson/writer.h"
 
 namespace com::dag_scheduler {
-const char YAMLDagDeserializer::DAG_KEY[] = "DAG";
-const char YAMLDagDeserializer::VERTICES_KEY[] = "Vertices";
-const char YAMLDagDeserializer::TASK_KEY[] = "Task";
-const char YAMLDagDeserializer::STAGES_KEY[] = "Stages";
-const char YAMLDagDeserializer::CONFIGURATION_KEY[] = "Configuration";
-const char YAMLDagDeserializer::INITIAL_INPUTS_KEY[] = "InitialInputs";
-const char YAMLDagDeserializer::TITLE_KEY[] = "Title";
-const char YAMLDagDeserializer::NAME_KEY[] = "Name";
-const char YAMLDagDeserializer::UUID_KEY[] = "UUID";
-const char YAMLDagDeserializer::CALLBACK_KEY[] = "Callback";
-const char YAMLDagDeserializer::LIBRARY_NAME_KEY[] = "LibraryName";
-const char YAMLDagDeserializer::SYMBOL_NAME_KEY[] = "SymbolName";
-const char YAMLDagDeserializer::CALLBACK_TYPE_KEY[] = "Type";
+const char YAMLDAGDeserializer::dag_key[] = "DAG";
+const char YAMLDAGDeserializer::vertices_key[] = "Vertices";
+const char YAMLDAGDeserializer::task_key[] = "Task";
+const char YAMLDAGDeserializer::stages_key[] = "Stages";
+const char YAMLDAGDeserializer::configuration_key[] = "Configuration";
+const char YAMLDAGDeserializer::initial_inputs_key[] = "InitialInputs";
+const char YAMLDAGDeserializer::title_key[] = "Title";
+const char YAMLDAGDeserializer::name_key[] = "Name";
+const char YAMLDAGDeserializer::uuid_key[] = "UUID";
+const char YAMLDAGDeserializer::callback_key[] = "Callback";
+const char YAMLDAGDeserializer::library_name_key[] = "LibraryName";
+const char YAMLDAGDeserializer::symbol_name_key[] = "SymbolName";
+const char YAMLDAGDeserializer::callback_type_key[] = "Type";
 
-YAMLDagDeserializerError::YAMLDagDeserializerError(const std::string& what)
+YAMLDAGDeserializerError::YAMLDAGDeserializerError(const std::string& what)
         : std::exception(), what_(what) {}
 
-const char* YAMLDagDeserializerError::what() const noexcept {
+const char* YAMLDAGDeserializerError::what() const noexcept {
     return what_.c_str();
 }
 
-YAMLDagDeserializerNonSupportedCallbackType::
-        YAMLDagDeserializerNonSupportedCallbackType(const std::string& what)
+YAMLDAGDeserializerNonSupportedCallbackType::
+        YAMLDAGDeserializerNonSupportedCallbackType(const std::string& what)
         : std::exception(), what_(what) {}
 
-const char* YAMLDagDeserializerNonSupportedCallbackType::what()
+const char* YAMLDAGDeserializerNonSupportedCallbackType::what()
         const noexcept {
     return what_.c_str();
 }
 
-YAMLDagWrongTypeError::YAMLDagWrongTypeError(const std::string& what)
-        : YAMLDagDeserializerError(what) {}
+YAMLDAGWrongTypeError::YAMLDAGWrongTypeError(const std::string& what)
+        : YAMLDAGDeserializerError(what) {}
 
-YAMLDagDeserializer::YAMLDagDeserializer()
-        : LoggedClass<YAMLDagDeserializer>(*this) {}
+YAMLDAGDeserializer::YAMLDAGDeserializer()
+        : LoggedClass<YAMLDAGDeserializer>(*this) {}
 
 std::string n2s(const YAML::Node& node) {
     std::stringstream string_stream;
@@ -65,14 +65,14 @@ std::string n2s(const YAML::Node& node) {
     return string_stream.str();
 }
 
-void YAMLDagDeserializer::stageStr(std::string& ret) {
+void YAMLDAGDeserializer::stageStr(std::string& ret) {
     ret = std::string("            - Name: <optional string>\n") +
           std::string("              LibraryName: <string>\n") +
           std::string("              SymbolName: <string>\n") +
           std::string("          ...\n") + std::string("    ...\n");
 }
 
-void YAMLDagDeserializer::stagesStr(std::string& ret) {
+void YAMLDAGDeserializer::stagesStr(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("        Stages:\n") + std::string("          ...");
     } else {
@@ -80,7 +80,7 @@ void YAMLDagDeserializer::stagesStr(std::string& ret) {
     }
 }
 
-void YAMLDagDeserializer::taskStr(std::string& ret) {
+void YAMLDAGDeserializer::taskStr(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("      Task:\n") +
               std::string("        Name: <optional string>\n") +
@@ -108,7 +108,7 @@ void YAMLDagDeserializer::taskStr(std::string& ret) {
     }
 }
 
-void YAMLDagDeserializer::vertexStr(std::string& ret) {
+void YAMLDAGDeserializer::vertexStr(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("    - Vertex:\n") +
               std::string("      Name: <optional string>\n") +
@@ -121,7 +121,7 @@ void YAMLDagDeserializer::vertexStr(std::string& ret) {
     }
 }
 
-void YAMLDagDeserializer::verticesStr(std::string& ret) {
+void YAMLDAGDeserializer::verticesStr(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("  Vertices:\n") + std::string("    ...");
     } else {
@@ -129,7 +129,7 @@ void YAMLDagDeserializer::verticesStr(std::string& ret) {
     }
 }
 
-void YAMLDagDeserializer::connectionsStr(std::string& ret) {
+void YAMLDAGDeserializer::connectionsStr(std::string& ret) {
     ret = std::string("  Connections:\n") +
           std::string("    - Connection:\n") +
           std::string("      From: <valid uuid4 string from vertex>\n") +
@@ -137,7 +137,7 @@ void YAMLDagDeserializer::connectionsStr(std::string& ret) {
           std::string("    ...");
 }
 
-void YAMLDagDeserializer::dagStr(std::string& ret) {
+void YAMLDAGDeserializer::dagStr(std::string& ret) {
     if (ret.empty()) {
         ret = std::string("DAG:\n") +
               std::string("  Title: <optional string>\n") +
@@ -151,7 +151,7 @@ void YAMLDagDeserializer::dagStr(std::string& ret) {
     }
 }
 
-std::string YAMLDagDeserializer::sampleDAGOutput(const UpTo& upto) {
+std::string YAMLDAGDeserializer::sampleDAGOutput(const UpTo& upto) {
     std::string ret_val;
 
     switch (upto) {
@@ -187,54 +187,54 @@ std::string YAMLDagDeserializer::sampleDAGOutput(const UpTo& upto) {
     return ret_val;
 }
 
-std::string YAMLDagDeserializer::fullSampleOutput() {
+std::string YAMLDAGDeserializer::fullSampleOutput() {
     std::string stage_output = sampleDAGOutput(UpTo::STAGE);
     std::string connections_output = sampleDAGOutput(UpTo::CONNECTIONS);
     return stage_output + connections_output;
 }
 
-std::unique_ptr<DAG> YAMLDagDeserializer::makeDAG(
+std::unique_ptr<DAG> YAMLDAGDeserializer::makeDAG(
         const YAML::Node& dag_node) const {
     Logging::info(LOG_TAG, "Going to build DAG from\n", dag_node);
 
     std::unique_ptr<DAG> ret_val;
-    if (dag_node[DAG_KEY]) {
+    if (dag_node[dag_key]) {
         // Not sure if this will ever get triggered. But better to
         // communicate more than less to users.
-        if (!dag_node[DAG_KEY].IsMap()) {
+        if (!dag_node[dag_key].IsMap()) {
             auto error = std::string("\"DAG\" the root element must be a ") +
                          std::string("YAML map.");
             throwWrongType(UpTo::DAG, error);
         }
 
-        const YAML::Node& dag_definition_node = dag_node[DAG_KEY];
+        const YAML::Node& dag_definition_node = dag_node[dag_key];
         rapidjson::Document json_dag_configuration;
-        if (dag_definition_node[CONFIGURATION_KEY]) {
+        if (dag_definition_node[configuration_key]) {
             YAML::Emitter json_emitter;
             json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
-                         << dag_definition_node[CONFIGURATION_KEY];
+                         << dag_definition_node[configuration_key];
             std::string json_str(json_emitter.c_str() + 1);
             if (json_dag_configuration.Parse<0>(json_str.c_str())
                         .HasParseError()) {
                 std::stringstream error_str;
                 error_str << "Could not parse dag configuration from "
-                          << dag_definition_node[CONFIGURATION_KEY];
+                          << dag_definition_node[configuration_key];
                 Logging::error(LOG_TAG, error_str.str());
-                throw YAMLDagDeserializerError(error_str.str());
+                throw YAMLDAGDeserializerError(error_str.str());
             }
             rapidjson::StringBuffer buffer;
             rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
             json_dag_configuration.Accept(writer);
             Logging::info(LOG_TAG,
                           "Converting",
-                          dag_definition_node[CONFIGURATION_KEY],
+                          dag_definition_node[configuration_key],
                           "to json string of",
                           buffer.GetString());
         }
 
         std::string title;
-        if (dag_definition_node[TITLE_KEY]) {
-            title = dag_definition_node[TITLE_KEY].as<std::string>();
+        if (dag_definition_node[title_key]) {
+            title = dag_definition_node[title_key].as<std::string>();
             ret_val = std::make_unique<DAG>(title, json_dag_configuration);
         } else {
             Logging::warn(LOG_TAG,
@@ -250,21 +250,21 @@ std::unique_ptr<DAG> YAMLDagDeserializer::makeDAG(
                       "-- from the following definition",
                       dag_definition_node);
 
-        if (dag_definition_node[VERTICES_KEY]) {
-            const YAML::Node& vertex_node = dag_definition_node[VERTICES_KEY];
+        if (dag_definition_node[vertices_key]) {
+            const YAML::Node& vertex_node = dag_definition_node[vertices_key];
             makeVertices(vertex_node, ret_val);
         } else {
             Logging::warn(LOG_TAG,
                           "No\"",
-                          VERTICES_KEY,
+                          vertices_key,
                           "\" map found in",
                           n2s(dag_node),
                           "Sample input would look like:\n",
                           fullSampleOutput());
         }
     } else {
-        std::string sample = YAMLDagDeserializer::sampleDAGOutput(UpTo::DAG);
-        throw YAMLDagDeserializerError(
+        std::string sample = YAMLDAGDeserializer::sampleDAGOutput(UpTo::DAG);
+        throw YAMLDAGDeserializerError(
                 "Root element of \"DAG\" not found in\n" + n2s(dag_node) +
                 "\nFor example, as in\n" + sample);
     }
@@ -272,7 +272,7 @@ std::unique_ptr<DAG> YAMLDagDeserializer::makeDAG(
     return ret_val;
 }
 
-YAMLDagDeserializer::CallbackType YAMLDagDeserializer::callbackTypeFromString(
+YAMLDAGDeserializer::CallbackType YAMLDAGDeserializer::callbackTypeFromString(
         const std::string& enum_str) {
     std::string to_lower = enum_str;
     std::transform(
@@ -282,7 +282,7 @@ YAMLDagDeserializer::CallbackType YAMLDagDeserializer::callbackTypeFromString(
             [](unsigned char rune) -> char {
                 return static_cast<char>(std::tolower(static_cast<int>(rune)));
             });
-    YAMLDagDeserializer::CallbackType ret_val = CallbackType::DNE;
+    YAMLDAGDeserializer::CallbackType ret_val = CallbackType::DNE;
     if (to_lower == "function") {
         ret_val = CallbackType::FUNCTION;
     } else if (to_lower == "plugin") {
@@ -291,7 +291,7 @@ YAMLDagDeserializer::CallbackType YAMLDagDeserializer::callbackTypeFromString(
     return ret_val;
 }
 
-void YAMLDagDeserializer::makeVertices(const YAML::Node& vertices_node,
+void YAMLDAGDeserializer::makeVertices(const YAML::Node& vertices_node,
                                        std::unique_ptr<DAG>& dag) const {
     if (vertices_node.IsSequence()) {
         const auto& vertices = vertices_node.as<std::vector<YAML::Node>>();
@@ -301,17 +301,17 @@ void YAMLDagDeserializer::makeVertices(const YAML::Node& vertices_node,
             for (const YAML::Node& vertex_node : vertices) {
                 Logging::info(LOG_TAG, "Processing", vertex_node, "...");
                 std::string name;
-                if (vertex_node[NAME_KEY]) {
-                    name = vertex_node[NAME_KEY].as<std::string>();
+                if (vertex_node[name_key]) {
+                    name = vertex_node[name_key].as<std::string>();
                 }
 
                 std::string uuid_str;
                 try {
-                    uuid_str = vertex_node[UUID_KEY].as<std::string>();
+                    uuid_str = vertex_node[uuid_key].as<std::string>();
                 } catch (const std::exception& exception) {
                     Logging::error(LOG_TAG,
                                    "Error: Missing",
-                                   UUID_KEY,
+                                   uuid_key,
                                    ". Should",
                                    "appear as in",
                                    sampleDAGOutput(UpTo::VERTEX));
@@ -319,8 +319,8 @@ void YAMLDagDeserializer::makeVertices(const YAML::Node& vertices_node,
                 }
                 UUID uuid = UUID(uuid_str);
                 std::unique_ptr<Task> task;
-                if (vertex_node[TASK_KEY]) {
-                    makeTask(vertex_node[TASK_KEY], task);
+                if (vertex_node[task_key]) {
+                    makeTask(vertex_node[task_key], task);
                 } else {
                     Logging::warn(LOG_TAG,
                                   "A Vertex without a Task was provided",
@@ -344,74 +344,74 @@ void YAMLDagDeserializer::makeVertices(const YAML::Node& vertices_node,
     }
 }
 
-void YAMLDagDeserializer::makeTask(const YAML::Node& task_node,
+void YAMLDAGDeserializer::makeTask(const YAML::Node& task_node,
                                    std::unique_ptr<Task>& task) const {
     std::string task_name;
-    if (task_node[NAME_KEY]) {
-        task_name = task_node[NAME_KEY].as<std::string>();
+    if (task_node[name_key]) {
+        task_name = task_node[name_key].as<std::string>();
     }
 
     std::vector<std::unique_ptr<TaskStage>> stages;
-    if (task_node[STAGES_KEY]) {
+    if (task_node[stages_key]) {
         Logging::info(LOG_TAG, "Going to process stages in", task_node, "...");
-        loadStages(task_node[STAGES_KEY], stages);
+        loadStages(task_node[stages_key], stages);
     } else {
         Logging::warn(LOG_TAG,
                       "Just created a task from",
-                      task_node[TASK_KEY],
+                      task_node[task_key],
                       "with no stages. To add a stage see:\n",
                       sampleDAGOutput(UpTo::STAGE));
     }
 
     rapidjson::Document json_config;
-    if (task_node[CONFIGURATION_KEY]) {
+    if (task_node[configuration_key]) {
         YAML::Emitter json_emitter;
         json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
-                     << task_node[CONFIGURATION_KEY];
+                     << task_node[configuration_key];
         std::string json_str(json_emitter.c_str() + 1);
         if (json_config.Parse<0>(json_str.c_str()).HasParseError()) {
             std::stringstream error_str;
             error_str << "Could not parse task configuration from "
-                      << task_node[CONFIGURATION_KEY];
+                      << task_node[configuration_key];
             Logging::error(LOG_TAG, error_str.str());
-            throw YAMLDagDeserializerError(error_str.str());
+            throw YAMLDAGDeserializerError(error_str.str());
         }
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         json_config.Accept(writer);
         Logging::info(LOG_TAG,
                       "Converting",
-                      task_node[CONFIGURATION_KEY],
+                      task_node[configuration_key],
                       "to json string of",
                       buffer.GetString());
     }
     rapidjson::Document json_initial_inputs;
-    if (task_node[INITIAL_INPUTS_KEY]) {
+    if (task_node[initial_inputs_key]) {
         YAML::Emitter json_emitter;
         json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
-                     << task_node[INITIAL_INPUTS_KEY];
+                     << task_node[initial_inputs_key];
         std::string json_str(json_emitter.c_str() + 1);
         if (json_initial_inputs.Parse<0>(json_str.c_str()).HasParseError()) {
             std::stringstream error_str;
             error_str << "Could not parse task initial inputs from "
-                      << task_node[INITIAL_INPUTS_KEY];
+                      << task_node[initial_inputs_key];
             Logging::error(LOG_TAG, error_str.str());
-            throw YAMLDagDeserializerError(error_str.str());
+            throw YAMLDAGDeserializerError(error_str.str());
         }
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         json_initial_inputs.Accept(writer);
         Logging::info(LOG_TAG,
                       "Converting",
-                      task_node[INITIAL_INPUTS_KEY],
+                      task_node[initial_inputs_key],
                       "to json string of",
                       buffer.GetString());
     }
 
-    if (task_node[CALLBACK_KEY]) {
+    if (task_node[callback_key]) {
         makeTaskCallback(task_name,
                          stages,
-                         task_node[CALLBACK_KEY],
+                         task_node[callback_key],
                          task,
                          json_config,
                          json_initial_inputs);
@@ -421,11 +421,11 @@ void YAMLDagDeserializer::makeTask(const YAML::Node& task_node,
     }
 }
 
-void YAMLDagDeserializer::throwWrongType(const UpTo& upto,
+void YAMLDAGDeserializer::throwWrongType(const UpTo& upto,
                                          const std::string& error) const {
-    std::string up_to_example = YAMLDagDeserializer::sampleDAGOutput(upto);
+    std::string up_to_example = YAMLDAGDeserializer::sampleDAGOutput(upto);
     auto error_str = error + std::string(" As in:\n") + up_to_example;
-    throw YAMLDagWrongTypeError(error_str);
+    throw YAMLDAGWrongTypeError(error_str);
 }
 
 std::stringstream& operator<<(std::stringstream& string_stream,
@@ -436,7 +436,7 @@ std::stringstream& operator<<(std::stringstream& string_stream,
     return string_stream;
 }
 
-void YAMLDagDeserializer::makeTaskCallback(
+void YAMLDAGDeserializer::makeTaskCallback(
         const std::string& task_name,
         std::vector<std::unique_ptr<TaskStage>>& stages,
         const YAML::Node& callback_node,
@@ -448,19 +448,19 @@ void YAMLDagDeserializer::makeTaskCallback(
                   "Going to create task callback from",
                   callback_node,
                   "...");
-    auto library_name = callback_node[LIBRARY_NAME_KEY].as<std::string>();
+    auto library_name = callback_node[library_name_key].as<std::string>();
 
     try {
         const DynamicLibraryRegistry::RegistryItem& shared_library =
                 DynamicLibraryRegistry::registerDynamicLibrary(library_name);
 
-        if (callback_node[CALLBACK_TYPE_KEY]) {
-            CallbackType type = YAMLDagDeserializer::callbackTypeFromString(
-                    callback_node[CALLBACK_TYPE_KEY].as<std::string>());
+        if (callback_node[callback_type_key]) {
+            CallbackType type = YAMLDAGDeserializer::callbackTypeFromString(
+                    callback_node[callback_type_key].as<std::string>());
             if (type == CallbackType::FUNCTION) {
                 task_callback = makeTaskFunctionCallback(
                         shared_library,
-                        callback_node[SYMBOL_NAME_KEY].as<std::string>());
+                        callback_node[symbol_name_key].as<std::string>());
                 task = std::make_unique<Task>(stages,
                                               task_name,
                                               task_callback,
@@ -470,14 +470,14 @@ void YAMLDagDeserializer::makeTaskCallback(
                 std::unique_ptr<TaskCallbackPlugin> task_callback_plugin;
                 makeTaskFunctionCallbackPlugin(
                         shared_library,
-                        callback_node[SYMBOL_NAME_KEY].as<std::string>(),
+                        callback_node[symbol_name_key].as<std::string>(),
                         task_callback_plugin);
                 if (!task_callback_plugin) {
                     std::stringstream error_stream;
                     error_stream << "Unable to properly deserialize"
                                  << callback_node;
                     Logging::error(LOG_TAG, error_stream.str());
-                    throw YAMLDagDeserializerError(error_stream.str());
+                    throw YAMLDAGDeserializerError(error_stream.str());
                 }
                 task = std::make_unique<Task>(stages,
                                               task_name,
@@ -485,7 +485,7 @@ void YAMLDagDeserializer::makeTaskCallback(
                                               json_config,
                                               json_initial_inputs);
             } else {
-                throw YAMLDagDeserializerNonSupportedCallbackType(
+                throw YAMLDAGDeserializerNonSupportedCallbackType(
                         std::string("Unsupported callback type specified. "
                                     "Currently ") +
                         std::string("only \"FUNCTION\" or \"PLUGIN\" are "
@@ -496,21 +496,21 @@ void YAMLDagDeserializer::makeTaskCallback(
         } else {
             std::stringstream error_builder;
             error_builder << std::string("If a callback is to be used in:\n");
-            error_builder << callback_node[CALLBACK_KEY];
+            error_builder << callback_node[callback_key];
             error_builder << std::string(" it must contain a Callback Type.");
             Logging::error(LOG_TAG, error_builder.str());
-            throw YAMLDagDeserializerError(error_builder.str());
+            throw YAMLDAGDeserializerError(error_builder.str());
         }
     } catch (const std::runtime_error& system_error) {
         std::stringstream error_builder;
         error_builder << "Could not load library from ";
         error_builder << library_name << " with " << system_error.what();
         Logging::error(LOG_TAG, error_builder.str());
-        throw YAMLDagDeserializerError(error_builder.str());
+        throw YAMLDAGDeserializerError(error_builder.str());
     }
 }
 
-std::function<void(bool)> YAMLDagDeserializer::makeTaskFunctionCallback(
+std::function<void(bool)> YAMLDAGDeserializer::makeTaskFunctionCallback(
         const DynamicLibraryRegistry::RegistryItem& shared_library,
         const std::string& symbol_name) const {
     std::string cb_symbols;
@@ -523,7 +523,7 @@ std::function<void(bool)> YAMLDagDeserializer::makeTaskFunctionCallback(
         ret_val = shared_library.getSharedLib().get_alias<void(bool)>(
                 symbol_name);
     } else {
-        throw YAMLDagDeserializerError(
+        throw YAMLDAGDeserializerError(
                 "Failed to load " + symbol_name + " from " +
                 shared_library.getName() +
                 ". It could not be found in available " + " symbols of " +
@@ -532,7 +532,7 @@ std::function<void(bool)> YAMLDagDeserializer::makeTaskFunctionCallback(
     return ret_val;
 }
 
-void YAMLDagDeserializer::makeTaskFunctionCallbackPlugin(
+void YAMLDAGDeserializer::makeTaskFunctionCallbackPlugin(
         const DynamicLibraryRegistry::RegistryItem& shared_library,
         const std::string& symbol_name,
         std::unique_ptr<TaskCallbackPlugin>& ret) const {
@@ -549,14 +549,14 @@ void YAMLDagDeserializer::makeTaskFunctionCallbackPlugin(
                         boost::dll::load_mode::append_decorations);
         ret = std::make_unique<TaskCallbackPlugin>(*(callback_plugin));
     } else {
-        throw YAMLDagDeserializerError(
+        throw YAMLDAGDeserializerError(
                 "Failed to load " + symbol_name + " from " +
                 shared_library.getName() + ". It could not be found " +
                 " in available symbols of " + cb_symbols);
     }
 }
 
-bool YAMLDagDeserializer::verifySymbolPresent(
+bool YAMLDAGDeserializer::verifySymbolPresent(
         const DynamicLibraryRegistry::RegistryItem& shared_library,
         const std::string& symbol_name,
         const std::string& section_name,
@@ -575,11 +575,11 @@ bool YAMLDagDeserializer::verifySymbolPresent(
         boost::dll::library_info lib_info(shared_library.getName());
         task_cb_funcs = lib_info.symbols(section_name);
     } catch (const std::runtime_error& rt_error) {
-        throw YAMLDagDeserializerError("Could not load symbol info from " +
+        throw YAMLDAGDeserializerError("Could not load symbol info from " +
                                        shared_library.getName() + " with " +
                                        rt_error.what());
     } catch (const std::exception& error) {
-        throw YAMLDagDeserializerError("Could not load symbol info from " +
+        throw YAMLDAGDeserializerError("Could not load symbol info from " +
                                        shared_library.getName() + " with " +
                                        error.what());
     }
@@ -608,7 +608,7 @@ bool YAMLDagDeserializer::verifySymbolPresent(
     return find_if_it != task_cb_funcs.end();
 }
 
-void YAMLDagDeserializer::loadStages(
+void YAMLDAGDeserializer::loadStages(
         const YAML::Node& stages_node,
         std::vector<std::unique_ptr<TaskStage>>& out_stages) const {
     std::vector<YAML::Node> stages_vector;
@@ -627,14 +627,14 @@ void YAMLDagDeserializer::loadStages(
             [this, &out_stages](const YAML::Node& stage_node) {
                 Logging::info(LOG_TAG, "Going to load", stage_node);
                 std::string stage_name;
-                if (stage_node[NAME_KEY]) {
-                    stage_name = stage_node[NAME_KEY].as<std::string>();
+                if (stage_node[name_key]) {
+                    stage_name = stage_node[name_key].as<std::string>();
                 }
 
                 std::string library_name;
-                if (stage_node[LIBRARY_NAME_KEY]) {
+                if (stage_node[library_name_key]) {
                     library_name =
-                            stage_node[LIBRARY_NAME_KEY].as<std::string>();
+                            stage_node[library_name_key].as<std::string>();
 
                     library_name.erase(std::remove_if(library_name.begin(),
                                                       library_name.end(),
@@ -643,25 +643,25 @@ void YAMLDagDeserializer::loadStages(
                 } else {
                     std::stringstream error_stream;
                     error_stream << std::string("The required key of \"")
-                                 << LIBRARY_NAME_KEY
+                                 << library_name_key
                                  << std::string("\" was not present in ")
                                  << stage_node;
                     Logging::error(LOG_TAG, error_stream.str());
-                    throw YAMLDagDeserializerError(error_stream.str());
+                    throw YAMLDAGDeserializerError(error_stream.str());
                 }
 
                 std::string symbol_name;
-                if (stage_node[SYMBOL_NAME_KEY]) {
+                if (stage_node[symbol_name_key]) {
                     symbol_name =
-                            stage_node[SYMBOL_NAME_KEY].as<std::string>();
+                            stage_node[symbol_name_key].as<std::string>();
                 } else {
                     std::stringstream error_stream;
                     error_stream << std::string("The required key of \"")
-                                 << SYMBOL_NAME_KEY
+                                 << symbol_name_key
                                  << std::string("\" was not present in ")
                                  << stage_node;
                     Logging::error(LOG_TAG, error_stream.str());
-                    throw YAMLDagDeserializerError(error_stream.str());
+                    throw YAMLDAGDeserializerError(error_stream.str());
                 }
 
                 try {
@@ -680,7 +680,7 @@ void YAMLDagDeserializer::loadStages(
                         error_builder << "Could not load library from ";
                         error_builder << library_name << " with unknown error";
                         Logging::error(LOG_TAG, error_builder.str());
-                        throw YAMLDagDeserializerError(error_builder.str());
+                        throw YAMLDAGDeserializerError(error_builder.str());
                     }
                     out_stages.push_back(std::move(next_stage));
                 } catch (const boost::system::system_error& system_error) {
@@ -689,12 +689,12 @@ void YAMLDagDeserializer::loadStages(
                     error_builder << library_name << " with "
                                   << system_error.what();
                     Logging::error(LOG_TAG, error_builder.str());
-                    throw YAMLDagDeserializerError(error_builder.str());
+                    throw YAMLDAGDeserializerError(error_builder.str());
                 }
             });
 }
 
-std::unique_ptr<TaskStage> YAMLDagDeserializer::dynamicallyLoadStage(
+std::unique_ptr<TaskStage> YAMLDAGDeserializer::dynamicallyLoadStage(
         const DynamicLibraryRegistry::RegistryItem& shared_library,
         const std::string& symbol_name,
         const std::string& stage_name) const {
@@ -714,7 +714,7 @@ std::unique_ptr<TaskStage> YAMLDagDeserializer::dynamicallyLoadStage(
         std::unique_ptr<TaskStage> ret_val = stage_creator(stage_name);
         return ret_val;
     } else {
-        throw YAMLDagDeserializerError(
+        throw YAMLDAGDeserializerError(
                 "Failed to load " + symbol_name + " from " +
                 shared_library.getName() + ". It could not be found" +
                 " in available symbols of --" + cb_symbols + "--.");

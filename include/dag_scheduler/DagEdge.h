@@ -182,12 +182,12 @@ private:
     std::weak_ptr<DAGVertex> connection_;
 
 private:
-    FRIEND_TEST(TestDagEdge, copy_ctor);
-    FRIEND_TEST(TestDagEdge, assignment_operator);
-    FRIEND_TEST(TestDagEdge, connect_and_clone);
-    FRIEND_TEST(TestDagEdge, connect_to_null);
+    FRIEND_TEST(TestDagEdge, copyCtor);
+    FRIEND_TEST(TestDagEdge, assignmentOperator);
+    FRIEND_TEST(TestDagEdge, connectAndClone);
+    FRIEND_TEST(TestDagEdge, connectToNull);
     FRIEND_TEST(TestDagEdge, connections);
-    FRIEND_TEST(TestDagEdge, equality_operators_with_connection);
+    FRIEND_TEST(TestDagEdge, equalityOperatorsWithConnection);
 };
 }  // namespace com::dag_scheduler
 #endif

@@ -12,10 +12,10 @@
 #include <iostream>
 
 namespace com::dag_scheduler {
-DAGEdge::DAGEdge() : current_status_(Status::initialized) {}
+DAGEdge::DAGEdge() : current_status_(Status::INITIALIZED) {}
 
 DAGEdge::~DAGEdge() {
-    current_status_ = Status::non_traversable;
+    current_status_ = Status::NON_TRAVERSABLE;
     connection_.reset();
 }
 
@@ -23,14 +23,14 @@ DAGEdge::DAGEdge(DAGEdge&& other) {
     uuid_ = std::move(other.uuid_);
     current_status_ = other.current_status_;
     connection_ = std::move(other.connection_);
-    other.current_status_ = Status::non_traversable;
+    other.current_status_ = Status::NON_TRAVERSABLE;
 }
 
 DAGEdge& DAGEdge::operator=(DAGEdge&& rhs) {
     uuid_ = std::move(rhs.uuid_);
     current_status_ = rhs.current_status_;
     connection_ = std::move(rhs.connection_);
-    rhs.current_status_ = Status::non_traversable;
+    rhs.current_status_ = Status::NON_TRAVERSABLE;
 
     return (*this);
 }
@@ -75,13 +75,13 @@ std::string DAGEdge::currentStatusAsString() const {
     std::string ret_val;
 
     switch (current_status_) {
-        case Status::initialized: {
+        case Status::INITIALIZED: {
             ret_val = "initialized";
         } break;
-        case Status::traversed: {
+        case Status::TRAVERSED: {
             ret_val = "traversed";
         } break;
-        case Status::non_traversable: {
+        case Status::NON_TRAVERSABLE: {
             ret_val = "non_traversable";
         } break;
     }

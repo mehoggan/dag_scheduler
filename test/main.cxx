@@ -14,7 +14,7 @@
 
 int main(int argc, char* argv[]) {
     const std::string exe_path = argv[0];
-    com::dag_scheduler::testing::TestEnvironment::EXE_PATH = exe_path;
+    com::dag_scheduler::testing::TestEnvironment::exe_path = exe_path;
 
     com::dag_scheduler::LogTag main_tag("main");
     com::dag_scheduler::Logging::addStdCoutLogger(main_tag);
