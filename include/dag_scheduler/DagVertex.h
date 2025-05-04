@@ -409,28 +409,28 @@ private:
     std::unique_ptr<Task> task_;
 
 private:
-    FRIEND_TEST(TestDagVertex, connect_and_contains_connection);
-    FRIEND_TEST(TestDagVertex, visit_all_edges_points_to_actual_vertices);
-    FRIEND_TEST(TestDagVertex, clone_all_edges_and_reestablish_connections);
-    FRIEND_TEST(TestDagVertex, move_ctor_with_edges);
-    FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges);
-    FRIEND_TEST(TestDagVertex, copy_ctor_no_edges);
-    FRIEND_TEST(TestDagVertex, assignment_operator_no_edges);
-    FRIEND_TEST(TestDagVertex, clone_all_edges);
-    FRIEND_TEST(TestDagVertex, copy_ctor_with_edges);
-    FRIEND_TEST(TestDagVertex, assignment_operator_with_edges);
-    FRIEND_TEST(TestDagVertex, move_ctor_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, copy_ctor_no_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_operator_no_edges_with_task);
-    FRIEND_TEST(TestDagVertex, clone_all_edges_with_task);
-    FRIEND_TEST(TestDagVertex, copy_ctor_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_operator_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, add_incoming_edge);
-    FRIEND_TEST(TestDagVertex, sub_incoming_edge);
-    FRIEND_TEST(TestDagVertex, clear_edges);
-    FRIEND_TEST(TestDagVertex, reset_incoming_edge_count);
-    FRIEND_TEST(TestDagVertex, get_edge_at);
+    FRIEND_TEST(TestDagVertex, connectAndContainsConnection);
+    FRIEND_TEST(TestDagVertex, visitAllEdgesPointsToActualVertices);
+    FRIEND_TEST(TestDagVertex, cloneAllEdgesAndReestablishConnections);
+    FRIEND_TEST(TestDagVertex, moveCtorWithEdges);
+    FRIEND_TEST(TestDagVertex, assignmentMoveOperatorWithEdges);
+    FRIEND_TEST(TestDagVertex, copyCtorNoEdges);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorNoEdges);
+    FRIEND_TEST(TestDagVertex, cloneAllEdges);
+    FRIEND_TEST(TestDagVertex, copyCtorWithEdges);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorWithEdges);
+    FRIEND_TEST(TestDagVertex, moveCtorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentMoveOperatorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, copyCtorNoEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorNoEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, cloneAllEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, copyCtorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, addIncomingEdge);
+    FRIEND_TEST(TestDagVertex, subIncomingEdge);
+    FRIEND_TEST(TestDagVertex, clearEdges);
+    FRIEND_TEST(TestDagVertex, resetIncomingEdgeCount);
+    FRIEND_TEST(TestDagVertex, getEdgeAt);
 };
 }  // namespace com::dag_scheduler
 #endif

@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     std::string help_string =
             (std::string("\t--dag_yaml should point to a ") +
              std::string("file with contents similar to:\n") +
-             com::dag_scheduler::YAMLDagDeserializer::fullSampleOutput());
+             com::dag_scheduler::YAMLDAGDeserializer::fullSampleOutput());
 
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()(
@@ -38,29 +38,29 @@ int main(int argc, char* argv[]) {
             boost::program_options::parse_command_line(argc, argv, desc),
             variable_map);
 
-    auto LOG_TAG = com::dag_scheduler::LogTag("root");
-    com::dag_scheduler::Logging::addStdCoutLogger(LOG_TAG);
+    auto log_tag = com::dag_scheduler::LogTag("root");
+    com::dag_scheduler::Logging::addStdCoutLogger(log_tag);
 
     int ret_value = EXIT_FAILURE;
     bool help = false;
     if (variable_map.count("help")) {
-        com::dag_scheduler::Logging::info(LOG_TAG, desc);
+        com::dag_scheduler::Logging::info(log_tag, desc);
         ret_value = EXIT_SUCCESS;
         help = true;
     } else {
         try {
-            com::dag_scheduler::Logging::info(LOG_TAG, "Loading YAML file...");
+            com::dag_scheduler::Logging::info(log_tag, "Loading YAML file...");
             const auto service_yaml_file =
                     variable_map["dag_yaml"].as<std::string>();
             YAML::Node yaml_node = YAML::LoadFile(service_yaml_file);
-            com::dag_scheduler::Logging::info(LOG_TAG, "Loaded YAML file.");
-            std::unique_ptr<com::dag_scheduler::DAG> dagPtr =
+            com::dag_scheduler::Logging::info(log_tag, "Loaded YAML file.");
+            std::unique_ptr<com::dag_scheduler::DAG> dag_ptr =
                     yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-            com::dag_scheduler::Logging::info(LOG_TAG,
+            com::dag_scheduler::Logging::info(log_tag,
                                               "Deserialized YAML file.");
-            com::dag_scheduler::Logging::info(LOG_TAG, (*dagPtr));
+            com::dag_scheduler::Logging::info(log_tag, (*dag_ptr));
         } catch (const std::exception& e) {
-            com::dag_scheduler::Logging::error(LOG_TAG, "Error:", e.what());
+            com::dag_scheduler::Logging::error(log_tag, "Error:", e.what());
             ret_value = EXIT_FAILURE;
         }
     }
