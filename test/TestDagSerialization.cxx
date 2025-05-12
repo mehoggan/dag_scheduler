@@ -111,7 +111,7 @@ TEST(TestYAMLDAGDeserializer, outputUptoEmpty) {
     EXPECT_EQ(expected_empty_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_DAG) {
+TEST(TestYAMLDAGDeserializer, outputUptoDAG) {
     std::string expected_dag_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -122,7 +122,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_DAG) {
     EXPECT_EQ(expected_dag_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_vertices) {
+TEST(TestYAMLDAGDeserializer, outputUptoVertices) {
     std::string expected_vertices_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -134,7 +134,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_vertices) {
     EXPECT_EQ(expected_vertices_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_vertex) {
+TEST(TestYAMLDAGDeserializer, outputUptoVertex) {
     std::string expected_vertex_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -149,7 +149,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_vertex) {
     EXPECT_EQ(expected_vertex_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_task) {
+TEST(TestYAMLDAGDeserializer, outputUptoTask) {
     std::string expected_task_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -174,7 +174,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_task) {
     EXPECT_EQ(expected_task_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_stages) {
+TEST(TestYAMLDAGDeserializer, outputUptoStages) {
     std::string expected_stages_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -199,7 +199,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_stages) {
     EXPECT_EQ(expected_stages_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_stage) {
+TEST(TestYAMLDAGDeserializer, outputUptoStage) {
     std::string expected_stage_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -228,7 +228,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_stage) {
     EXPECT_EQ(expected_stage_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_upto_just_connections) {
+TEST(TestYAMLDAGDeserializer, outputUptoJustConnections) {
     std::string expected_connections_upto =
             std::string("  Connections:\n") +
             std::string("    - Connection:\n") +
@@ -240,7 +240,7 @@ TEST(TestYAMLDAGDeserializer, output_upto_just_connections) {
     EXPECT_EQ(expected_connections_upto, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, output_full) {
+TEST(TestYAMLDAGDeserializer, outputFull) {
     std::string expected_full =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -273,11 +273,11 @@ TEST(TestYAMLDAGDeserializer, output_full) {
     EXPECT_EQ(expected_full, actual);
 }
 
-TEST(TestYAMLDAGDeserializer, default_ctor) {
+TEST(TestYAMLDAGDeserializer, defaultCtor) {
     EXPECT_NO_THROW(YAMLDAGDeserializer());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_wrong_root_element) {
+TEST(TestYAMLDAGDeserializer, makeDAGWrongRootElement) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, std::string>(
             {{YAMLDAGDeserializer::title_key, "Test YAML DAG"}});
@@ -294,7 +294,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_wrong_root_element) {
     }
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_title) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitle) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, std::string>(
             {{YAMLDAGDeserializer::title_key, "Test YAML DAG"}});
@@ -304,7 +304,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_title) {
     EXPECT_EQ(0ull, test_dag->vertexCount());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_title_DAG_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitleDAGConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -321,7 +321,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_title_DAG_config) {
     EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG) {
+TEST(TestYAMLDAGDeserializer, makeDAG) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, std::string>();
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
@@ -330,7 +330,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG) {
     EXPECT_EQ(0ull, test_dag->vertexCount());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_DAG_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGWithDAGConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -346,7 +346,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_DAG_config) {
     EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_bad_vertices_not_list_of_obj) {
+TEST(TestYAMLDAGDeserializer, makeDAGBadVerticesNotListOfObj) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>(
@@ -367,7 +367,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_bad_vertices_not_list_of_obj) {
     }
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -387,7 +387,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_config) {
     EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_vertices_title) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesTitle) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -411,7 +411,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_vertices_title) {
                 nullptr);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_title_DAG_config_vertices) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitleDAGConfigVertices) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -441,7 +441,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_title_DAG_config_vertices) {
     EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_bad_vertices_no_vertex_uuid) {
+TEST(TestYAMLDAGDeserializer, makeDAGBadVerticesNoVertexUUID) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -462,7 +462,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_bad_vertices_no_vertex_uuid) {
     }
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTask) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -488,7 +488,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task) {
     EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTaskTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -526,7 +526,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task_task_config) {
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTaskInitialInputs) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -567,7 +567,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_vertices_named_task_initial_inputs) {
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_vertices_named_task_initial_inputs_task_config) {
+     makeDAGVerticesNamedTaskInitialInputsTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -618,7 +618,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_named_task) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesNamedTask) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -651,7 +651,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_named_task) {
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_named_task_task_config) {
+     makeDAGLabelDAGConfigVerticesNamedTaskTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -696,7 +696,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_named_task_initial_inputs) {
+     makeDAGLabelDAGConfigVerticesNamedTaskInitialInputs) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -743,7 +743,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_named_task_initial_inputs_task_config) {
+     makeDAGLabelDAGConfigVerticesNamedTaskInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -800,7 +800,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTask) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -822,7 +822,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task) {
     EXPECT_EQ("", uuid1_vertex->getTask()->label());
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -856,7 +856,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_task_config) {
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskInitialInputs) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -893,7 +893,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_initial_inputs) {
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_initial_inputs_task_config) {
+     makeDAGLabelVerticesTaskInitialInputsTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -940,7 +940,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_task) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTask) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -968,8 +968,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_task) {
     EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1009,8 +1008,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskInitialInputs) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1053,7 +1051,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_initial_inputs_task_config) {
+     makeDAGLabelDAGConfigVerticesTaskInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1106,7 +1104,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_title_vertices_bad_task_callback) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitleVerticesBadTaskCallback) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1134,8 +1132,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_title_vertices_bad_task_callback) {
     }
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_bad_task_callback_lib_not_found) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesBadTaskCallbackLibNotFound) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1174,7 +1171,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_bad_task_callback_lib_found_no_method) {
+     makeDAGLabelVerticesBadTaskCallbackLibFoundNoMethod) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1217,7 +1214,7 @@ TEST(TestYAMLDAGDeserializer,
     }
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_callback) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallback) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1258,8 +1255,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_callback) {
     test_vertex->getTask()->complete(true);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1312,8 +1308,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackInitialInputs) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1369,7 +1364,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_initial_inputs_task_config) {
+     makeDAGLabelVerticesTaskCallbackInitialInputsTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1435,8 +1430,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskCallback) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1484,7 +1478,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback_task_config) {
+     makeDAGLabelDAGConfigVerticesTaskCallbackTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1544,7 +1538,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback_initial_inputs) {
+     makeDAGLabelDAGConfigVerticesTaskCallbackInitialInputs) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1606,7 +1600,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     label_DAG_config_vertices_task_callback_initial_inputs_task_config) {
+     labelDAGConfigVerticesTaskCallbackInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1678,7 +1672,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_callback_plugin) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackPlugin) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1720,7 +1714,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_callback_plugin) {
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_plugin_task_config) {
+     makeDAGLabelVerticesTaskCallbackPluginTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1774,7 +1768,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_plugin_initial_inputs) {
+     makeDAGLabelVerticesTaskCallbackPluginInitialInputs) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1830,7 +1824,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_callback_plugin_initial_inputs_task_config) {
+     makeDAGLabelVerticesTaskCallbackPluginInitialInputsTaskConfig) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -1897,7 +1891,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback_plugin) {
+     makeDAGLabelDAGConfigVerticesTaskCallbackPlugin) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -1945,7 +1939,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback_plugin_task_config) {
+     makeDAGLabelDAGConfigVerticesTaskCallbackPluginTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -2005,7 +1999,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_callback_plugin_initial_inputs) {
+     makeDAGLabelDAGConfigVerticesTaskCallbackPluginInitialInputs) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -2067,7 +2061,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     DAG_config_vertices_task_callback_plugin_initial_inputs_task_config) {
+     daGConfigVerticesTaskCallbackPluginInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
     getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
@@ -2183,8 +2177,7 @@ TEST(TestYAMLDAGDeserializer,
     }
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_bad_task_stages_node_wrong_type) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesBadTaskStagesNodeWrongType) {
     YAML::Node yaml_node;
     yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
@@ -2213,7 +2206,7 @@ TEST(TestYAMLDAGDeserializer,
     }
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_stages) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStages) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2276,8 +2269,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_vertices_task_stages) {
     EXPECT_EQ(1, stage_count);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_stages_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStagesTaskConfig) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2352,8 +2344,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_stages_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStagesInitialInputs) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2431,7 +2422,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_vertices_task_stages_initial_inputs_task_config) {
+     makeDAGLabelVerticesTaskStagesInitialInputsTaskConfig) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2519,7 +2510,7 @@ TEST(TestYAMLDAGDeserializer,
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_task_stages) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskStages) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2589,7 +2580,7 @@ TEST(TestYAMLDAGDeserializer, make_DAG_label_DAG_config_vertices_task_stages) {
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_stages_task_config) {
+     makeDAGLabelDAGConfigVerticesTaskStagesTaskConfig) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2671,7 +2662,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     make_DAG_label_DAG_config_vertices_task_stages_initial_inputs) {
+     makeDAGLabelDAGConfigVerticesTaskStagesInitialInputs) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();
@@ -2755,7 +2746,7 @@ TEST(TestYAMLDAGDeserializer,
 }
 
 TEST(TestYAMLDAGDeserializer,
-     label_DAG_config_vertices_task_stages_initial_inputs_task_config) {
+     labelDAGConfigVerticesTaskStagesInitialInputsTaskConfig) {
     std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
             testing::TestEnvironment::pathing.getStagesLibPath();

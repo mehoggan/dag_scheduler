@@ -184,7 +184,7 @@ TEST_F(TestDagEdge, assignmentOperator) {
     EXPECT_EQ(edge, e_copy_post_connect);
 }
 
-TEST_F(TestDagEdge, equality_operators_no_connection) {
+TEST_F(TestDagEdge, equalityOperatorsNoConnection) {
     DAGEdge edge;
     DAGEdge e_copy = edge.clone();
 

@@ -91,7 +91,7 @@ TEST_F(TestDAGAlgorithms, dagVerticesWithNoIncomingEdges) {
     }
 }
 
-TEST_F(TestDAGAlgorithms, dag_topological_sort) {
+TEST_F(TestDAGAlgorithms, dagTopologicalSort) {
     std::vector<DAGVertex> vertices = fillDAGDefault();
 
     getDAG().connect(vertices[0], vertices[1]);
@@ -119,7 +119,7 @@ TEST_F(TestDAGAlgorithms, dag_topological_sort) {
     getDAG().reset();
 }
 
-TEST_F(TestDAGAlgorithms, dag_topological_sort_non_linear) {
+TEST_F(TestDAGAlgorithms, dagTopologicalSortNonLinear) {
     std::vector<DAGVertex> vertices = fillDAGDefault();
 
     getDAG().connect(vertices[0], vertices[1]);  // a -> b
@@ -175,7 +175,7 @@ TEST_F(TestDAGAlgorithms, dag_topological_sort_non_linear) {
     getDAG().reset();
 }
 
-TEST_F(TestDAGAlgorithms, process_dag) {
+TEST_F(TestDAGAlgorithms, processDAG) {
     {
         std::vector<DAGVertex> vertices = fillDAGDefault();
 
@@ -219,7 +219,7 @@ TEST_F(TestDAGAlgorithms, process_dag) {
     }
 }
 
-TEST_F(TestDAGAlgorithms, process_dag_cyclic) {
+TEST_F(TestDAGAlgorithms, processDAGCyclic) {
     {
         std::vector<DAGVertex> vertices = fillDAGDefault();
 

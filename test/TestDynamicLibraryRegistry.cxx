@@ -19,15 +19,14 @@ TEST(TestDynamicLibraryRegistry, ctor) {
     EXPECT_NO_THROW(DynamicLibraryRegistry());
 }
 
-TEST(TestDynamicLibraryRegistry, register_dynamic_library_dne) {
+TEST(TestDynamicLibraryRegistry, registerDynamicLibraryDNE) {
     ASSERT_THROW(
-            DynamicLibraryRegistry::register_dynamic_library("pink_elephant"),
+            DynamicLibraryRegistry::registerDynamicLibrary("pink_elephant"),
             std::runtime_error);
 }
 
-TEST(TestDynamicLibraryRegistry, register_dynamic_library_exists) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    ASSERT_NO_THROW(
-            DynamicLibraryRegistry::register_dynamic_library(lib_path));
+TEST(TestDynamicLibraryRegistry, registerDynamicLibraryExists) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    ASSERT_NO_THROW(DynamicLibraryRegistry::registerDynamicLibrary(lib_path));
 }
 }  // namespace com::dag_scheduler

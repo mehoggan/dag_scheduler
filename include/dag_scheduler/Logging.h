@@ -381,12 +381,12 @@ private:
     LogTag tag_;
 
 private:
-    static std::atomic<bool> init_;
-    static Dict loggers_;
-    static std::mutex loggers_mutex_;
+    static std::atomic<bool> s_init;
+    static Dict s_loggers;
+    static std::mutex s_loggers_mutex;
 
 private:
-    FRIEND_TEST(TestLogging, test_clear_all);
+    FRIEND_TEST(TestLogging, testClearAll);
 };
 
 /**
@@ -408,10 +408,10 @@ LogTag addStdCoutStdErrLoggerForTypeInstance(
         const T& type,
         boost::log::trivial::severity_level cout_level = DAG_SCHEDULER_INFO,
         boost::log::trivial::severity_level cerr_level = DAG_SCHEDULER_ERROR) {
-    LogTag LOG_TAG = Logging::logTagForThis(type);
-    Logging::addStdCoutLogger(LOG_TAG, cout_level);
-    Logging::addStdCerrLogger(LOG_TAG, cerr_level);
-    return LOG_TAG;
+    LogTag log_tag = Logging::logTagForThis(type);
+    Logging::addStdCoutLogger(log_tag, cout_level);
+    Logging::addStdCerrLogger(log_tag, cerr_level);
+    return log_tag;
 }
 }  // namespace com::dag_scheduler
 #endif

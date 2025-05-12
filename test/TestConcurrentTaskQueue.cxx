@@ -32,12 +32,12 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(TestConcurrentTaskQueue, test_size_when_empty) {
+TEST_F(TestConcurrentTaskQueue, testSizeWhenEmpty) {
     ConcurrentTaskQueue empty_queue;
     EXPECT_EQ(0u, empty_queue.size());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_size_predictable_concurrent) {
+TEST_F(TestConcurrentTaskQueue, testSizePredictableConcurrent) {
     ConcurrentTaskQueue non_empty_queue;
     std::unique_ptr<Task> task_ptr(new Task);
     non_empty_queue.push(std::move(task_ptr));
@@ -52,7 +52,7 @@ TEST_F(TestConcurrentTaskQueue, test_size_predictable_concurrent) {
     EXPECT_EQ(2u, non_empty_queue.size());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data) {
+TEST_F(TestConcurrentTaskQueue, testPushTryPopAndData) {
     ConcurrentTaskQueue queue;
 
     std::vector<std::string> uuids;
@@ -72,7 +72,7 @@ TEST_F(TestConcurrentTaskQueue, test_push_try_pop_and_data) {
     EXPECT_EQ(uuids[0], task->getUUID().asString());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data) {
+TEST_F(TestConcurrentTaskQueue, testPushWaitAndPopAndData) {
     ConcurrentTaskQueue queue;
     std::condition_variable signal_condition;
     std::mutex signal_block;
@@ -105,7 +105,7 @@ TEST_F(TestConcurrentTaskQueue, test_push_wait_and_pop_and_data) {
     thread.join();
 }
 
-TEST_F(TestConcurrentTaskQueue, test_empty) {
+TEST_F(TestConcurrentTaskQueue, testEmpty) {
     ConcurrentTaskQueue queue;
     EXPECT_TRUE(queue.empty());
     std::unique_ptr<Task> task_ptr(new Task);
@@ -115,7 +115,7 @@ TEST_F(TestConcurrentTaskQueue, test_empty) {
     EXPECT_TRUE(queue.empty());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue) {
+TEST_F(TestConcurrentTaskQueue, testRemoveTaskFromQueue) {
     ConcurrentTaskQueue queue;
     std::unique_ptr<Task> task_ptr(new Task);
     const UUID& uuid_ref = task_ptr->getUUID();
@@ -127,7 +127,7 @@ TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue) {
     EXPECT_TRUE(queue.empty());
 }
 
-TEST_F(TestConcurrentTaskQueue, test_remove_task_from_queue_remaining_ok) {
+TEST_F(TestConcurrentTaskQueue, testRemoveTaskFromQueueRemainingOk) {
     ConcurrentTaskQueue queue;
 
     std::unique_ptr<Task> task_ptr(new Task);

@@ -44,7 +44,7 @@ TEST_F(TestDagVertex, ctor) {
     EXPECT_EQ(nullptr, vertex.getTask());
 }
 
-TEST_F(TestDagVertex, string_ctor) {
+TEST_F(TestDagVertex, stringCtor) {
     DAGVertex vertex("1");
     EXPECT_EQ(DAGVertex::Status::INITIALIZED, vertex.currentStatus());
     EXPECT_EQ(std::string("initialized"), vertex.currentStatusAsString());
@@ -55,7 +55,7 @@ TEST_F(TestDagVertex, string_ctor) {
     EXPECT_EQ(nullptr, vertex.getTask());
 }
 
-TEST_F(TestDagVertex, string_task_ctor) {
+TEST_F(TestDagVertex, stringTaskCtor) {
     std::vector<std::unique_ptr<TaskStage>> stages{};
     auto task = std::make_unique<Task>(stages, "1 Task");
     std::string task_uuid = task->getUUID().asString();
@@ -70,7 +70,7 @@ TEST_F(TestDagVertex, string_task_ctor) {
     EXPECT_EQ(task_uuid, vertex.getTask()->getUUID().asString());
 }
 
-TEST_F(TestDagVertex, string_task_uuid_ctor) {
+TEST_F(TestDagVertex, stringTaskUUIDCtor) {
     class UUID user_generated_uuid;
     const std::string user_generated_uuid_str = user_generated_uuid.asString();
     std::vector<std::unique_ptr<TaskStage>> stages{};
@@ -87,7 +87,7 @@ TEST_F(TestDagVertex, string_task_uuid_ctor) {
     EXPECT_EQ(task_uuid, vertex.getTask()->getUUID().asString());
 }
 
-TEST_F(TestDagVertex, dtor_no_edges) {
+TEST_F(TestDagVertex, dtorNoEdges) {
     DAGVertex vertex("1");
     vertex.~DAGVertex();
     EXPECT_EQ(DAGVertex::Status::INVALID, vertex.currentStatus());
@@ -98,7 +98,7 @@ TEST_F(TestDagVertex, dtor_no_edges) {
     EXPECT_EQ(0ul, vertex.incomingEdgeCount());
 }
 
-TEST_F(TestDagVertex, move_ctor_no_edges) {
+TEST_F(TestDagVertex, moveCtorNoEdges) {
     DAGVertex vertex("1");
     DAGVertex v_moved = std::move(vertex);
 
@@ -118,7 +118,7 @@ TEST_F(TestDagVertex, move_ctor_no_edges) {
     EXPECT_EQ(nullptr, v_moved.getTask());
 }
 
-TEST_F(TestDagVertex, assignment_move_operator_no_edges) {
+TEST_F(TestDagVertex, assignmentMoveOperatorNoEdges) {
     DAGVertex vertex("1");
     DAGVertex v_moved;
     v_moved = std::move(vertex);
@@ -139,7 +139,7 @@ TEST_F(TestDagVertex, assignment_move_operator_no_edges) {
     EXPECT_EQ(nullptr, v_moved.getTask());
 }
 
-TEST_F(TestDagVertex, clone_no_edges) {
+TEST_F(TestDagVertex, cloneNoEdges) {
     DAGVertex vertex("1");
     DAGVertex v_cloned = vertex.clone();
 
@@ -200,7 +200,7 @@ TEST_F(TestDagVertex, assignmentOperatorNoEdges) {
     EXPECT_EQ(nullptr, v_copied.getTask());
 }
 
-TEST_F(TestDagVertex, move_ctor_no_edges_with_task) {
+TEST_F(TestDagVertex, moveCtorNoEdgesWithTask) {
     std::vector<std::unique_ptr<TaskStage>> stages{};
     auto task = std::make_unique<Task>(stages, "1 Task");
     std::string task_uuid = task->getUUID().asString();
@@ -224,7 +224,7 @@ TEST_F(TestDagVertex, move_ctor_no_edges_with_task) {
     EXPECT_EQ(task_uuid, v_moved.getTask()->getUUID().asString());
 }
 
-TEST_F(TestDagVertex, assignment_move_operator_no_edges_with_task) {
+TEST_F(TestDagVertex, assignmentMoveOperatorNoEdgesWithTask) {
     std::vector<std::unique_ptr<TaskStage>> stages{};
     auto task = std::make_unique<Task>(stages, "1 Task");
     std::string task_uuid = task->getUUID().asString();
@@ -249,7 +249,7 @@ TEST_F(TestDagVertex, assignment_move_operator_no_edges_with_task) {
     EXPECT_EQ(task_uuid, v_moved.getTask()->getUUID().asString());
 }
 
-TEST_F(TestDagVertex, clone_no_edges_with_task) {
+TEST_F(TestDagVertex, cloneNoEdgesWithTask) {
     std::vector<std::unique_ptr<TaskStage>> stages{};
     auto task = std::make_unique<Task>(stages, "1 Task");
     std::string task_uuid = task->getUUID().asString();
@@ -427,7 +427,7 @@ TEST_F(TestDagVertex, cloneAllEdgesAndReestablishConnections) {
     ASSERT_EQ(0ul, getDAGVertex().edgeCount());
 }
 
-TEST_F(TestDagVertex, has_incoming_edge_and_incomingEdgeCount) {
+TEST_F(TestDagVertex, hasIncomingEdgeAndIncomingEdgeCount) {
     std::vector<std::shared_ptr<DAGVertex>> connections = {
             std::make_shared<DAGVertex>("1"),
             std::make_shared<DAGVertex>("2"),
@@ -566,7 +566,7 @@ TEST_F(TestDagVertex, assignmentMoveOperatorWithEdges) {
     EXPECT_EQ(0ul, v_moved.edgeCount());
 }
 
-TEST_F(TestDagVertex, clone_with_edges) {
+TEST_F(TestDagVertex, cloneWithEdges) {
     DAGVertex vertex("orig");
 
     std::vector<std::shared_ptr<DAGVertex>> connections = {
@@ -704,7 +704,7 @@ TEST_F(TestDagVertex, getEdgeAt) {
     });
 }
 
-TEST_F(TestDagVertex, copy_ctor_with_edges) {
+TEST_F(TestDagVertex, copyCtorWithEdges) {
     DAGVertex vertex("orig");
 
     std::vector<std::shared_ptr<DAGVertex>> connections = {
@@ -772,7 +772,7 @@ TEST_F(TestDagVertex, copy_ctor_with_edges) {
     EXPECT_EQ(0ul, vertex.incomingEdgeCount());
 }
 
-TEST_F(TestDagVertex, assignment_operator_with_edges) {
+TEST_F(TestDagVertex, assignmentOperatorWithEdges) {
     DAGVertex vertex("orig");
 
     std::vector<std::shared_ptr<DAGVertex>> connections = {

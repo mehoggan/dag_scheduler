@@ -7,24 +7,21 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASK_H
-#define USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASK_H
+#ifndef UTILS_TESTTASK_H
+#define UTILS_TESTTASK_H
 
 #include <gtest/gtest_prod.h>
 #include <rapidjson/document.h>
 
-#include <atomic>
 #include <functional>
 
-#include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/Task.h"
 #include "dag_scheduler/TaskCallbackPlugin.h"
 
 namespace com::dag_scheduler {
 class TestTaskImpl : public Task {
 private:
-    FRIEND_TEST(TestTask,
-                iterate_stages_succeeds_if_all_stages_ran_no_kill_task);
+    FRIEND_TEST(TestTask, iterateStagesSucceedsIfAllStagesRanNoKillTask);
 
 public:
     TestTaskImpl();

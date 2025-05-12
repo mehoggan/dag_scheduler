@@ -15,7 +15,6 @@
 #include <boost/filesystem/path.hpp>
 #include <fstream>
 #include <sstream>
-#include <streambuf>
 #include <string>
 
 namespace com::dag_scheduler {
@@ -26,41 +25,41 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(TestLogging, add_loggers_no_duplicates) {
+TEST_F(TestLogging, addLoggersNoDuplicates) {
     LogTag tag1("tag1");
 
-    Logging::clear_all();
-    EXPECT_TRUE(Logging::add_std_cout_logger(tag1));
-    EXPECT_FALSE(Logging::add_std_cout_logger(tag1));
-    Logging::clear_all();
-    EXPECT_TRUE(Logging::add_std_cerr_logger(tag1));
-    EXPECT_FALSE(Logging::add_std_cerr_logger(tag1));
-    Logging::clear_all();
-    EXPECT_TRUE(Logging::add_std_log_logger(tag1));
-    EXPECT_FALSE(Logging::add_std_log_logger(tag1));
-    Logging::clear_all();
-    EXPECT_TRUE(Logging::add_file_logger(tag1, ""));
-    EXPECT_FALSE(Logging::add_file_logger(tag1, ""));
-    Logging::clear_all();
+    Logging::clearAll();
+    EXPECT_TRUE(Logging::addStdCoutLogger(tag1));
+    EXPECT_FALSE(Logging::addStdCoutLogger(tag1));
+    Logging::clearAll();
+    EXPECT_TRUE(Logging::addStdCerrLogger(tag1));
+    EXPECT_FALSE(Logging::addStdCerrLogger(tag1));
+    Logging::clearAll();
+    EXPECT_TRUE(Logging::addStdLogLogger(tag1));
+    EXPECT_FALSE(Logging::addStdLogLogger(tag1));
+    Logging::clearAll();
+    EXPECT_TRUE(Logging::addFileLogger(tag1, ""));
+    EXPECT_FALSE(Logging::addFileLogger(tag1, ""));
+    Logging::clearAll();
 }
 
-TEST_F(TestLogging, does_tag_sink_filtering_work) {
-    Logging::add_std_log_logger(LogTag("TAGA"), DAG_SCHEDULER_INFO);
+TEST_F(TestLogging, doesTagSinkFilteringWork) {
+    Logging::addStdLogLogger(LogTag("TAGA"), DAG_SCHEDULER_INFO);
     Logging::debug(LogTag("TAGA"), "Hello World");
-    Logging::add_std_cerr_logger(LogTag("TAGB"));
+    Logging::addStdCerrLogger(LogTag("TAGB"));
     Logging::error(LogTag("TAGB"), "Goodbye World!");
-    Logging::add_std_cerr_logger(LogTag("TAGC"));
+    Logging::addStdCerrLogger(LogTag("TAGC"));
     Logging::error(LogTag("TAGC"), "Goodbye World!!");
-    Logging::add_std_cerr_logger(LogTag("TAGD"));
+    Logging::addStdCerrLogger(LogTag("TAGD"));
     Logging::error(LogTag("TAGD"), "Goodbye World!!!");
 }
 
-TEST_F(TestLogging, mktmpdir_makes_tmp_dir_and_correct_logs_written) {
-    LogTag tag("mktmpdir_makes_tmp_dir");
-    Logging::add_std_log_logger(tag, DAG_SCHEDULER_DEBUG);
+TEST_F(TestLogging, mktmpdirMakesTmpDirAndCorrectLogsWritten) {
+    LogTag log_tag("mktmpdir_makes_tmp_dir");
+    Logging::addStdLogLogger(log_tag, DAG_SCHEDULER_DEBUG);
     boost::filesystem::path tmpdir = Logging::mktmpdir();
     boost::filesystem::path log_path = tmpdir / "logs.lg";
-    Logging::add_file_logger(
+    Logging::addFileLogger(
             LogTag("FILE_LOGGER"), log_path, DAG_SCHEDULER_INFO);
     for (std::size_t i = 0; i < 20; ++i) {
         Logging::info(LogTag("FILE_LOGGER"), "Hello World", i);
@@ -72,27 +71,27 @@ TEST_F(TestLogging, mktmpdir_makes_tmp_dir_and_correct_logs_written) {
 
     sleep(1);
 
-    std::ifstream ifs(log_path.string());
+    std::ifstream input_fs(log_path.string());
     std::string line;
-    std::size_t i = 0;
-    while (std::getline(ifs, line)) {
-        std::stringstream ss;
-        ss << "Hello World " << i;
-        EXPECT_TRUE(line.find(ss.str(), 0) != std::string::npos)
-                << ss.str() << " not in " << line;
-        ++i;
+    std::size_t index = 0;
+    while (std::getline(input_fs, line)) {
+        std::stringstream string_stream;
+        string_stream << "Hello World " << index;
+        EXPECT_TRUE(line.find(string_stream.str(), 0) != std::string::npos)
+                << string_stream.str() << " not in " << line;
+        ++index;
     }
 
     boost::filesystem::remove_all(tmpdir);
 }
 
-TEST_F(TestLogging, test_clear_all) {
-    ASSERT_TRUE(Logging::clear_all());
-    LogTag tag("test_clear_all");
-    Logging::add_std_log_logger(tag, DAG_SCHEDULER_DEBUG);
-    EXPECT_EQ(1u, Logging::loggers_.size());
-    ASSERT_TRUE(Logging::clear_all());
-    EXPECT_EQ(0u, Logging::loggers_.size());
-    Logging::info(tag, "Check to see if log write to stdout.");
+TEST_F(TestLogging, testClearAll) {
+    ASSERT_TRUE(Logging::clearAll());
+    LogTag log_tag("test_clearAll");
+    Logging::addStdLogLogger(log_tag, DAG_SCHEDULER_DEBUG);
+    EXPECT_EQ(1u, Logging::s_loggers.size());
+    ASSERT_TRUE(Logging::clearAll());
+    EXPECT_EQ(0u, Logging::s_loggers.size());
+    Logging::info(log_tag, "Check to see if log write to stdout.");
 }
 }  // namespace com::dag_scheduler

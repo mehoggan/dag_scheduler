@@ -588,10 +588,10 @@ private:
     std::unique_ptr<rapidjson::Document> json_config_;
 
 private:
-    FRIEND_TEST(TestDAG, get_vertex_at);
-    FRIEND_TEST(TestDAG, clone_connections);
-    FRIEND_TEST(TestDAG, copy_ctor);
-    FRIEND_TEST(TestDAG, assignment_operator);
+    FRIEND_TEST(TestDAG, getVertexAt);
+    FRIEND_TEST(TestDAG, cloneConnections);
+    FRIEND_TEST(TestDAG, copyCtor);
+    FRIEND_TEST(TestDAG, assignmentOperator);
 };
 }  // namespace com::dag_scheduler
 #endif  // DAG_SCHEDULER_DAG_H

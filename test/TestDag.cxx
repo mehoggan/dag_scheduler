@@ -175,7 +175,7 @@ TEST_F(TestDAG, ctor) {
     EXPECT_EQ("{}", actual_config);
 }
 
-TEST_F(TestDAG, ctor_with_title) {
+TEST_F(TestDAG, ctorWithTitle) {
     DAG test_dag("test_dag");
 
     EXPECT_EQ(0ul, test_dag.edgeCount());
@@ -186,7 +186,7 @@ TEST_F(TestDAG, ctor_with_title) {
     EXPECT_EQ("{}", actual_config);
 }
 
-TEST_F(TestDAG, ctor_with_title_and_config) {
+TEST_F(TestDAG, ctorWithTitleAndConfig) {
     rapidjson::Document json_config;
     TestDAG::getGenericConfig(json_config);
     DAG test_dag("test_dag", json_config);
@@ -199,7 +199,7 @@ TEST_F(TestDAG, ctor_with_title_and_config) {
     EXPECT_EQ(TestDAG::getExpectedConfigStr(), actual_config);
 }
 
-TEST_F(TestDAG, move_ctor_no_edges_no_vertices) {
+TEST_F(TestDAG, moveCtorNoEdgesNoVertices) {
     DAG test_dag;
 
     DAG d_moved(std::move(test_dag));
@@ -210,7 +210,7 @@ TEST_F(TestDAG, move_ctor_no_edges_no_vertices) {
     EXPECT_EQ("{}", actual_config);
 }
 
-TEST_F(TestDAG, move_ctor_no_edges_no_vertices_title_and_config) {
+TEST_F(TestDAG, moveCtorNoEdgesNoVerticesTitleAndConfig) {
     rapidjson::Document json_config;
     TestDAG::getGenericConfig(json_config);
     DAG test_dag("test_dag", json_config);
@@ -227,7 +227,7 @@ TEST_F(TestDAG, move_ctor_no_edges_no_vertices_title_and_config) {
     EXPECT_EQ("", actual_config) << "Empty because we moved it.";
 }
 
-TEST_F(TestDAG, assignment_move_operator_no_edges_no_vertices) {
+TEST_F(TestDAG, assignmentMoveOperatorNoEdgesNoVertices) {
     DAG test_dag;
 
     DAG d_moved;
@@ -239,8 +239,7 @@ TEST_F(TestDAG, assignment_move_operator_no_edges_no_vertices) {
     EXPECT_EQ("{}", actual_config);
 }
 
-TEST_F(TestDAG,
-       assignment_move_operator_no_edges_no_vertices_title_and_config) {
+TEST_F(TestDAG, assignmentMoveOperatorNoEdgesNoVerticesTitleAndConfig) {
     rapidjson::Document json_config;
     TestDAG::getGenericConfig(json_config);
     DAG test_dag("test_dag", json_config);
@@ -258,7 +257,7 @@ TEST_F(TestDAG,
     EXPECT_EQ("", actual_config) << "Empty because we moved it.";
 }
 
-TEST_F(TestDAG, clone_no_edges_no_vertices) {
+TEST_F(TestDAG, cloneNoEdgesNoVertices) {
     DAG test_dag;
 
     DAG d_cloned = test_dag.clone();
@@ -271,7 +270,7 @@ TEST_F(TestDAG, clone_no_edges_no_vertices) {
     EXPECT_EQ("{}", actual_config);
 }
 
-TEST_F(TestDAG, clone_no_edges_no_vertices_title_and_config) {
+TEST_F(TestDAG, cloneNoEdgesNoVerticesTitleAndConfig) {
     rapidjson::Document json_config;
     TestDAG::getGenericConfig(json_config);
     DAG test_dag("test_dag", json_config);
@@ -289,7 +288,7 @@ TEST_F(TestDAG, clone_no_edges_no_vertices_title_and_config) {
     EXPECT_EQ(TestDAG::getExpectedConfigStr(), actual_cloned_config);
 }
 
-TEST_F(TestDAG, add_vertex_and_reset) {
+TEST_F(TestDAG, addVertexAndReset) {
     DAGVertex vertex_1("1");
     getDAG().addVertex(std::move(vertex_1));
     EXPECT_EQ(0ul, getDAG().edgeCount());
@@ -300,7 +299,7 @@ TEST_F(TestDAG, add_vertex_and_reset) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, add_single_vertex_and_findVertex_by_vertex_and_uuid) {
+TEST_F(TestDAG, addSingleVertexAndFindVertexByVertexAndUUID) {
     DAGVertex vertex_1("1");
     DAGVertex v1_cloned = vertex_1.clone();
     getDAG().addVertex(std::move(vertex_1));
@@ -322,7 +321,7 @@ TEST_F(TestDAG, add_single_vertex_and_findVertex_by_vertex_and_uuid) {
     EXPECT_TRUE(v2_weak.expired());
 }
 
-TEST_F(TestDAG, add_single_vertex_and_findVertex_by_label) {
+TEST_F(TestDAG, addSingleVertexAndFindVertexByLabel) {
     DAGVertex vertex_1("1");
     DAGVertex v1_cloned = vertex_1.clone();
     getDAG().addVertex(std::move(vertex_1));
@@ -338,7 +337,7 @@ TEST_F(TestDAG, add_single_vertex_and_findVertex_by_label) {
     EXPECT_TRUE(vertices[0].expired());
 }
 
-TEST_F(TestDAG, add_vertices_with_same_and_different_labels) {
+TEST_F(TestDAG, addVerticesWithSameAndDifferentLabels) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
 
     {
@@ -402,7 +401,7 @@ TEST_F(TestDAG, add_vertices_with_same_and_different_labels) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, clone_with_multiple_vertices_no_connections) {
+TEST_F(TestDAG, cloneWithMultipleVerticesNoConnections) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
     DAG dag_cloned = getDAG().clone();
 
@@ -417,7 +416,7 @@ TEST_F(TestDAG, clone_with_multiple_vertices_no_connections) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, connect_and_acyclic_check) {
+TEST_F(TestDAG, connectAndAcyclicCheck) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
 
     /* cloned_vertices[0] -> cloned_vertices[1] */
@@ -466,7 +465,7 @@ TEST_F(TestDAG, connect_and_acyclic_check) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, connectAllByLabel_and_acyclic_check) {
+TEST_F(TestDAG, connectAllByLabelAndAcyclicCheck) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
 
     EXPECT_TRUE(getDAG().connectAllByLabel("1", "2"));
@@ -478,7 +477,7 @@ TEST_F(TestDAG, connectAllByLabel_and_acyclic_check) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, addAndConnect_and_acyclic_check) {
+TEST_F(TestDAG, addAndConnectAndAcyclicCheck) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
     DAG test_dag("test_dag");
 
@@ -551,7 +550,7 @@ TEST_F(TestDAG, areConnected) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, areConnected_by_uuid) {
+TEST_F(TestDAG, areConnectedByUUID) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
 
     {
@@ -570,7 +569,7 @@ TEST_F(TestDAG, areConnected_by_uuid) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, all_areConnected_by_label) {
+TEST_F(TestDAG, allAreConnectedByLabel) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
 
     EXPECT_TRUE(getDAG().connectAllByLabel("1", "2"));
@@ -590,7 +589,7 @@ TEST_F(TestDAG, all_areConnected_by_label) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, get_vertex_at) {
+TEST_F(TestDAG, getVertexAt) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
     ASSERT_EQ(vertices_cloned.size(), getDAG().vertexCount());
     for (std::size_t i = 0; i < vertices_cloned.size(); ++i) {
@@ -602,7 +601,7 @@ TEST_F(TestDAG, get_vertex_at) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, clone_connections) {
+TEST_F(TestDAG, cloneConnections) {
     std::vector<DAGVertex> vertices_cloned = fillDAGDefault();
     for (std::size_t i = 1; i < vertices_cloned.size(); ++i) {
         getDAG().connect(vertices_cloned[0], vertices_cloned[i]);
@@ -616,7 +615,7 @@ TEST_F(TestDAG, clone_connections) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, copy_ctor) {
+TEST_F(TestDAG, copyCtor) {
     {
         DAG d_copy(getDAG());  // NOLINT
         EXPECT_EQ(d_copy, getDAG());
@@ -650,7 +649,7 @@ TEST_F(TestDAG, copy_ctor) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, assignment_operator) {
+TEST_F(TestDAG, assignmentOperator) {
     {
         DAG d_copy;
         d_copy = getDAG();
@@ -687,7 +686,7 @@ TEST_F(TestDAG, assignment_operator) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, remove_vertex) {
+TEST_F(TestDAG, removeVertex) {
     fillDAGDefault();
     DAG g_clone = getDAG().clone();
 
@@ -750,7 +749,7 @@ TEST_F(TestDAG, removeVertexByUUID) {
     EXPECT_EQ(0ul, getDAG().vertexCount());
 }
 
-TEST_F(TestDAG, remove_vertices_with_label) {
+TEST_F(TestDAG, removeVerticesWithLabel) {
     fillDAGDefaultWithTasks();
     DAG g_clone = getDAG().clone();
 
