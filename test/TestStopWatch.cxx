@@ -9,8 +9,6 @@
 /////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/StopWatch.h"
 
@@ -26,21 +24,21 @@ protected:
     void TearDown() override {}
 };
 
-TEST_F(TestStopWatch, output_validate) {
-    StopWatch sw(LogTag(__FUNCTION__), "no-op-0");
-    sw.mark();
-    sw = StopWatch(LogTag(__FUNCTION__), "no-op-1", false);
-    sw.mark();
+TEST_F(TestStopWatch, outputValidate) {
+    StopWatch stop_watch(LogTag(__FUNCTION__), "no-op-0");
+    stop_watch.mark();
+    stop_watch = StopWatch(LogTag(__FUNCTION__), "no-op-1", false);
+    stop_watch.mark();
     // Expect no output because we are using the copy ctor which is a reset.
-    sw = StopWatch(LogTag(__FUNCTION__), "no-op-2");
-    sw.mark();
-    sw.start();
-    sw.mark();
-    sw.mark();
-    sw.mark();
-    sw.mark();
-    sw.mark();
-    sw.mark();
-    sw.stop();
+    stop_watch = StopWatch(LogTag(__FUNCTION__), "no-op-2");
+    stop_watch.mark();
+    stop_watch.start();
+    stop_watch.mark();
+    stop_watch.mark();
+    stop_watch.mark();
+    stop_watch.mark();
+    stop_watch.mark();
+    stop_watch.mark();
+    stop_watch.stop();
 }
 }  // namespace com::dag_scheduler

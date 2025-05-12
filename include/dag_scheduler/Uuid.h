@@ -78,14 +78,14 @@ public:
      *
      * @return true if (this) was moved false otherwise.
      */
-    bool is_initialized() const;
+    bool isInitialized() const;
 
     /**
      * @brief Get a string representation of a \ref UUID.
      *
      * @return A string representation of the \ref UUID.
      */
-    std::string as_string() const;
+    std::string asString() const;
 
     /**
      * @brief A utility function used to write a \ref UUID to a stream.
@@ -95,8 +95,8 @@ public:
      *
      * @return The stream \p out after \p u was written to it.
      */
-    friend std::ostream& operator<<(std::ostream& out, const UUID& u) {
-        out << u.as_string();
+    friend std::ostream& operator<<(std::ostream& out, const UUID& uuid) {
+        out << uuid.asString();
         return out;
     }
 
@@ -109,8 +109,8 @@ public:
      * @return The stream \p out after \p u was written to it.
      */
     friend std::stringstream& operator<<(std::stringstream& out,
-                                         const UUID& u) {
-        out << u.as_string();
+                                         const UUID& uuid) {
+        out << uuid.asString();
         return out;
     }
 
@@ -124,19 +124,19 @@ public:
      *         if the string representation of \p rhs equals that of
      *         \p rhs, false otherwise.
      */
-    friend bool operator==(const UUID& lhs, const UUID& rhs) {
-        bool ret = true;
+    friend bool operator==(const UUID& left, const UUID& right) {
+        bool ret_val = true;
 
-        if (!lhs.is_initialized() && !rhs.is_initialized()) {
-            ret = true;
-        } else if (!lhs.is_initialized() || !rhs.is_initialized()) {
-            ret = false;
+        if (!left.isInitialized() && !right.isInitialized()) {
+            ret_val = true;
+        } else if (!left.isInitialized() || !right.isInitialized()) {
+            ret_val = false;
         } else {
             // Returns 0 on true.
-            ret = (lhs.as_string() == rhs.as_string());
+            ret_val = (left.asString() == right.asString());
         }
 
-        return ret;
+        return ret_val;
     }
 
     /**
@@ -149,8 +149,8 @@ public:
      *         if the string representation of \p rhs equals that of
      *         \p rhs, true otherwise.
      */
-    friend bool operator!=(const UUID& lhs, const UUID& rhs) {
-        return !(lhs == rhs);
+    friend bool operator!=(const UUID& left, const UUID& right) {
+        return !(left == right);
     }
 
 private:

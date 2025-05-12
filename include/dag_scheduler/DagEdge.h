@@ -33,13 +33,13 @@ class DAGEdge {
 private:
     friend class DAG;
     friend class DAGVertex;
-    friend struct DAGVertex::DAGVertex_connection;
-    friend bool dag_topological_sort(DAG& g,
-                                     std::list<DAGVertex>& sorted_vertices);
+    friend struct DAGVertex::DAGVertexConnection;
+    friend bool dagTopologicalSort(DAG& dag,
+                                   std::list<DAGVertex>& sorted_vertices);
 
 public:
     // TODO: Use DAG class to manage status.
-    enum class Status { initialized, traversed, non_traversable };
+    enum class Status { INITIALIZED, TRAVERSED, NON_TRAVERSABLE };
 
 public:
     /**
@@ -100,17 +100,17 @@ public:
      * @return A \ref std::weak_ptr<\ref DAGVertex> that points to the
      *         \ref DAGVertex that this points to.
      */
-    std::weak_ptr<DAGVertex> get_connection();
+    std::weak_ptr<DAGVertex> getConnection();
 
     /**
      * @brief Checks to see if this \ref DAGEdge points to \ref v
      *
-     * @param[in] v A \ref DAGVertex for which we are checking for a
-     *              connection to.
+     * @param[in] vertex A \ref DAGVertex for which we are checking for a
+     *                   connection to.
      *
      * @return true if \ref this points to \ref v. False other wise.
      */
-    bool is_a_connection_to(const DAGVertex& v) const;
+    bool isAConnectionTo(const DAGVertex& vertex) const;
 
     /**
      * @brief A getter for the \ref uuid of \ref this.
@@ -120,13 +120,13 @@ public:
      *
      * @return A \ref uuid that uniquely identifies any clone of \ref this.
      */
-    const UUID& get_uuid() const;
+    const UUID& getUUID() const;
 
     //! TODO (mhoggan): Add doc string once implemented. // cspell:disable-line
-    const Status& current_status() const;
+    const Status& currentStatus() const;
 
     //! TODO (mhoggan): Add doc string once implemented. // cspell:disable-line
-    std::string current_status_as_string() const;
+    std::string currentStatusAsString() const;
 
 public:
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @return A reference to \p out after it was streamed to.
      */
-    friend std::ostream& operator<<(std::ostream& out, const DAGEdge& e);
+    friend std::ostream& operator<<(std::ostream& out, const DAGEdge& edge);
 
     /**
      * @brief Comparison operator to compare equivalence of two
@@ -172,7 +172,7 @@ public:
     friend bool operator!=(const DAGEdge& lhs, const DAGEdge& rhs);
 
 protected:
-    bool connect_to(std::shared_ptr<DAGVertex> v);
+    bool connectTo(std::shared_ptr<DAGVertex> vertex);
     DAGEdge(const DAGEdge& other);
     DAGEdge& operator=(const DAGEdge& rhs);
 
@@ -182,12 +182,12 @@ private:
     std::weak_ptr<DAGVertex> connection_;
 
 private:
-    FRIEND_TEST(TestDagEdge, copy_ctor);
-    FRIEND_TEST(TestDagEdge, assignment_operator);
-    FRIEND_TEST(TestDagEdge, connect_and_clone);
-    FRIEND_TEST(TestDagEdge, connect_to_null);
+    FRIEND_TEST(TestDagEdge, copyCtor);
+    FRIEND_TEST(TestDagEdge, assignmentOperator);
+    FRIEND_TEST(TestDagEdge, connectAndClone);
+    FRIEND_TEST(TestDagEdge, connectToNull);
     FRIEND_TEST(TestDagEdge, connections);
-    FRIEND_TEST(TestDagEdge, equality_operators_with_connection);
+    FRIEND_TEST(TestDagEdge, equalityOperatorsWithConnection);
 };
 }  // namespace com::dag_scheduler
 #endif

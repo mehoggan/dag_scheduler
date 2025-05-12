@@ -90,7 +90,7 @@ public:
      *
      * @return The \ref uuid owned by (this).
      */
-    const UUID& get_uuid() const;
+    const UUID& getUUID() const;
 
     /**
      * @brief A virtual function used to run a \ref BaseTaskStage.
@@ -113,7 +113,7 @@ public:
      * @return true if \ref BaseTaskStage was run successfully, false
      *         otherwise.
      */
-    virtual bool is_running() const;
+    virtual bool isRunning() const;
 
     /**
      * @brief A virtual function used to end a \ref BaseTaskStage 's

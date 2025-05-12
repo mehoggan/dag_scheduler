@@ -57,8 +57,7 @@ public:
      * @return A \ref RegistryItem which associates the name of the library
      *         for future lookup within the \ref DynamicLibraryRegistry.
      */
-    static const RegistryItem& register_dynamic_library(
-            const std::string& name);
+    static const RegistryItem& registerDynamicLibrary(const std::string& name);
 
 public:
     /**
@@ -99,12 +98,12 @@ public:
          *
          * @return A const reference to a \ref boost::dll::shared_library.
          */
-        const boost::dll::shared_library& get_shared_lib() const;
+        const boost::dll::shared_library& getSharedLib() const;
 
         /**
          * @brief Getter for the \ref library_name passed in to the \ref ctor.
          */
-        const std::string& get_name() const;
+        const std::string& getName() const;
 
         /**
          * @brief Operator overload used by \ref DynamicLibraryRegistry

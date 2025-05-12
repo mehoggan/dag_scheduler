@@ -15,7 +15,6 @@
 #include <array>
 #include <memory>
 #include <mutex>
-#include <tuple>
 
 #include "dag_scheduler/ConcurrentTaskQueue.h"
 #include "dag_scheduler/InterruptibleTaskThread.h"
@@ -43,7 +42,7 @@ public:
      *
      * @param t
      */
-    void queue_task(std::unique_ptr<Task>&& t);
+    void queueTask(std::unique_ptr<Task>&& task);
 
     /**
      * @brief
@@ -52,7 +51,7 @@ public:
      *
      * @return
      */
-    bool kill_task(const Task& t);
+    bool killTask(const Task& task);
 
     /**
      * @brief
@@ -61,7 +60,7 @@ public:
      *
      * @return
      */
-    bool kill_task(const UUID& u);
+    bool killTask(const UUID& uuid);
 
     /**
      * @brief
@@ -78,7 +77,7 @@ public:
      *
      * @return
      */
-    bool is_paused();
+    bool isPaused();
 
     /**
      * @brief
@@ -90,18 +89,16 @@ public:
      *
      * @return
      */
-    bool is_shutdown();
+    bool isShutdown();
 
 private:
-    std::size_t first_unused_thread();
+    std::size_t firstUnusedThread();
 
 private:
     ConcurrentTaskQueue queue_;
     volatile std::atomic_bool pause_;
     volatile std::atomic_bool kill_;
-    std::array<std::unique_ptr<InterruptibleTaskThread>,  // cspell:disable-line
-               10>
-            thread_pool_;
+    std::array<std::unique_ptr<InterruptibleTaskThread>, 10> thread_pool_;
     std::mutex thread_pool_lock_;
 };
 }  // namespace com::dag_scheduler

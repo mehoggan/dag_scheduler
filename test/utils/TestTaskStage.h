@@ -7,13 +7,12 @@
 // This software is licensed under the terms of the Your License.
 // See the LICENSE file in the top-level directory.
 /////////////////////////////////////////////////////////////////////////
-#ifndef USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASKSTAGE_H
-#define USERS_MATTHEW_HOGGAN_DEVEL_GITLAB_MEHOGGAN_DAG_SCHEDULER_TEST_UTILS_TESTTASKSTAGE_H
+#ifndef UTILS_TESTTASKSTAGE_H
+#define UTILS_TESTTASKSTAGE_H
 
 #include <atomic>
 #include <chrono>
 
-#include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/TaskStage.h"
 
 namespace com::dag_scheduler {
@@ -42,7 +41,7 @@ public:
 
     bool run() override;
 
-    bool is_running() const override;
+    bool isRunning() const override;
 
     bool end() override;
 

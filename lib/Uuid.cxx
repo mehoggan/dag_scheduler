@@ -38,17 +38,17 @@ UUID& UUID::operator=(UUID&& rhs) {
     return (*this);
 }
 
-bool UUID::is_initialized() const { return !uuid_is_null(uuid_); }
+bool UUID::isInitialized() const { return !uuid_is_null(uuid_); }
 
-std::string UUID::as_string() const {
-    std::string ret;
-    if (is_initialized()) {
+std::string UUID::asString() const {
+    std::string ret_val;
+    if (isInitialized()) {
         char uuid_str[37];
         uuid_unparse_lower(uuid_, uuid_str);
-        ret = std::string(uuid_str);
+        ret_val = std::string(uuid_str);
     }
 
-    return ret;
+    return ret_val;
 }
 
 UUID::UUID(const UUID& other) { uuid_copy(uuid_, other.uuid_); }

@@ -103,7 +103,7 @@ public:
      *
      * @return True if queue was not empty and item was removed.
      */
-    bool try_pop(std::unique_ptr<Task>& popped_value);
+    bool tryPop(std::unique_ptr<Task>& popped_value);
 
     /**
      * @brief A function that removes \ref task from queue if it is not
@@ -119,7 +119,7 @@ public:
      * @return popped_value The \ref task to assign to if queue is
      *                      NOT empty.
      */
-    std::unique_ptr<Task> wait_and_pop();
+    std::unique_ptr<Task> waitAndPop();
 
     /**
      * @brief A function that removes \ref task from queue if it is not
@@ -145,7 +145,7 @@ public:
      * @return "true" if queue was not empty and item was removed.
      */
     template <typename Rep, typename Period>
-    bool wait_for_and_pop(
+    bool waitForAndPop(
             std::unique_ptr<Task>& popped_value,
             const std::chrono::duration<Rep, Period>& wait_duration) {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -174,8 +174,8 @@ public:
      *
      * @return "true" if item was found and removed, false otherwise.
      */
-    void remove_task_from_queue(const UUID& to_remove,
-                                std::unique_ptr<Task>& ret_ptr);
+    void removeTaskFromQueue(const UUID& to_remove,
+                             std::unique_ptr<Task>& ret_ptr);
 
 private:
     std::deque<std::unique_ptr<Task>> queue_;

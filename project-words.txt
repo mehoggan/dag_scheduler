@@ -4,3 +4,17 @@ sggz
 mehoggan
 winpty
 sslv
+libstages
+libdag
+TESTENVIRONMENT
+DAGALGORITHMS
+DAGSERIALIZATION
+mtor
+massign
+YAMLDAG
+TAGA
+TAGB
+TAGC
+TAGD
+
+

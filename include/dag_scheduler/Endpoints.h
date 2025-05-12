@@ -75,8 +75,8 @@ public:
                     std::unique_ptr<Responder>&& responder) const final;
 
 private:
-    bool handle_request(StringRequestType&& req,
-                        std::unique_ptr<Responder>&& responder) const;
+    bool handleRequest(StringRequestType&& req,
+                       std::unique_ptr<Responder>&& responder) const;
 
 private:
     boost::beast::string_view doc_root_;

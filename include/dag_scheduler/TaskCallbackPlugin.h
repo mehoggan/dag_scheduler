@@ -10,7 +10,6 @@
 #ifndef DAG_SCHEDULER_TASKCALLBACKPLUGIN_H  // cspell:disable-line
 #define DAG_SCHEDULER_TASKCALLBACKPLUGIN_H  // cspell:disable-line
 
-#include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/Task.h"
 
 namespace com::dag_scheduler {

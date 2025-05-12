@@ -22,8 +22,8 @@ InterruptibleTaskThread::InterruptibleTaskThread()
 
 InterruptibleTaskThread::InterruptibleTaskThread(const LogTag& tag)
         : LOG_TAG(tag), interrupt_(false), running_(false) {
-    Logging::add_std_cout_logger(tag);
-    Logging::add_std_cerr_logger(tag);
+    Logging::addStdCoutLogger(tag);
+    Logging::addStdCerrLogger(tag);
 }
 
 InterruptibleTaskThread::~InterruptibleTaskThread() { shutdown(); }
@@ -33,14 +33,14 @@ InterruptibleTaskThread::InterruptibleTaskThread(
         : LOG_TAG(std::move(other.LOG_TAG))
         , interrupt_(false)
         , running_(false) {
-    assert(!other.is_running() && "Cannot move a running task.");
+    assert(!other.isRunning() && "Cannot move a running task.");
 
     task_ = std::move(other.task_);
 }
 
 InterruptibleTaskThread& InterruptibleTaskThread::operator=(
         InterruptibleTaskThread&& rhs) {
-    assert(!rhs.is_running() && "Cannot move a running task.");
+    assert(!rhs.isRunning() && "Cannot move a running task.");
 
     LOG_TAG = std::move(rhs.LOG_TAG);
     interrupt_.store(false);
@@ -50,7 +50,7 @@ InterruptibleTaskThread& InterruptibleTaskThread::operator=(
     return (*this);
 }
 
-bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
+bool InterruptibleTaskThread::setTaskAndRun(std::unique_ptr<Task>&& task) {
     bool thread_started = false;
     std::mutex return_mutex;
     std::unique_lock<std::mutex> return_lock(return_mutex);
@@ -68,7 +68,7 @@ bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
                 bool all_ran = false;
                 if (self->task_ != nullptr) {
                     self->running_.store(true);
-                    all_ran = self->task_->iterate_stages([&](TaskStage& next) {
+                    all_ran = self->task_->iterateStages([&](TaskStage& next) {
                         bool stage_status = false;
                         {
                             std::lock_guard<std::mutex> lock(task_lock_);
@@ -79,7 +79,7 @@ bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
                         }
 
                         const bool this_was_interrupted =
-                                self->was_interrupted();
+                                self->wasInterrupted();
                         const bool cont =
                                 stage_status && (!this_was_interrupted);
 
@@ -92,11 +92,11 @@ bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
 
                         return cont;
                     });
-                    std::unique_ptr<com::dag_scheduler::Task> tmp =
+                    std::unique_ptr<com::dag_scheduler::Task> tmp_task =
                             std::move(self->task_);
                     self->task_.reset();
                     self->running_.store(false);
-                    tmp->complete(all_ran);
+                    tmp_task->complete(all_ran);
                 }
                 return all_ran;
             };
@@ -108,7 +108,7 @@ bool InterruptibleTaskThread::set_task_and_run(std::unique_ptr<Task>&& task) {
     return thread_started;
 }
 
-void InterruptibleTaskThread::set_interrupt(bool should_interrupt) {
+void InterruptibleTaskThread::setInterrupt(bool should_interrupt) {
     {
         std::lock_guard<std::mutex> lock(task_lock_);
         (task_ != nullptr) ? task_->kill() : true;
@@ -116,13 +116,13 @@ void InterruptibleTaskThread::set_interrupt(bool should_interrupt) {
     interrupt_.store(should_interrupt);
 }
 
-bool InterruptibleTaskThread::was_interrupted() const {
+bool InterruptibleTaskThread::wasInterrupted() const {
     return interrupt_.load();
 }
 
-bool InterruptibleTaskThread::is_running() const { return running_.load(); }
+bool InterruptibleTaskThread::isRunning() const { return running_.load(); }
 
-bool InterruptibleTaskThread::has_task() const {
+bool InterruptibleTaskThread::hasTask() const {
     {
         std::lock_guard<std::mutex> lock(task_lock_);
         return task_ != nullptr;
@@ -131,7 +131,7 @@ bool InterruptibleTaskThread::has_task() const {
 
 void InterruptibleTaskThread::shutdown() {
     if (running_.load()) {
-        set_interrupt();
+        setInterrupt();
     }
     if (thread_.joinable()) {
         thread_.join();

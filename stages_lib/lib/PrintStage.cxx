@@ -1,17 +1,24 @@
+////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2025 Directed Acyclic Graph Scheduler
+// All rights reserved.
+//
+// Contact: mehoggan@gmail.com
+//
+// This software is licensed under the terms of the Your License.
+// See the LICENSE file in the top-level directory.
+/////////////////////////////////////////////////////////////////////////
 #include "stages_lib/PrintStage.h"
 
 #include <boost/dll/alias.hpp>
 #include <iostream>
 #include <memory>
 
-#include "dag_scheduler/Logging.h"
-
-BOOST_DLL_ALIAS_SECTIONED(com::stages_lib::PrintStage::make_stage,
+BOOST_DLL_ALIAS_SECTIONED(com::stages_lib::PrintStage::makeStage,
                           print_stage,
                           Stages)
 
 namespace com::stages_lib {
-PrintStage::PrintStage() : PrintStage("") { label_ = uuid_.as_string(); }
+PrintStage::PrintStage() : PrintStage("") { label_ = uuid_.asString(); }
 
 PrintStage::PrintStage(const std::string& label)
         : com::dag_scheduler::TaskStage(label) {}
@@ -23,13 +30,13 @@ PrintStage::PrintStage(const std::string& label,
 PrintStage::~PrintStage() {}
 
 PrintStage::PrintStage(PrintStage&& other) {
-    assert(!other.is_running() && "You cannot move a running PrintStage");
+    assert(!other.isRunning() && "You cannot move a running PrintStage");
     label_ = std::move(other.label_);
     uuid_ = std::move(other.uuid_);
 }
 
 PrintStage& PrintStage::operator=(PrintStage&& other) {
-    assert(!other.is_running() && "You cannot move a running PrintStage");
+    assert(!other.isRunning() && "You cannot move a running PrintStage");
 
     label_ = std::move(other.label_);
     uuid_ = std::move(other.uuid_);
@@ -44,7 +51,7 @@ bool PrintStage::run() {
     return true;
 }
 
-bool PrintStage::is_running() const { return running_.load(); }
+bool PrintStage::isRunning() const { return running_.load(); }
 
 bool PrintStage::end() { return true; }
 
@@ -64,25 +71,26 @@ bool operator!=(const PrintStage& lhs, const PrintStage& rhs) {
     return !(lhs == rhs);
 }
 
-std::ostream& operator<<(std::ostream& out, const PrintStage& t) {
-    out << "label = " << t.label_;
-    if (t.label_ != t.uuid_.as_string()) {
-        out << " uuid = " << t.uuid_;
+std::ostream& operator<<(std::ostream& out, const PrintStage& stage) {
+    out << "label = " << stage.label_;
+    if (stage.label_ != stage.uuid_.asString()) {
+        out << " uuid = " << stage.uuid_;
     }
 
     return out;
 }
 
-std::stringstream& operator<<(std::stringstream& out, const PrintStage& t) {
-    out << "label = " << t.label_;
-    if (t.label_ != t.uuid_.as_string()) {
-        out << " uuid = " << t.uuid_;
+std::stringstream& operator<<(std::stringstream& out,
+                              const PrintStage& stage) {
+    out << "label = " << stage.label_;
+    if (stage.label_ != stage.uuid_.asString()) {
+        out << " uuid = " << stage.uuid_;
     }
 
     return out;
 }
 
-std::unique_ptr<com::dag_scheduler::TaskStage> PrintStage::make_stage(
+std::unique_ptr<com::dag_scheduler::TaskStage> PrintStage::makeStage(
         const std::string& name) {
     return std::make_unique<PrintStage>(name);
 }

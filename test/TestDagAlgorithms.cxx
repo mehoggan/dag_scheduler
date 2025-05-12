@@ -9,53 +9,51 @@
 /////////////////////////////////////////////////////////////////////////
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "dag_scheduler/DagAlgorithms.h"
-#include "dag_scheduler/Logging.h"
 
 namespace com::dag_scheduler {
-class TestDagAlgorithms : public ::testing::Test {
+class TestDAGAlgorithms : public ::testing::Test {
 protected:
     void SetUp() override {}
 
     void TearDown() override {}
 
-    DAG& get_dag() { return d_; }
+    DAG& getDAG() { return d_; }
 
-    std::vector<DAGVertex> fill_dag_default() {
-        DAGVertex v0("a"), v1("b"), v2("c"), v3("d"), v4("e"), v5("f"), v6("g"),
-                v7("h"), v8("i"), v9("j");
+    std::vector<DAGVertex> fillDAGDefault() {
+        DAGVertex vertex_0("a"), vertex_1("b"), vertex_2("c"), vertex_3("d"),
+                vertex_4("e"), vertex_5("f"), vertex_6("g"), vertex_7("h"),
+                vertex_8("i"), vertex_9("j");
         std::vector<DAGVertex> vertices_to_add;
-        vertices_to_add.push_back(std::move(v0));
-        vertices_to_add.push_back(std::move(v1));
-        vertices_to_add.push_back(std::move(v2));
-        vertices_to_add.push_back(std::move(v3));
-        vertices_to_add.push_back(std::move(v4));
-        vertices_to_add.push_back(std::move(v5));
-        vertices_to_add.push_back(std::move(v6));
-        vertices_to_add.push_back(std::move(v7));
-        vertices_to_add.push_back(std::move(v8));
-        vertices_to_add.push_back(std::move(v9));
+        vertices_to_add.push_back(std::move(vertex_0));
+        vertices_to_add.push_back(std::move(vertex_1));
+        vertices_to_add.push_back(std::move(vertex_2));
+        vertices_to_add.push_back(std::move(vertex_3));
+        vertices_to_add.push_back(std::move(vertex_4));
+        vertices_to_add.push_back(std::move(vertex_5));
+        vertices_to_add.push_back(std::move(vertex_6));
+        vertices_to_add.push_back(std::move(vertex_7));
+        vertices_to_add.push_back(std::move(vertex_8));
+        vertices_to_add.push_back(std::move(vertex_9));
 
         std::vector<DAGVertex> vertices_cloned;
         vertices_cloned.reserve(vertices_to_add.size());
         std::for_each(
                 vertices_to_add.begin(),
                 vertices_to_add.end(),
-                [&](DAGVertex& v) {
-                    DAGVertex v_clone_1 = v.clone();
-                    DAGVertex v_clone_2 = v.clone();
-                    DAGVertex v_clone_3 = v.clone();
+                [&](DAGVertex& vertex) {
+                    DAGVertex v_clone_1 = vertex.clone();
+                    DAGVertex v_clone_2 = vertex.clone();
+                    DAGVertex v_clone_3 = vertex.clone();
 
                     vertices_cloned.push_back(std::move(v_clone_1));
-                    get_dag().add_vertex(std::move(v_clone_2));
+                    getDAG().addVertex(std::move(v_clone_2));
 
                     std::weak_ptr<DAGVertex> v_weak =
-                            get_dag().find_vertex_by_uuid(v_clone_3.get_uuid());
+                            getDAG().findVertexByUUID(v_clone_3.getUUID());
                     EXPECT_FALSE(v_weak.expired());
                 });
-        EXPECT_EQ(vertices_to_add.size(), get_dag().vertex_count());
+        EXPECT_EQ(vertices_to_add.size(), getDAG().vertexCount());
         vertices_to_add.clear();
 
         return vertices_cloned;
@@ -65,140 +63,140 @@ private:
     DAG d_;
 };
 
-TEST_F(TestDagAlgorithms, dag_vertices_with_no_incoming_edges) {
+TEST_F(TestDAGAlgorithms, dagVerticesWithNoIncomingEdges) {
     {
-        std::vector<DAGVertex> vertices = fill_dag_default();
+        std::vector<DAGVertex> vertices = fillDAGDefault();
 
-        get_dag().connect(vertices[0], vertices[1]);  // a -> b
-        get_dag().connect(vertices[0], vertices[2]);  // a -> c
-        get_dag().connect(vertices[0], vertices[4]);  // a -> e
-        get_dag().connect(vertices[1], vertices[3]);  // b -> d
-        get_dag().connect(vertices[1], vertices[5]);  // b -> f
-        get_dag().connect(vertices[2], vertices[3]);  // c -> d
-        get_dag().connect(vertices[4], vertices[5]);  // e -> f
-        get_dag().connect(vertices[4], vertices[6]);  // e -> g
-        get_dag().connect(vertices[5], vertices[6]);  // f -> g
-        get_dag().connect(vertices[5], vertices[7]);  // f -> h
-        get_dag().connect(vertices[5], vertices[8]);  // f -> i
-        get_dag().connect(vertices[5], vertices[9]);  // f -> j
-        get_dag().connect(vertices[6], vertices[7]);  // g -> h
+        getDAG().connect(vertices[0], vertices[1]);  // a -> b
+        getDAG().connect(vertices[0], vertices[2]);  // a -> c
+        getDAG().connect(vertices[0], vertices[4]);  // a -> e
+        getDAG().connect(vertices[1], vertices[3]);  // b -> d
+        getDAG().connect(vertices[1], vertices[5]);  // b -> f
+        getDAG().connect(vertices[2], vertices[3]);  // c -> d
+        getDAG().connect(vertices[4], vertices[5]);  // e -> f
+        getDAG().connect(vertices[4], vertices[6]);  // e -> g
+        getDAG().connect(vertices[5], vertices[6]);  // f -> g
+        getDAG().connect(vertices[5], vertices[7]);  // f -> h
+        getDAG().connect(vertices[5], vertices[8]);  // f -> i
+        getDAG().connect(vertices[5], vertices[9]);  // f -> j
+        getDAG().connect(vertices[6], vertices[7]);  // g -> h
 
         std::vector<std::shared_ptr<DAGVertex>> actual =
-                dag_vertices_with_no_incoming_edges(get_dag());
+                dagVerticesWithNoIncomingEdges(getDAG());
 
         EXPECT_EQ(1u, actual.size());
         EXPECT_EQ("a", actual[0]->label());
 
-        get_dag().reset();
+        getDAG().reset();
     }
 }
 
-TEST_F(TestDagAlgorithms, dag_topological_sort) {
-    std::vector<DAGVertex> vertices = fill_dag_default();
+TEST_F(TestDAGAlgorithms, dagTopologicalSort) {
+    std::vector<DAGVertex> vertices = fillDAGDefault();
 
-    get_dag().connect(vertices[0], vertices[1]);
-    get_dag().connect(vertices[1], vertices[2]);
-    get_dag().connect(vertices[2], vertices[3]);
-    get_dag().connect(vertices[3], vertices[4]);
-    get_dag().connect(vertices[4], vertices[5]);
-    get_dag().connect(vertices[5], vertices[6]);
-    get_dag().connect(vertices[6], vertices[7]);
-    get_dag().connect(vertices[7], vertices[8]);
-    get_dag().connect(vertices[8], vertices[9]);
+    getDAG().connect(vertices[0], vertices[1]);
+    getDAG().connect(vertices[1], vertices[2]);
+    getDAG().connect(vertices[2], vertices[3]);
+    getDAG().connect(vertices[3], vertices[4]);
+    getDAG().connect(vertices[4], vertices[5]);
+    getDAG().connect(vertices[5], vertices[6]);
+    getDAG().connect(vertices[6], vertices[7]);
+    getDAG().connect(vertices[7], vertices[8]);
+    getDAG().connect(vertices[8], vertices[9]);
 
-    DAG g_clone = get_dag().clone();
-    ASSERT_EQ(get_dag(), g_clone);
+    DAG g_clone = getDAG().clone();
+    ASSERT_EQ(getDAG(), g_clone);
 
     std::list<DAGVertex> sorted_vertices;
-    dag_topological_sort(g_clone, sorted_vertices);
+    dagTopologicalSort(g_clone, sorted_vertices);
 
-    std::size_t i = 0;
-    for (DAGVertex& v : sorted_vertices) {
-        EXPECT_EQ(v, vertices[i]);
-        ++i;
+    std::size_t index = 0;
+    for (DAGVertex& vertex : sorted_vertices) {
+        EXPECT_EQ(vertex, vertices[index]);
+        ++index;
     }
 
-    get_dag().reset();
+    getDAG().reset();
 }
 
-TEST_F(TestDagAlgorithms, dag_topological_sort_non_linear) {
-    std::vector<DAGVertex> vertices = fill_dag_default();
+TEST_F(TestDAGAlgorithms, dagTopologicalSortNonLinear) {
+    std::vector<DAGVertex> vertices = fillDAGDefault();
 
-    get_dag().connect(vertices[0], vertices[1]);  // a -> b
-    get_dag().connect(vertices[0], vertices[2]);  // a -> c
-    get_dag().connect(vertices[0], vertices[4]);  // a -> e
-    get_dag().connect(vertices[1], vertices[3]);  // b -> d
-    get_dag().connect(vertices[1], vertices[5]);  // b -> f
-    get_dag().connect(vertices[2], vertices[3]);  // c -> d
-    get_dag().connect(vertices[4], vertices[5]);  // e -> f
-    get_dag().connect(vertices[4], vertices[6]);  // e -> g
-    get_dag().connect(vertices[5], vertices[6]);  // f -> g
-    get_dag().connect(vertices[5], vertices[7]);  // f -> h
-    get_dag().connect(vertices[5], vertices[8]);  // f -> i
-    get_dag().connect(vertices[5], vertices[9]);  // f -> j
-    get_dag().connect(vertices[6], vertices[7]);  // g -> h
+    getDAG().connect(vertices[0], vertices[1]);  // a -> b
+    getDAG().connect(vertices[0], vertices[2]);  // a -> c
+    getDAG().connect(vertices[0], vertices[4]);  // a -> e
+    getDAG().connect(vertices[1], vertices[3]);  // b -> d
+    getDAG().connect(vertices[1], vertices[5]);  // b -> f
+    getDAG().connect(vertices[2], vertices[3]);  // c -> d
+    getDAG().connect(vertices[4], vertices[5]);  // e -> f
+    getDAG().connect(vertices[4], vertices[6]);  // e -> g
+    getDAG().connect(vertices[5], vertices[6]);  // f -> g
+    getDAG().connect(vertices[5], vertices[7]);  // f -> h
+    getDAG().connect(vertices[5], vertices[8]);  // f -> i
+    getDAG().connect(vertices[5], vertices[9]);  // f -> j
+    getDAG().connect(vertices[6], vertices[7]);  // g -> h
 
-    DAG g_clone = get_dag().clone();
-    ASSERT_EQ(get_dag(), g_clone);
+    DAG g_clone = getDAG().clone();
+    ASSERT_EQ(getDAG(), g_clone);
 
     std::list<DAGVertex> sorted_vertices;
-    dag_topological_sort(g_clone, sorted_vertices);
-    ASSERT_EQ(g_clone.vertex_count(), sorted_vertices.size());
+    dagTopologicalSort(g_clone, sorted_vertices);
+    ASSERT_EQ(g_clone.vertexCount(), sorted_vertices.size());
 
     std::vector<DAGVertex> expected;
-    DAGVertex tmp;
-    tmp = vertices[0].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[1].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[2].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[4].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[3].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[5].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[6].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[8].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[9].clone();
-    expected.push_back(std::move(tmp));
-    tmp = vertices[7].clone();
-    expected.push_back(std::move(tmp));
+    DAGVertex tmp_vertex;
+    tmp_vertex = vertices[0].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[1].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[2].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[4].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[3].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[5].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[6].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[8].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[9].clone();
+    expected.push_back(std::move(tmp_vertex));
+    tmp_vertex = vertices[7].clone();
+    expected.push_back(std::move(tmp_vertex));
 
-    std::size_t i = 0;
-    for (DAGVertex& v : sorted_vertices) {
-        EXPECT_EQ(expected[i], v);
-        ++i;
+    std::size_t index = 0;
+    for (DAGVertex& vertex : sorted_vertices) {
+        EXPECT_EQ(expected[index], vertex);
+        ++index;
     }
 
-    get_dag().reset();
+    getDAG().reset();
 }
 
-TEST_F(TestDagAlgorithms, process_dag) {
+TEST_F(TestDAGAlgorithms, processDAG) {
     {
-        std::vector<DAGVertex> vertices = fill_dag_default();
+        std::vector<DAGVertex> vertices = fillDAGDefault();
 
-        get_dag().connect(vertices[0], vertices[1]);  // a -> b
-        get_dag().connect(vertices[0], vertices[2]);  // a -> c
-        get_dag().connect(vertices[0], vertices[4]);  // a -> e
-        get_dag().connect(vertices[1], vertices[3]);  // b -> d
-        get_dag().connect(vertices[1], vertices[5]);  // b -> f
-        get_dag().connect(vertices[2], vertices[3]);  // c -> d
-        get_dag().connect(vertices[4], vertices[5]);  // e -> f
-        get_dag().connect(vertices[4], vertices[6]);  // e -> g
-        get_dag().connect(vertices[5], vertices[6]);  // f -> g
-        get_dag().connect(vertices[5], vertices[7]);  // f -> h
-        get_dag().connect(vertices[5], vertices[8]);  // f -> i
-        get_dag().connect(vertices[5], vertices[9]);  // f -> j
-        get_dag().connect(vertices[6], vertices[7]);  // g -> h
+        getDAG().connect(vertices[0], vertices[1]);  // a -> b
+        getDAG().connect(vertices[0], vertices[2]);  // a -> c
+        getDAG().connect(vertices[0], vertices[4]);  // a -> e
+        getDAG().connect(vertices[1], vertices[3]);  // b -> d
+        getDAG().connect(vertices[1], vertices[5]);  // b -> f
+        getDAG().connect(vertices[2], vertices[3]);  // c -> d
+        getDAG().connect(vertices[4], vertices[5]);  // e -> f
+        getDAG().connect(vertices[4], vertices[6]);  // e -> g
+        getDAG().connect(vertices[5], vertices[6]);  // f -> g
+        getDAG().connect(vertices[5], vertices[7]);  // f -> h
+        getDAG().connect(vertices[5], vertices[8]);  // f -> i
+        getDAG().connect(vertices[5], vertices[9]);  // f -> j
+        getDAG().connect(vertices[6], vertices[7]);  // g -> h
 
-        processed_order_type ordered_batches;
+        ProcessedOrder_t ordered_batches;
 
-        TaskScheduler ts;
-        EXPECT_TRUE(process_dag(get_dag(), ordered_batches, ts));
+        TaskScheduler task_scheduler;
+        EXPECT_TRUE(processDAG(getDAG(), ordered_batches, task_scheduler));
 
         ASSERT_EQ(5u, ordered_batches.size());
         ASSERT_EQ(1u, ordered_batches[0].size());
@@ -217,36 +215,36 @@ TEST_F(TestDagAlgorithms, process_dag) {
         ASSERT_EQ(1u, ordered_batches[4].size());
         EXPECT_EQ("h", ordered_batches[4][0].label());
 
-        get_dag().reset();
+        getDAG().reset();
     }
 }
 
-TEST_F(TestDagAlgorithms, process_dag_cyclic) {
+TEST_F(TestDAGAlgorithms, processDAGCyclic) {
     {
-        std::vector<DAGVertex> vertices = fill_dag_default();
+        std::vector<DAGVertex> vertices = fillDAGDefault();
 
-        get_dag().connect(vertices[0], vertices[1]);  // a -> b
-        get_dag().connect(vertices[0], vertices[2]);  // a -> c
-        get_dag().connect(vertices[0], vertices[4]);  // a -> e
-        get_dag().connect(vertices[1], vertices[3]);  // b -> d
-        get_dag().connect(vertices[1], vertices[5]);  // b -> f
-        get_dag().connect(vertices[2], vertices[3]);  // c -> d
-        get_dag().connect(vertices[4], vertices[5]);  // e -> f
-        get_dag().connect(vertices[4], vertices[6]);  // e -> g
-        get_dag().connect(vertices[5], vertices[6]);  // f -> g
-        get_dag().connect(vertices[5], vertices[7]);  // f -> h
-        get_dag().connect(vertices[5], vertices[8]);  // f -> i
-        get_dag().connect(vertices[5], vertices[9]);  // f -> j
-        get_dag().connect(vertices[6], vertices[7]);  // g -> h
-        std::weak_ptr<DAGVertex> v7 = get_dag().find_vertex(vertices[7]);
-        std::weak_ptr<DAGVertex> v0 = get_dag().find_vertex(vertices[0]);
-        v7.lock()->connect(v0.lock());
+        getDAG().connect(vertices[0], vertices[1]);  // a -> b
+        getDAG().connect(vertices[0], vertices[2]);  // a -> c
+        getDAG().connect(vertices[0], vertices[4]);  // a -> e
+        getDAG().connect(vertices[1], vertices[3]);  // b -> d
+        getDAG().connect(vertices[1], vertices[5]);  // b -> f
+        getDAG().connect(vertices[2], vertices[3]);  // c -> d
+        getDAG().connect(vertices[4], vertices[5]);  // e -> f
+        getDAG().connect(vertices[4], vertices[6]);  // e -> g
+        getDAG().connect(vertices[5], vertices[6]);  // f -> g
+        getDAG().connect(vertices[5], vertices[7]);  // f -> h
+        getDAG().connect(vertices[5], vertices[8]);  // f -> i
+        getDAG().connect(vertices[5], vertices[9]);  // f -> j
+        getDAG().connect(vertices[6], vertices[7]);  // g -> h
+        std::weak_ptr<DAGVertex> vertex_7 = getDAG().findVertex(vertices[7]);
+        std::weak_ptr<DAGVertex> vertex_0 = getDAG().findVertex(vertices[0]);
+        vertex_7.lock()->connect(vertex_0.lock());
 
-        processed_order_type ordered_batches;
+        ProcessedOrder_t ordered_batches;
 
-        TaskScheduler ts;
-        EXPECT_FALSE(process_dag(get_dag(), ordered_batches, ts));
-        get_dag().reset();
+        TaskScheduler task_scheduler;
+        EXPECT_FALSE(processDAG(getDAG(), ordered_batches, task_scheduler));
+        getDAG().reset();
     }
 }
 }  // namespace com::dag_scheduler

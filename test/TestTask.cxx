@@ -13,8 +13,6 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <atomic>
-
 #include "dag_scheduler/LoggedClass.hpp"
 #include "dag_scheduler/Task.h"
 #include "dag_scheduler/TaskCallbackPlugin.h"
@@ -24,7 +22,7 @@ class TestTask : public ::testing::Test, public LoggedClass<TestTask> {
 public:
     TestTask() : LoggedClass<TestTask>(*this) {}
 
-    static void get_generic_config(rapidjson::Document& config_doc) {
+    static void getGenericConfig(rapidjson::Document& config_doc) {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         writer.StartObject();
@@ -40,14 +38,14 @@ public:
         config_doc.Parse(buffer.GetString());
     }
 
-    static std::string get_expected_config_str() {
+    static std::string getExpectedConfigStr() {
         return std::string("{") + std::string("\"test_value_int\":-1,") +
                std::string("\"test_value_str\":\"test_string\",") +
                std::string("\"test_value_bool\":true,") +
                std::string("\"test_value_double\":-1.0") + std::string("}");
     }
 
-    static void get_generic_initial_inputs(
+    static void getGenericInitialInputs(
             rapidjson::Document& initial_inputs_doc) {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -64,7 +62,7 @@ public:
         initial_inputs_doc.Parse(buffer.GetString());
     }
 
-    static std::string get_expected_generic_initial_inputs_str() {
+    static std::string getExpectedGenericInitialInputsStr() {
         return std::string("{") + std::string("\"test_value_int\":-1,") +
                std::string("\"test_value_str\":\"test_string\",") +
                std::string("\"test_value_bool\":true,") +
@@ -103,16 +101,16 @@ public:
 TEST_F(TestTask, default_ctor) {
     std::unique_ptr<Task> test(new TestTaskImpl);
     EXPECT_NE(nullptr, test);
-    EXPECT_EQ(test->get_uuid().as_string(), test->label());
+    EXPECT_EQ(test->getUUID().asString(), test->label());
     {
         std::string empty_config;
-        test->json_config_str(empty_config);
+        test->jsonConfigStr(empty_config);
         EXPECT_EQ("{}", empty_config);
     }
 
     {
         std::string empty_initial_json_inputs;
-        test->json_initial_inputs_str(empty_initial_json_inputs);
+        test->jsonInitialInputsStr(empty_initial_json_inputs);
         EXPECT_EQ("{}", empty_initial_json_inputs);
     }
 }
@@ -121,16 +119,16 @@ TEST_F(TestTask, default_ctor_clone) {
     std::unique_ptr<Task> test(new TestTaskImpl);
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     {
         std::string empty_config;
-        test->json_config_str(empty_config);
+        test->jsonConfigStr(empty_config);
         EXPECT_EQ("{}", empty_config);
     }
 
     {
         std::string empty_initial_json_inputs;
-        test->json_initial_inputs_str(empty_initial_json_inputs);
+        test->jsonInitialInputsStr(empty_initial_json_inputs);
         EXPECT_EQ("{}", empty_initial_json_inputs);
     }
 }
@@ -138,39 +136,39 @@ TEST_F(TestTask, default_ctor_clone) {
 TEST_F(TestTask, label_ctor) {
     std::unique_ptr<Task> test(new TestTaskImpl("test_label"));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
     {
         std::string empty_config;
-        test->json_config_str(empty_config);
+        test->jsonConfigStr(empty_config);
         EXPECT_EQ("{}", empty_config);
     }
 
     {
         std::string empty_initial_json_inputs;
-        test->json_initial_inputs_str(empty_initial_json_inputs);
+        test->jsonInitialInputsStr(empty_initial_json_inputs);
         EXPECT_EQ("{}", empty_initial_json_inputs);
     }
 }
 
 TEST_F(TestTask, label_ctor_with_inputs) {
     rapidjson::Document initial_inputs;
-    TestTask::get_generic_initial_inputs(initial_inputs);
+    TestTask::getGenericInitialInputs(initial_inputs);
     std::unique_ptr<Task> test(new TestTaskImpl("test_label", initial_inputs));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
     {
         std::string empty_config;
-        test->json_config_str(empty_config);
+        test->jsonConfigStr(empty_config);
         EXPECT_EQ("{}", empty_config);
     }
 
     {
         std::string json_inputs;
-        test->json_initial_inputs_str(json_inputs);
+        test->jsonInitialInputsStr(json_inputs);
         std::string expected_initial_json_inputs =
-                TestTask::get_expected_generic_initial_inputs_str();
+                TestTask::getExpectedGenericInitialInputsStr();
         EXPECT_EQ(expected_initial_json_inputs, json_inputs);
     }
 }
@@ -179,10 +177,10 @@ TEST_F(TestTask, label_ctor_clone) {
     std::unique_ptr<Task> test(new TestTaskImpl("test_label"));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
     std::string empty_config;
-    test_clone->json_config_str(empty_config);
+    test_clone->jsonConfigStr(empty_config);
     EXPECT_EQ("{}", empty_config);
 }
 
@@ -193,11 +191,11 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback) {
     std::unique_ptr<Task> test(
             new TestTaskImpl("test_label", complete_callback));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
     test->complete(true);
     std::string empty_config;
-    test->json_config_str(empty_config);
+    test->jsonConfigStr(empty_config);
     EXPECT_EQ("{}", empty_config);
 }
 
@@ -209,11 +207,11 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_clone) {
             new TestTaskImpl("test_label", complete_callback));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
     test_clone->complete(true);
     std::string empty_config;
-    test_clone->json_config_str(empty_config);
+    test_clone->jsonConfigStr(empty_config);
     EXPECT_EQ("{}", empty_config);
 }
 
@@ -223,12 +221,12 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin) {
     std::unique_ptr<Task> test(new TestTaskImpl(
             "test_label", std::move(complete_callback_plugin)));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
-    EXPECT_TRUE(test->callback_plugin_is_set());
+    EXPECT_TRUE(test->callbackPluginIsSet());
     test->complete(true);
     std::string empty_config;
-    test->json_config_str(empty_config);
+    test->jsonConfigStr(empty_config);
     EXPECT_EQ("{}", empty_config);
 }
 
@@ -239,95 +237,99 @@ TEST_F(TestTask, call_back_ctor_sets_appropiate_callback_plugin_clone) {
             "test_label", std::move(complete_callback_plugin)));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
-    EXPECT_TRUE(test_clone->callback_plugin_is_set());
+    EXPECT_TRUE(test_clone->callbackPluginIsSet());
     test_clone->complete(true);
     std::string empty_config;
-    test_clone->json_config_str(empty_config);
+    test_clone->jsonConfigStr(empty_config);
     EXPECT_EQ("{}", empty_config);
 }
 
 TEST_F(TestTask, label_ctor_with_initial_inputs) {
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_config(json_initial_inputs);
+    TestTask::getGenericConfig(json_initial_inputs);
     std::unique_ptr<Task> test(
             new TestTaskImpl("test_label", json_initial_inputs));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
     std::string actual_initial_inputs;
-    test->json_initial_inputs_str(actual_initial_inputs);
+    test->jsonInitialInputsStr(actual_initial_inputs);
     std::string expected_initial_json_inputs =
-            TestTask::get_expected_generic_initial_inputs_str();
+            TestTask::getExpectedGenericInitialInputsStr();
     EXPECT_EQ(actual_initial_inputs, expected_initial_json_inputs);
 }
 
 TEST_F(TestTask, label_ctor_with_initial_inputs_clone) {
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_initial_inputs(json_initial_inputs);
+    TestTask::getGenericInitialInputs(json_initial_inputs);
     std::unique_ptr<Task> test(
             new TestTaskImpl("test_label", json_initial_inputs));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
     std::string actual_initial_inputs;
-    test_clone->json_initial_inputs_str(actual_initial_inputs);
+    test_clone->jsonInitialInputsStr(actual_initial_inputs);
     std::string expected_initial_json_inputs =
-            TestTask::get_expected_generic_initial_inputs_str();
+            TestTask::getExpectedGenericInitialInputsStr();
     EXPECT_EQ(actual_initial_inputs, expected_initial_json_inputs);
 }
 
 TEST_F(TestTask,
        call_back_ctor_sets_appropiate_callback_with_initial_inputs_empty_) {
     rapidjson::Document json_config;
-    TestTask::get_generic_config(json_config);
+    TestTask::getGenericConfig(json_config);
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_initial_inputs(json_initial_inputs);
+    TestTask::getGenericInitialInputs(json_initial_inputs);
     std::function<void(bool)> complete_callback = [](bool status) {
         EXPECT_TRUE(status);
     };
-    std::unique_ptr<Task> test(new TestTaskImpl(
-            "test_label", json_initial_inputs, json_config, complete_callback));
+    std::unique_ptr<Task> test(new TestTaskImpl("test_label",
+                                                json_initial_inputs,
+                                                json_config,
+                                                complete_callback));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
     test->complete(true);
     std::string actual_config;
-    test->json_config_str(actual_config);
-    std::string expected_config = TestTask::get_expected_config_str();
+    test->jsonConfigStr(actual_config);
+    std::string expected_config = TestTask::getExpectedConfigStr();
     EXPECT_EQ(actual_config, expected_config);
 }
 
 TEST_F(TestTask,
        call_back_ctor_sets_appropiate_callback_with_config_empty_stages_clone) {
     rapidjson::Document json_config;
-    TestTask::get_generic_config(json_config);
+    TestTask::getGenericConfig(json_config);
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_initial_inputs(json_initial_inputs);
+    TestTask::getGenericInitialInputs(json_initial_inputs);
     std::function<void(bool)> complete_callback = [](bool status) {
         EXPECT_TRUE(status);
     };
-    std::unique_ptr<Task> test(new TestTaskImpl(
-            "test_label", json_initial_inputs, json_config, complete_callback));
+    std::unique_ptr<Task> test(new TestTaskImpl("test_label",
+                                                json_initial_inputs,
+                                                json_config,
+                                                complete_callback));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
     test_clone->complete(true);
     std::string actual_config;
-    test_clone->json_config_str(actual_config);
-    std::string expected_config = TestTask::get_expected_config_str();
+    test_clone->jsonConfigStr(actual_config);
+    std::string expected_config = TestTask::getExpectedConfigStr();
     EXPECT_EQ(actual_config, expected_config);
 }
 
 TEST_F(TestTask,
        call_back_ctor_sets_appropiate_callback_plugin_with_config_empty_) {
     rapidjson::Document json_config;
-    TestTask::get_generic_config(json_config);
+    TestTask::getGenericConfig(json_config);
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_initial_inputs(json_initial_inputs);
+    TestTask::getGenericInitialInputs(json_initial_inputs);
     std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
             std::make_unique<TestTaskCallbackPlugin>();
     std::unique_ptr<Task> test(
@@ -336,22 +338,22 @@ TEST_F(TestTask,
                              json_config,
                              std::move(complete_callback_plugin)));
     EXPECT_NE(nullptr, test);
-    EXPECT_NE(test->get_uuid().as_string(), test->label());
+    EXPECT_NE(test->getUUID().asString(), test->label());
     EXPECT_EQ("test_label", test->label());
-    EXPECT_TRUE(test->callback_plugin_is_set());
+    EXPECT_TRUE(test->callbackPluginIsSet());
     test->complete(true);
     std::string actual_config;
-    test->json_config_str(actual_config);
-    std::string expected_config = TestTask::get_expected_config_str();
+    test->jsonConfigStr(actual_config);
+    std::string expected_config = TestTask::getExpectedConfigStr();
     EXPECT_EQ(actual_config, expected_config);
 }
 
 TEST_F(TestTask,
        call_back_ctor_sets_appropiate_callback_plugin_with_config_clone) {
     rapidjson::Document json_config;
-    TestTask::get_generic_config(json_config);
+    TestTask::getGenericConfig(json_config);
     rapidjson::Document json_initial_inputs;
-    TestTask::get_generic_initial_inputs(json_initial_inputs);
+    TestTask::getGenericInitialInputs(json_initial_inputs);
     std::unique_ptr<TaskCallbackPlugin> complete_callback_plugin =
             std::make_unique<TestTaskCallbackPlugin>();
     std::unique_ptr<Task> test(
@@ -361,57 +363,57 @@ TEST_F(TestTask,
                              std::move(complete_callback_plugin)));
     std::unique_ptr<Task>&& test_clone = test->clone();
     EXPECT_NE(nullptr, test_clone);
-    EXPECT_EQ(test_clone->get_uuid().as_string(), test->get_uuid().as_string());
+    EXPECT_EQ(test_clone->getUUID().asString(), test->getUUID().asString());
     EXPECT_EQ("test_label", test_clone->label());
-    EXPECT_TRUE(test_clone->callback_plugin_is_set());
+    EXPECT_TRUE(test_clone->callbackPluginIsSet());
     test_clone->complete(true);
     std::string actual_config;
-    test_clone->json_config_str(actual_config);
-    std::string expected_config = TestTask::get_expected_config_str();
+    test_clone->jsonConfigStr(actual_config);
+    std::string expected_config = TestTask::getExpectedConfigStr();
     EXPECT_EQ(actual_config, expected_config);
 }
 
-TEST_F(TestTask, iterate_stages_succeeds_if_all_stages_ran_no_kill_task) {
+TEST_F(TestTask, iterateStagesSucceedsIfAllStagesRanNoKillTask) {
     const auto expected = {"A", "B", "C"};
-    TestTaskImpl tt;
+    TestTaskImpl test_task;
     auto expected_it = expected.begin();
-    ASSERT_EQ(tt.stages_.size(), expected.size());
-    bool ran_all = tt.iterate_stages([&](TaskStage& next) {
+    ASSERT_EQ(test_task.stages_.size(), expected.size());
+    bool ran_all = test_task.iterateStages([&](TaskStage& next) {
         EXPECT_EQ(*(expected_it), next.label());
-        bool ran = next.run();
+        bool has_ran = next.run();
         ++expected_it;
-        return ran;
+        return has_ran;
     });
     EXPECT_TRUE(ran_all);
 }
 
-TEST_F(TestTask, iterate_stages_fails_if_one_stage_failed) {
-    TestTaskImpl tt;
-    bool ran_all = tt.iterate_stages([&](TaskStage& next) {
-        bool ran = next.run();
-        return (next.label() == "B" ? false : ran);
+TEST_F(TestTask, iterateStagesFailsIfOneStageFailed) {
+    TestTaskImpl test_task;
+    bool ran_all = test_task.iterateStages([&](TaskStage& next) {
+        bool has_ran = next.run();
+        return (next.label() == "B" ? false : has_ran);
     });
     EXPECT_FALSE(ran_all);
 }
 
-TEST_F(TestTask, iterate_stages_fails_if_task_killed) {
-    TestTaskImpl tt;
-    bool ran_all = tt.iterate_stages([&](TaskStage& next) {
+TEST_F(TestTask, iterateStagesFailsIfTaskKilled) {
+    TestTaskImpl test_task;
+    bool ran_all = test_task.iterateStages([&](TaskStage& next) {
         next.end();
-        bool keep_running = (next.label() == "C") ? (!tt.kill()) : true;
+        bool keep_running = (next.label() == "C") ? (!test_task.kill()) : true;
         return keep_running;
     });
     EXPECT_FALSE(ran_all);
 }
 
-TEST_F(TestTask, user_cannot_move_task_while_iterating_stages) {
+TEST_F(TestTask, userCannotMoveTaskWhileIteratingStages) {
     // Test move copy ctor.
     ASSERT_DEATH(
             {
-                TestTaskImpl tt;
-                tt.iterate_stages([&](TaskStage& next) {
+                TestTaskImpl test_task;
+                test_task.iterateStages([&](TaskStage& next) {
                     next.end();
-                    TestTaskImpl destroy(std::move(tt));
+                    TestTaskImpl destroy(std::move(test_task));
                     return true;
                 });
             },
@@ -420,11 +422,11 @@ TEST_F(TestTask, user_cannot_move_task_while_iterating_stages) {
     // Test move assignment operator.
     ASSERT_DEATH(
             {
-                TestTaskImpl tt;
-                tt.iterate_stages([&](TaskStage& next) {
+                TestTaskImpl test_task;
+                test_task.iterateStages([&](TaskStage& next) {
                     next.end();
                     TestTaskImpl destroy;
-                    destroy = std::move(tt);
+                    destroy = std::move(test_task);
                     return true;
                 });
             },

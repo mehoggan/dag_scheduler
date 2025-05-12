@@ -45,13 +45,14 @@ public:
     void run();
 
 private:
-    void on_run();
-    void on_handshake(boost::beast::error_code ec);
-    void do_read();
-    void on_read(boost::beast::error_code ec, std::size_t bytes_transferred);
-    void do_close();
-    void on_shutdown(boost::beast::error_code ec);
-    void on_write(bool close, boost::beast::error_code ec, std::size_t);
+    void onRun();
+    void onHandshake(boost::beast::error_code error_code);
+    void doRead();
+    void onRead(boost::beast::error_code error_code,
+                std::size_t bytes_transferred);
+    void doClose();
+    void onShutdown(boost::beast::error_code error_code);
+    void onWrite(bool close, boost::beast::error_code error_code, std::size_t);
 
 private:
     boost::beast::ssl_stream<boost::beast::tcp_stream> stream_;

@@ -43,13 +43,13 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(severity,
 BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Tag", std::string)
 
 namespace com::dag_scheduler {
-std::atomic<bool> Logging::init_(false);
+std::atomic<bool> Logging::s_init(false);
 std::unordered_map<LogTag, boost::weak_ptr<Logging::TextSink>>
-        Logging::loggers_;
-std::mutex Logging::loggers_mutex_;
+        Logging::s_loggers;
+std::mutex Logging::s_loggers_mutex;
 
 namespace detail {
-boost::log::formatter fmt =
+boost::log::formatter format =
         boost::log::expressions::stream
         << boost::log::expressions::format_date_time<boost::posix_time::ptime>(
                    "TimeStamp", "%Y-%m-%d %H:%M:%S")
@@ -63,29 +63,32 @@ boost::log::formatter fmt =
         << " " << severity << "(" << line_id << ")" << " - \'"
         << boost::log::expressions::smessage << "\'";
 
-boost::shared_ptr<Logging::TextSink> make_sink() {
+boost::shared_ptr<Logging::TextSink> makeSink() {
     boost::shared_ptr<Logging::TextSink> sink =
             boost::make_shared<Logging::TextSink>();
     return sink;
 }
 
-void configure_sink(boost::shared_ptr<Logging::TextSink> sink,
-                    boost::log::trivial::severity_level level,
-                    const std::string& tag) {
-    sink->set_formatter(detail::fmt);
+void configureSink(boost::shared_ptr<Logging::TextSink> sink,
+                   boost::log::trivial::severity_level level,
+                   const std::string& tag) {
+    sink->set_formatter(detail::format);
     boost::log::core::get()->add_sink(sink);
     sink->set_filter(
             severity >= level &&
             (boost::log::expressions::has_attr(tag_attr) && tag_attr == tag));
 }
 
-Logging::Dict::iterator find_sink(const LogTag& tag, Logging::Dict& dict) {
-    Logging::Dict::iterator it = std::find_if(
-            dict.begin(), dict.end(), [&](Logging::Dict::value_type& v) {
-                bool ret = std::string(v.first.tag()) == std::string(tag.tag());
-                return ret;
+Logging::Dict::iterator findSink(const LogTag& tag, Logging::Dict& dict) {
+    Logging::Dict::iterator iterator = std::find_if(
+            dict.begin(),
+            dict.end(),
+            [&](Logging::Dict::value_type& key_value) {
+                bool ret_val = std::string(key_value.first.tag()) ==
+                               std::string(tag.tag());
+                return ret_val;
             });
-    return it;
+    return iterator;
 }
 }  // namespace detail
 
@@ -94,11 +97,11 @@ LogTag::LogTag(const ::std::string& tag) : tag_(tag) {}
 const char* LogTag::tag() const { return tag_.c_str(); }
 
 bool Logging::init() {
-    if (!init_.load()) {
+    if (!s_init.load()) {
         boost::log::add_common_attributes();
-        init_.store(true);
+        s_init.store(true);
     }
-    return init_.load();
+    return s_init.load();
 }
 
 boost::filesystem::path Logging::mktmpdir(
@@ -108,89 +111,89 @@ boost::filesystem::path Logging::mktmpdir(
     return tmppath;
 }
 
-bool Logging::add_std_cout_logger(const LogTag& tag,
-                                  boost::log::trivial::severity_level level) {
-    bool ret = false;
+bool Logging::addStdCoutLogger(const LogTag& tag,
+                               boost::log::trivial::severity_level level) {
+    bool ret_val = false;
 
-    std::lock_guard<std::mutex> lock(Logging::loggers_mutex_);
-    auto end_it = Logging::loggers_.end();
-    auto tag_it = detail::find_sink(tag, Logging::loggers_);
+    std::lock_guard<std::mutex> lock(Logging::s_loggers_mutex);
+    auto end_it = Logging::s_loggers.end();
+    auto tag_it = detail::findSink(tag, Logging::s_loggers);
     if (tag_it == end_it) {
-        boost::shared_ptr<Logging::TextSink> sink = detail::make_sink();
+        boost::shared_ptr<Logging::TextSink> sink = detail::makeSink();
         boost::shared_ptr<std::ostream> stream(&std::cout,
                                                boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
-        detail::configure_sink(sink, level, tag.tag());
-        Logging::loggers_[tag] = sink;
-        ret = true;
+        detail::configureSink(sink, level, tag.tag());
+        Logging::s_loggers[tag] = sink;
+        ret_val = true;
     }
 
-    return ret;
+    return ret_val;
 }
 
-bool Logging::add_std_cerr_logger(const LogTag& tag,
-                                  boost::log::trivial::severity_level level) {
-    bool ret = false;
+bool Logging::addStdCerrLogger(const LogTag& tag,
+                               boost::log::trivial::severity_level level) {
+    bool ret_val = false;
 
-    std::lock_guard<std::mutex> lock(Logging::loggers_mutex_);
-    auto end_it = Logging::loggers_.end();
-    auto tag_it = detail::find_sink(tag, Logging::loggers_);
+    std::lock_guard<std::mutex> lock(Logging::s_loggers_mutex);
+    auto end_it = Logging::s_loggers.end();
+    auto tag_it = detail::findSink(tag, Logging::s_loggers);
     if (tag_it == end_it) {
-        boost::shared_ptr<Logging::TextSink> sink = detail::make_sink();
+        boost::shared_ptr<Logging::TextSink> sink = detail::makeSink();
         boost::shared_ptr<std::ostream> stream(&std::cerr,
                                                boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
-        detail::configure_sink(sink, level, tag.tag());
-        Logging::loggers_[tag] = sink;
-        ret = true;
+        detail::configureSink(sink, level, tag.tag());
+        Logging::s_loggers[tag] = sink;
+        ret_val = true;
     }
 
-    return ret;
+    return ret_val;
 }
 
-bool Logging::add_std_log_logger(const LogTag& tag,
-                                 boost::log::trivial::severity_level level) {
-    bool ret = false;
+bool Logging::addStdLogLogger(const LogTag& tag,
+                              boost::log::trivial::severity_level level) {
+    bool ret_val = false;
 
-    std::lock_guard<std::mutex> lock(Logging::loggers_mutex_);
-    auto end_it = Logging::loggers_.end();
-    auto tag_it = detail::find_sink(tag, Logging::loggers_);
+    std::lock_guard<std::mutex> lock(Logging::s_loggers_mutex);
+    auto end_it = Logging::s_loggers.end();
+    auto tag_it = detail::findSink(tag, Logging::s_loggers);
     if (tag_it == end_it) {
-        boost::shared_ptr<Logging::TextSink> sink = detail::make_sink();
+        boost::shared_ptr<Logging::TextSink> sink = detail::makeSink();
         boost::shared_ptr<std::ostream> stream(&std::clog,
                                                boost::null_deleter());
         sink->locked_backend()->add_stream(stream);
-        detail::configure_sink(sink, level, tag.tag());
-        Logging::loggers_[tag] = sink;
-        ret = true;
+        detail::configureSink(sink, level, tag.tag());
+        Logging::s_loggers[tag] = sink;
+        ret_val = true;
     }
 
-    return ret;
+    return ret_val;
 }
 
-bool Logging::add_file_logger(const LogTag& tag,
-                              const boost::filesystem::path& log_path,
-                              boost::log::trivial::severity_level level) {
-    bool ret = false;
+bool Logging::addFileLogger(const LogTag& tag,
+                            const boost::filesystem::path& log_path,
+                            boost::log::trivial::severity_level level) {
+    bool ret_val = false;
 
-    std::lock_guard<std::mutex> lock(Logging::loggers_mutex_);
-    auto end_it = Logging::loggers_.end();
-    auto tag_it = detail::find_sink(tag, Logging::loggers_);
+    std::lock_guard<std::mutex> lock(Logging::s_loggers_mutex);
+    auto end_it = Logging::s_loggers.end();
+    auto tag_it = detail::findSink(tag, Logging::s_loggers);
     if (tag_it == end_it) {
-        boost::shared_ptr<Logging::TextSink> sink = detail::make_sink();
+        boost::shared_ptr<Logging::TextSink> sink = detail::makeSink();
         sink->locked_backend()->add_stream(
                 boost::make_shared<std::ofstream>(log_path.string()));
-        detail::configure_sink(sink, level, tag.tag());
-        Logging::loggers_[tag] = sink;
-        ret = true;
+        detail::configureSink(sink, level, tag.tag());
+        Logging::s_loggers[tag] = sink;
+        ret_val = true;
     }
 
-    return ret;
+    return ret_val;
 }
 
-void Logging::write_severity_log(const LogTag& tag,
-                                 boost::log::trivial::severity_level level,
-                                 const std::string& message) {
+void Logging::writeSeverityLog(const LogTag& tag,
+                               boost::log::trivial::severity_level level,
+                               const std::string& message) {
     Logging::init();
     boost::log::sources::severity_logger<boost::log::trivial::severity_level>
             s_logger;
@@ -202,23 +205,23 @@ void Logging::write_severity_log(const LogTag& tag,
     std::clog.flush();
 }
 
-bool Logging::clear_all() {
-    bool ret = true;
+bool Logging::clearAll() {
+    bool ret_val = true;
 
-    std::lock_guard<std::mutex> lock(Logging::loggers_mutex_);
+    std::lock_guard<std::mutex> lock(Logging::s_loggers_mutex);
 
-    std::for_each(Logging::loggers_.begin(),
-                  Logging::loggers_.end(),
+    std::for_each(Logging::s_loggers.begin(),
+                  Logging::s_loggers.end(),
                   [&](std::unordered_map<LogTag, boost::weak_ptr<TextSink>>::
                               value_type& pair) {
                       boost::log::core::get()->remove_sink(pair.second.lock());
                       pair.second.reset();
                   });
-    Logging::loggers_.clear();
+    Logging::s_loggers.clear();
     // Get rid of default sink.
     boost::log::core::get()->remove_all_sinks();
-    ret = Logging::loggers_.empty();
+    ret_val = Logging::s_loggers.empty();
 
-    return ret;
+    return ret_val;
 }
 }  // namespace com::dag_scheduler

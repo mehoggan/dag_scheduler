@@ -19,18 +19,18 @@ std::unordered_set<DynamicLibraryRegistry::RegistryItem,
         DynamicLibraryRegistry::registry_;
 
 const DynamicLibraryRegistry::RegistryItem&
-DynamicLibraryRegistry::register_dynamic_library(const std::string& name) {
+DynamicLibraryRegistry::registerDynamicLibrary(const std::string& name) {
     typedef std::unordered_set<RegistryItem> Collection_t;
     RegistryItem item(name);
     Collection_t::iterator find_it = registry_.find(item);
-    Collection_t::iterator ret = registry_.end();
+    Collection_t::iterator ret_val = registry_.end();
     if (find_it == registry_.end()) {
         auto find_pair_it = registry_.insert(item);
-        ret = find_pair_it.first;
+        ret_val = find_pair_it.first;
     } else {
-        ret = find_it;
+        ret_val = find_it;
     }
-    return (*ret);
+    return (*ret_val);
 }
 
 DynamicLibraryRegistry::RegistryItem::RegistryItem() {}
@@ -54,11 +54,11 @@ DynamicLibraryRegistry::RegistryItem::~RegistryItem() {
 }
 
 const boost::dll::shared_library&
-DynamicLibraryRegistry::RegistryItem::get_shared_lib() const {
+DynamicLibraryRegistry::RegistryItem::getSharedLib() const {
     return shared_library_;
 }
 
-const std::string& DynamicLibraryRegistry::RegistryItem::get_name() const {
+const std::string& DynamicLibraryRegistry::RegistryItem::getName() const {
     return library_name_;
 }
 

@@ -16,11 +16,20 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
+#include <boost/functional/hash.hpp>
 #include <memory>
 
 #include "dag_scheduler/Endpoints.h"
 #include "dag_scheduler/LoggedClass.hpp"
-#include "dag_scheduler/ServiceHelpers.h"
+
+class StringViewHasher {
+public:
+    std::size_t operator()(
+            const boost::beast::string_view& string_view) const {
+        std::string hash_string(string_view.data(), string_view.size());
+        return boost::hash_range(hash_string.begin(), hash_string.end());
+    }
+};
 
 /*
  * Code in this module borrowed from:
@@ -41,15 +50,16 @@ public:
 
     struct Router {
     public:
-        bool register_endpoint(const boost::beast::string_view& endpoint,
-                               std::unique_ptr<EndpointHandler> handler);
+        bool registerEndpoint(const boost::beast::string_view& endpoint,
+                              std::unique_ptr<EndpointHandler> handler);
 
         std::unique_ptr<EndpointHandler>& operator[](
                 const boost::beast::string_view& endpoint);
 
     private:
         std::unordered_map<boost::beast::string_view,
-                           std::unique_ptr<EndpointHandler>>
+                           std::unique_ptr<EndpointHandler>,
+                           StringViewHasher>
                 router_;
     };
 
@@ -69,12 +79,12 @@ public:
         void reset();
 
     private:
-        void do_accept();
+        void doAccept();
 
-        void on_accept(boost::beast::error_code ec,
-                       boost::asio::ip::tcp::socket socket);
+        void onAccept(boost::beast::error_code error_code,
+                      boost::asio::ip::tcp::socket socket);
 
-        void create_acceptor();
+        void createAcceptor();
 
     private:
         boost::asio::io_context& ioc_;
@@ -89,7 +99,7 @@ public:
     /**
      * @brief default ctor
      */
-    explicit WorkflowService(const ConnectionInfo& ci);
+    explicit WorkflowService(const ConnectionInfo& connectionInfo);
 
 private:
     boost::asio::io_context ioc_;

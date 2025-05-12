@@ -90,7 +90,7 @@ public:
      *
      * @return The \ref uuid owned by (this).
      */
-    const UUID& get_uuid() const;
+    const UUID& getUUID() const;
 
 public:
     /**
@@ -114,7 +114,7 @@ public:
      * @return true if \ref TaskStage was run successfully, false
      *         otherwise.
      */
-    virtual bool is_running() const = 0;
+    virtual bool isRunning() const = 0;
 
     /**
      * @brief A pure virtual function used to end a \ref TaskStage 's
@@ -178,7 +178,7 @@ public:
      *
      * @return The stream after \p t has been written to it.
      */
-    friend std::ostream& operator<<(std::ostream& out, const TaskStage& t);
+    friend std::ostream& operator<<(std::ostream& out, const TaskStage& task);
 
     /**
      * @brief A utility function to print a \ref TaskStage to a stream.
@@ -192,7 +192,7 @@ public:
      * @return The stream after \p t has been written to it.
      */
     friend std::stringstream& operator<<(std::stringstream& out,
-                                         const TaskStage& t);
+                                         const TaskStage& task);
 
 protected:
     TaskStage(const std::string& label, const UUID& uuid);

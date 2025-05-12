@@ -50,14 +50,14 @@ public:
      * This is a utility class used to reconnect two \ref DAGVertex
      * and their associated \ref DAGEdge.
      */
-    struct DAGVertex_connection {
+    struct DAGVertexConnection {
     public:
         /**
          * @brief A constructor for a \ref DAGVertex_connection
          *
          * A constructor for a \ref DAGVertex_connection
          */
-        DAGVertex_connection();
+        DAGVertexConnection();
 
         /**
          * @brief A constructor for a \ref DAGVertex_connection
@@ -67,7 +67,7 @@ public:
          * @param edge The \ref DAGEdge that points to \ref vertex.
          * @param vertex The \ref DAGVertex pointed to by \ref edge.
          */
-        DAGVertex_connection(DAGEdge& edge, DAGVertex& vertex);
+        DAGVertexConnection(DAGEdge& edge, DAGVertex& vertex);
 
         /**
          * @brief A getter for the \ref DAGEdge that points to \ref vertex_
@@ -215,7 +215,7 @@ public:
      *
      * @return true if (*this) is connected via a \ref DAGEdge to \p other.
      */
-    bool contains_connection_to(const DAGVertex& other);
+    bool containsConnectionTo(const DAGVertex& other);
 
     /**
      * @brief A utility function used by \ref dag to reconnect after a
@@ -237,8 +237,8 @@ public:
      *         which contains ref counted instances of the connections
      *         reestablished by calling this function.
      */
-    std::vector<std::shared_ptr<DAGVertex>> reestablish_connections(
-            std::vector<DAGVertex_connection>& connections);
+    std::vector<std::shared_ptr<DAGVertex>> reestablishConnections(
+            std::vector<DAGVertexConnection>& connections);
 
     /**
      * @brief Used to get the number of \ref DAGVertex (s) this points to.
@@ -250,7 +250,7 @@ public:
      * @return A positive integer with the number of \ref DAGEdge (s) that
      *         extend from \ref this to other \ref DAGVertex (s).
      */
-    std::size_t edge_count() const;
+    std::size_t edgeCount() const;
 
     /**
      * @brief A utility function that visits all \ref DAGEdge (s) of this.
@@ -259,11 +259,11 @@ public:
      * \ref DAGEdge in the order they were added to the collection of
      * \ref DAGEdge (s) \ref this contains.
      *
-     * @param[in] cb A user defined function that is called once per
-     *               \ref DAGEdge that \ref this contains in the order
-     *               that the \ref DAGEdge (s) were added.
+     * @param[in] callBack A user defined function that is called once per
+     *                     \ref DAGEdge that \ref this contains in the order
+     *                     that the \ref DAGEdge (s) were added.
      */
-    void visit_all_edges(std::function<void(const DAGEdge&)> cb) const;
+    void visitAllEdges(std::function<void(const DAGEdge&)> callBack) const;
 
     /**
      * @brief A utility function used with \ref clone to preserve
@@ -278,7 +278,7 @@ public:
      * @return A \ref std::vector<\ref DAGVertex_connections> of the
      *         \ref DAGEdge (s) and their associate \ref DAGVertex.
      */
-    std::vector<DAGVertex_connection> clone_all_connections();
+    std::vector<DAGVertexConnection> cloneAllConnections();
 
     /**
      * @brief A utility function to see if any \ref DAGEdges point to this.
@@ -291,7 +291,7 @@ public:
      *         the aforementioned function of \ref DAGEdge. If the
      *         contrary, then \ref false is returned.
      */
-    bool has_incoming_edges() const;
+    bool hasIncomingEdges() const;
 
     /**
      * @brief A utility function used to get the number of \ref DAGEdge (s)
@@ -303,7 +303,7 @@ public:
      * @return A positive integer that represents the number of
      *         \ref DAGEdge (s) that point at this.
      */
-    std::size_t incoming_edge_count() const;
+    std::size_t incomingEdgeCount() const;
 
     /**
      * @brief A getter for the unique id owned by a instance of
@@ -314,13 +314,13 @@ public:
      *
      * @return A \ref uuid owned by the instance of \ref this.
      */
-    const UUID& get_uuid() const;
+    const UUID& getUUID() const;
 
-    //*! TODO (mhoggan): Add doc string.  // cspell:disable-line
-    const Status& current_status() const;
+    //*! TODO (mehoggan): Add doc string.
+    const Status& currentStatus() const;
 
-    //*! TODO (mhoggan): Add doc string.  // cspell:disable-line
-    std::string current_status_as_string() const;
+    //*! TODO (mehoggan): Add doc string.
+    std::string currentStatusAsString() const;
 
     /**
      * @brief A getter for the label used to visualize a \ref DAGVertex.
@@ -338,18 +338,19 @@ public:
      *
      * @return The Task held by this vertex.
      */
-    std::unique_ptr<Task>& get_task();
+    std::unique_ptr<Task>& getTask();
 
 public:
     /**
      * @brief A stream operator for writing a \ref DAGVertex to a stream.
      *
      * @param[out] out The stream to write \p v to.
-     * @param[in] v The \ref DAGVertex to write it \p out.
+     * @param[in] vertex The \ref DAGVertex to write it \p out.
      *
      * @return A reference to \p out after it was streamed to.
      */
-    friend std::ostream& operator<<(std::ostream& out, const DAGVertex& v);
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const DAGVertex& vertex);
 
     /**
      * @brief Comparison operator to compare equivalence of two
@@ -390,11 +391,11 @@ public:
     friend bool operator!=(const DAGVertex& lhs, const DAGVertex& rhs);
 
 protected:
-    void add_incoming_edge();
-    void sub_incoming_edge();
-    void clear_edges();
-    void reset_incoming_edge_count();
-    const DAGEdge& get_edge_at(std::size_t i) const;
+    void addIncomingEdge();
+    void subIncomingEdge();
+    void clearEdges();
+    void resetIncomingEdgeCount();
+    const DAGEdge& getEdgeAt(std::size_t index) const;
 
     DAGVertex(const DAGVertex& other);
     DAGVertex& operator=(const DAGVertex& rhs);
@@ -408,28 +409,28 @@ private:
     std::unique_ptr<Task> task_;
 
 private:
-    FRIEND_TEST(TestDagVertex, connect_and_contains_connection);
-    FRIEND_TEST(TestDagVertex, visit_all_edges_points_to_actual_vertices);
-    FRIEND_TEST(TestDagVertex, clone_all_edges_and_reestablish_connections);
-    FRIEND_TEST(TestDagVertex, move_ctor_with_edges);
-    FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges);
-    FRIEND_TEST(TestDagVertex, copy_ctor_no_edges);
-    FRIEND_TEST(TestDagVertex, assignment_operator_no_edges);
-    FRIEND_TEST(TestDagVertex, clone_all_edges);
-    FRIEND_TEST(TestDagVertex, copy_ctor_with_edges);
-    FRIEND_TEST(TestDagVertex, assignment_operator_with_edges);
-    FRIEND_TEST(TestDagVertex, move_ctor_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_move_operator_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, copy_ctor_no_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_operator_no_edges_with_task);
-    FRIEND_TEST(TestDagVertex, clone_all_edges_with_task);
-    FRIEND_TEST(TestDagVertex, copy_ctor_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, assignment_operator_with_edges_with_task);
-    FRIEND_TEST(TestDagVertex, add_incoming_edge);
-    FRIEND_TEST(TestDagVertex, sub_incoming_edge);
-    FRIEND_TEST(TestDagVertex, clear_edges);
-    FRIEND_TEST(TestDagVertex, reset_incoming_edge_count);
-    FRIEND_TEST(TestDagVertex, get_edge_at);
+    FRIEND_TEST(TestDagVertex, connectAndContainsConnection);
+    FRIEND_TEST(TestDagVertex, visitAllEdgesPointsToActualVertices);
+    FRIEND_TEST(TestDagVertex, cloneAllEdgesAndReestablishConnections);
+    FRIEND_TEST(TestDagVertex, moveCtorWithEdges);
+    FRIEND_TEST(TestDagVertex, assignmentMoveOperatorWithEdges);
+    FRIEND_TEST(TestDagVertex, copyCtorNoEdges);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorNoEdges);
+    FRIEND_TEST(TestDagVertex, cloneAllEdges);
+    FRIEND_TEST(TestDagVertex, copyCtorWithEdges);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorWithEdges);
+    FRIEND_TEST(TestDagVertex, moveCtorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentMoveOperatorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, copyCtorNoEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorNoEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, cloneAllEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, copyCtorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, assignmentOperatorWithEdgesWithTask);
+    FRIEND_TEST(TestDagVertex, addIncomingEdge);
+    FRIEND_TEST(TestDagVertex, subIncomingEdge);
+    FRIEND_TEST(TestDagVertex, clearEdges);
+    FRIEND_TEST(TestDagVertex, resetIncomingEdgeCount);
+    FRIEND_TEST(TestDagVertex, getEdgeAt);
 };
 }  // namespace com::dag_scheduler
 #endif

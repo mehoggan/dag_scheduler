@@ -14,7 +14,7 @@
 namespace com::dag_scheduler {
 TestTaskImpl::TestTaskImpl() {
     Logging::info(LOG_TAG, "This was called. 1A");
-    label_ = uuid_.as_string();
+    label_ = uuid_.asString();
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("A")));
     Task::stages_.push_back(
@@ -44,7 +44,7 @@ TestTaskImpl::TestTaskImpl(const std::string& label,
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonInitialInputs(json_initial_inputs);
 }
 
 TestTaskImpl::TestTaskImpl(const std::string& label,
@@ -71,7 +71,7 @@ TestTaskImpl::TestTaskImpl(const std::string& label,
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonInitialInputs(json_initial_inputs);
     complete_callback_ = complete_callback;
 }
 
@@ -101,7 +101,7 @@ TestTaskImpl::TestTaskImpl(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonInitialInputs(json_initial_inputs);
     complete_callback_plugin_ = std::move(complete_callback_plugin);
 }
 
@@ -116,8 +116,8 @@ TestTaskImpl::TestTaskImpl(const std::string& label,
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_config(json_config);
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonConfig(json_config);
+    Task::setJsonInitialInputs(json_initial_inputs);
 }
 
 TestTaskImpl::TestTaskImpl(const std::string& label,
@@ -132,8 +132,8 @@ TestTaskImpl::TestTaskImpl(const std::string& label,
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_config(json_config);
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonConfig(json_config);
+    Task::setJsonInitialInputs(json_initial_inputs);
     complete_callback_ = complete_callback;
 }
 
@@ -150,8 +150,8 @@ TestTaskImpl::TestTaskImpl(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("B")));
     Task::stages_.push_back(
             std::unique_ptr<TaskStage>(new TestTaskStageImpl("C")));
-    Task::set_json_config(json_config);
-    Task::set_json_initial_inputs(json_initial_inputs);
+    Task::setJsonConfig(json_config);
+    Task::setJsonInitialInputs(json_initial_inputs);
     complete_callback_plugin_ = std::move(complete_callback_plugin);
 }
 

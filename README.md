@@ -145,3 +145,10 @@ bear -- make
 
 ## Force Change 1 ##
 
+## Running Executables in Linux after a Rebuild ##
+
+```sh
+patchelf --set-rpath ${PWD}/build/lib/.libs/ \
+    ${PWD}/build/bin/.libs/dag_serializer_runner
+```
+

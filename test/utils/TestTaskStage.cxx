@@ -9,11 +9,12 @@
 /////////////////////////////////////////////////////////////////////////
 #include "TestTaskStage.h"
 
-#include <assert.h>
+#include <cassert>
+#include <thread>
 
 namespace com::dag_scheduler {
 TestTaskStageImpl::TestTaskStageImpl() : TestTaskStageImpl("") {
-    label_ = get_uuid().as_string();
+    label_ = getUUID().asString();
 }
 
 TestTaskStageImpl::TestTaskStageImpl(
@@ -38,16 +39,18 @@ TestTaskStageImpl::TestTaskStageImpl(TestTaskStageImpl&& other)
         : TaskStage(std::move(other))
         , running_(false)
         , nasty_user_defined_pointer_(
-                  std::move(other.nasty_user_defined_pointer_))
-        , run_sleep_time_(std::move(other.run_sleep_time_)) {
-    assert(!other.is_running() && "You cannot move a running TaskStage");
+                  std::move(other.nasty_user_defined_pointer_))  // NOLINT
+        , run_sleep_time_(std::move(other.run_sleep_time_)) {    // NOLINT
+    assert(!other.isRunning() &&                                 // NOLINT
+           "You cannot move a running TaskStage");
 
     other.nasty_user_defined_pointer_ = nullptr;
 }
 
 TestTaskStageImpl& TestTaskStageImpl::operator=(TestTaskStageImpl&& other) {
     TaskStage::operator=(std::move(other));
-    assert(!other.is_running() && "You cannot move a running TaskStage");
+    assert(!other.isRunning() &&  // NOLINT
+           "You cannot move a running TaskStage");
     running_.store(false);
     nasty_user_defined_pointer_ = std::move(other.nasty_user_defined_pointer_);
     run_sleep_time_ = std::move(other.run_sleep_time_);
@@ -67,7 +70,7 @@ bool TestTaskStageImpl::run() {
     return true;
 }
 
-bool TestTaskStageImpl::is_running() const { return running_.load(); }
+bool TestTaskStageImpl::isRunning() const { return running_.load(); }
 
 bool TestTaskStageImpl::end() { return true; }
 

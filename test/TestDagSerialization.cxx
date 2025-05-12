@@ -12,126 +12,129 @@
 #include <algorithm>
 #include <boost/exception/exception.hpp>
 #include <cctype>
-#include <map>
 #include <string>
 
 #include "dag_scheduler/DagSerialization.h"
 #include "utils/TestEnvironment.h"
 
 namespace com::dag_scheduler {
-const char TEST_UUID_1[] = "fa6e25e4-0992-4c0e-9429-a3c66175ab91";
-const char TEST_UUID_2[] = "fa6e25e4-0992-4c0e-9429-a3c66175ab92";
-const char DUMMY_CONFIG_STR_KEY_1[] = "StringKey1";
-const char DUMMY_CONFIG_STR_KEY_2[] = "StringKey2";
-const char DUMMY_CONFIG_STR_KEY_3[] = "StringKey3";
-const char DUMMY_CONFIG_STR_KEY_4[] = "StringKey4";
-const char DUMMY_CONFIG_INT_KEY[] = "IntKey";
-const char DUMMY_CONFIG_FLT_KEY[] = "FloatKey";
-const char DUMMY_CONFIG_BOL_KEY[] = "BooleanKey";
+const char test_uuid_1[] = "fa6e25e4-0992-4c0e-9429-a3c66175ab91";
+const char test_uuid_2[] = "fa6e25e4-0992-4c0e-9429-a3c66175ab92";
+const char dummy_config_str_key_1[] = "StringKey1";
+const char dummy_config_str_key_2[] = "StringKey2";
+const char dummy_config_str_key_3[] = "StringKey3";
+const char dummy_config_str_key_4[] = "StringKey4";
+const char dummy_config_int_key[] = "IntKey";
+const char dummy_config_flt_key[] = "FloatKey";
+const char dummy_config_bol_key[] = "BooleanKey";
 
-void get_base_task_initial_inputs(YAML::Node& out_initial_inputs_node) {
+void getBaseTaskInitialInputs(YAML::Node& out_initial_inputs_node) {
     out_initial_inputs_node = YAML::Node();
-    out_initial_inputs_node[DUMMY_CONFIG_STR_KEY_1] =
+    out_initial_inputs_node[dummy_config_str_key_1] =
             std::map<std::string, YAML::Node>(
-                    {{DUMMY_CONFIG_INT_KEY, YAML::Node(1)},
-                     {DUMMY_CONFIG_FLT_KEY, YAML::Node(2.0)},
-                     {DUMMY_CONFIG_BOL_KEY, YAML::Node(false)}});
+                    {{dummy_config_int_key, YAML::Node(1)},
+                     {dummy_config_flt_key, YAML::Node(2.0)},
+                     {dummy_config_bol_key, YAML::Node(false)}});
 }
 
-std::string get_base_task_initial_inputs_as_json_str() {
+std::string getBaseTaskInitialInputsAsJsonStr() {
     YAML::Node initial_inputs_node;
-    get_base_task_initial_inputs(initial_inputs_node);
+    getBaseTaskInitialInputs(initial_inputs_node);
     YAML::Emitter json_emitter;
     json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
                  << initial_inputs_node;
     std::string json_str(json_emitter.c_str() + 1);
-    json_str.erase(
-            std::remove_if(json_str.begin(),
-                           json_str.end(),
-                           [](unsigned char c) { return std::isspace(c); }),
-            json_str.end());
+    json_str.erase(std::remove_if(json_str.begin(),
+                                  json_str.end(),
+                                  [](unsigned char rune) {
+                                      return std::isspace(rune);
+                                  }),
+                   json_str.end());
     return json_str;
 }
 
-void get_base_task_configuration(YAML::Node& out_config_node) {
+void getBaseTaskConfiguration(YAML::Node& out_config_node) {
     out_config_node = YAML::Node();
-    out_config_node[DUMMY_CONFIG_STR_KEY_2] = 10;
-    out_config_node[DUMMY_CONFIG_STR_KEY_3] = 20.0;
-    out_config_node[DUMMY_CONFIG_STR_KEY_4] = true;
+    out_config_node[dummy_config_str_key_2] = 10;
+    out_config_node[dummy_config_str_key_3] = 20.0;
+    out_config_node[dummy_config_str_key_4] = true;
 }
 
-std::string get_base_task_configuration_as_json_str() {
+std::string getBaseTaskConfigurationAsJsonStr() {
     YAML::Node config_node;
-    get_base_task_configuration(config_node);
+    getBaseTaskConfiguration(config_node);
     YAML::Emitter json_emitter;
     json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
                  << config_node;
     std::string json_str(json_emitter.c_str() + 1);
-    json_str.erase(
-            std::remove_if(json_str.begin(),
-                           json_str.end(),
-                           [](unsigned char c) { return std::isspace(c); }),
-            json_str.end());
+    json_str.erase(std::remove_if(json_str.begin(),
+                                  json_str.end(),
+                                  [](unsigned char rune) {
+                                      return std::isspace(rune);
+                                  }),
+                   json_str.end());
     return json_str;
 }
 
-void get_base_dag_configuration(YAML::Node& out_config_node) {
+void getBaseDAGConfiguration(YAML::Node& out_config_node) {
     out_config_node = YAML::Node();
-    out_config_node[DUMMY_CONFIG_STR_KEY_1] = std::map<std::string, YAML::Node>(
-            {{DUMMY_CONFIG_INT_KEY, YAML::Node(1)},
-             {DUMMY_CONFIG_FLT_KEY, YAML::Node(2.0)},
-             {DUMMY_CONFIG_BOL_KEY, YAML::Node(false)}});
-    out_config_node[DUMMY_CONFIG_STR_KEY_2] = 10;
-    out_config_node[DUMMY_CONFIG_STR_KEY_3] = 20.0;
-    out_config_node[DUMMY_CONFIG_STR_KEY_4] = true;
+    out_config_node[dummy_config_str_key_1] =
+            std::map<std::string, YAML::Node>(
+                    {{dummy_config_int_key, YAML::Node(1)},
+                     {dummy_config_flt_key, YAML::Node(2.0)},
+                     {dummy_config_bol_key, YAML::Node(false)}});
+    out_config_node[dummy_config_str_key_2] = 10;
+    out_config_node[dummy_config_str_key_3] = 20.0;
+    out_config_node[dummy_config_str_key_4] = true;
 }
 
-std::string get_base_dag_configuration_as_json_str() {
+std::string getBaseDAGConfigurationAsJsonStr() {
     YAML::Node config_node;
-    get_base_dag_configuration(config_node);
+    getBaseDAGConfiguration(config_node);
     YAML::Emitter json_emitter;
     json_emitter << YAML::DoubleQuoted << YAML::Flow << YAML::BeginSeq
                  << config_node;
     std::string json_str(json_emitter.c_str() + 1);
-    json_str.erase(
-            std::remove_if(json_str.begin(),
-                           json_str.end(),
-                           [](unsigned char c) { return std::isspace(c); }),
-            json_str.end());
+    json_str.erase(std::remove_if(json_str.begin(),
+                                  json_str.end(),
+                                  [](unsigned char rune) {
+                                      return std::isspace(rune);
+                                  }),
+                   json_str.end());
     return json_str;
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_empty) {
+TEST(TestYAMLDAGDeserializer, outputUptoEmpty) {
     std::string expected_empty_upto = "\n";
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::EMPTY);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::EMPTY);
     EXPECT_EQ(expected_empty_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_dag) {
+TEST(TestYAMLDAGDeserializer, outputUptoDAG) {
     std::string expected_dag_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
             std::string("  Configuration: <optional YAML>\n") +
             std::string("    <valid YAML>\n") + std::string("  ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::DAG);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::DAG);
     EXPECT_EQ(expected_dag_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_vertices) {
+TEST(TestYAMLDAGDeserializer, outputUptoVertices) {
     std::string expected_vertices_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
             std::string("  Configuration: <optional YAML>\n") +
             std::string("    <valid YAML>\n") + std::string("  Vertices:\n") +
             std::string("    ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::VERTICES);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::VERTICES);
     EXPECT_EQ(expected_vertices_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_vertex) {
+TEST(TestYAMLDAGDeserializer, outputUptoVertex) {
     std::string expected_vertex_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -141,12 +144,12 @@ TEST(TestYAMLDagDeserializer, output_upto_vertex) {
             std::string("      Name: <optional string>\n") +
             std::string("      UUID: <valid uuid4 string>\n") +
             std::string("        ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::VERTEX);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::VERTEX);
     EXPECT_EQ(expected_vertex_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_task) {
+TEST(TestYAMLDAGDeserializer, outputUptoTask) {
     std::string expected_task_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -166,12 +169,12 @@ TEST(TestYAMLDagDeserializer, output_upto_task) {
             std::string("            SymbolName: <string>\n") +
             std::string("            Type: <enum {Plugin, Function}>\n") +
             std::string("        ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::TASK);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::TASK);
     EXPECT_EQ(expected_task_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_stages) {
+TEST(TestYAMLDAGDeserializer, outputUptoStages) {
     std::string expected_stages_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -191,12 +194,12 @@ TEST(TestYAMLDagDeserializer, output_upto_stages) {
             std::string("            SymbolName: <string>\n") +
             std::string("            Type: <enum {Plugin, Function}>\n") +
             std::string("        Stages:\n") + std::string("          ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::STAGES);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::STAGES);
     EXPECT_EQ(expected_stages_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_stage) {
+TEST(TestYAMLDAGDeserializer, outputUptoStage) {
     std::string expected_stage_upto =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -220,24 +223,24 @@ TEST(TestYAMLDagDeserializer, output_upto_stage) {
             std::string("              LibraryName: <string>\n") +
             std::string("              SymbolName: <string>\n") +
             std::string("          ...\n") + std::string("    ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::STAGE);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::STAGE);
     EXPECT_EQ(expected_stage_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_upto_just_connections) {
+TEST(TestYAMLDAGDeserializer, outputUptoJustConnections) {
     std::string expected_connections_upto =
             std::string("  Connections:\n") +
             std::string("    - Connection:\n") +
             std::string("      From: <valid uuid4 string from vertex>\n") +
             std::string("      To: <valid uuid4 string from vertex>\n") +
             std::string("    ...\n");
-    std::string actual = YAMLDagDeserializer::sample_dag_output(
-            YAMLDagDeserializer::UpTo::CONNECTIONS);
+    std::string actual = YAMLDAGDeserializer::sampleDAGOutput(
+            YAMLDAGDeserializer::UpTo::CONNECTIONS);
     EXPECT_EQ(expected_connections_upto, actual);
 }
 
-TEST(TestYAMLDagDeserializer, output_full) {
+TEST(TestYAMLDAGDeserializer, outputFull) {
     std::string expected_full =
             std::string("DAG:\n") +
             std::string("  Title: <optional string>\n") +
@@ -266,908 +269,899 @@ TEST(TestYAMLDagDeserializer, output_full) {
             std::string("      From: <valid uuid4 string from vertex>\n") +
             std::string("      To: <valid uuid4 string from vertex>\n") +
             std::string("    ...\n");
-    std::string actual = YAMLDagDeserializer::full_sample_output();
+    std::string actual = YAMLDAGDeserializer::fullSampleOutput();
     EXPECT_EQ(expected_full, actual);
 }
 
-TEST(TestYAMLDagDeserializer, default_ctor) {
-    EXPECT_NO_THROW(YAMLDagDeserializer());
+TEST(TestYAMLDAGDeserializer, defaultCtor) {
+    EXPECT_NO_THROW(YAMLDAGDeserializer());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_wrong_root_element) {
+TEST(TestYAMLDAGDeserializer, makeDAGWrongRootElement) {
     YAML::Node yaml_node;
-    yaml_node["Dag"] = std::map<std::string, std::string>(
-            {{YAMLDagDeserializer::TITLE_KEY, "Test YAML DAG"}});
+    yaml_node["DAG"] = std::map<std::string, std::string>(
+            {{YAMLDAGDeserializer::title_key, "Test YAML DAG"}});
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    } catch (const YAMLDagDeserializerError& ydde) {
+    } catch (const YAMLDAGDeserializerError& yaml_error) {
         auto expected = std::string("Root element of \"DAG\" not found in\n") +
-                        std::string("Dag:\n  Title: Test YAML DAG\n") +
+                        std::string("DAG:\n  Title: Test YAML DAG\n") +
                         std::string("For example, as in\n") +
-                        YAMLDagDeserializer::sample_dag_output(
-                                YAMLDagDeserializer::UpTo::DAG);
-        auto actual = std::string(ydde.what());
+                        YAMLDAGDeserializer::sampleDAGOutput(
+                                YAMLDAGDeserializer::UpTo::DAG);
+        auto actual = std::string(yaml_error.what());
         EXPECT_EQ(expected, actual);
     }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_title) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitle) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, std::string>(
-            {{YAMLDagDeserializer::TITLE_KEY, "Test YAML DAG"}});
+            {{YAMLDAGDeserializer::title_key, "Test YAML DAG"}});
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(0ull, test_dag->vertex_count());
+    EXPECT_EQ(0ull, test_dag->vertexCount());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_title_dag_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitleDAGConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(0ull, test_dag->vertex_count());
+    EXPECT_EQ(0ull, test_dag->vertexCount());
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag) {
+TEST(TestYAMLDAGDeserializer, makeDAG) {
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, std::string>();
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("", test_dag->title());
-    EXPECT_EQ(0ull, test_dag->vertex_count());
+    EXPECT_EQ(0ull, test_dag->vertexCount());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_dag_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGWithDAGConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("", test_dag->title());
-    EXPECT_EQ(0ull, test_dag->vertex_count());
+    EXPECT_EQ(0ull, test_dag->vertexCount());
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_not_list_of_obj) {
+TEST(TestYAMLDAGDeserializer, makeDAGBadVerticesNotListOfObj) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
             std::map<std::string, YAML::Node>(
-                    {{std::string(YAMLDagDeserializer::TITLE_KEY),
+                    {{std::string(YAMLDAGDeserializer::title_key),
                       YAML::Node("Test YAML DAG")}});
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] =
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] =
                      "This is bad input";
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    } catch (const YAMLDagDeserializerError& ydde) {
+    } catch (const YAMLDAGDeserializerError& yaml_error) {
         auto expected = std::string("\"Vertices\" must be a ") +
                         std::string("YAML Sequence. As in:\n") +
-                        YAMLDagDeserializer::sample_dag_output(
-                                YAMLDagDeserializer::UpTo::VERTEX);
-        auto actual = std::string(ydde.what());
+                        YAMLDAGDeserializer::sampleDAGOutput(
+                                YAMLDAGDeserializer::UpTo::VERTEX);
+        auto actual = std::string(yaml_error.what());
         EXPECT_EQ(expected, actual);
     }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] =
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] =
                      std::vector<YAML::Node>{};
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(0ull, test_dag->vertex_count());
+    EXPECT_EQ(0ull, test_dag->vertexCount());
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_vertices_title) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesTitle) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
     YAML::Node second_vertex;
-    second_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_2;
+    second_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_2;
     std::vector<YAML::Node> vertices = {first_vertex, second_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(2ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    EXPECT_TRUE(test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock() !=
+    EXPECT_EQ(2ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    EXPECT_TRUE(test_dag->findVertexByUUID(std::move(uuid_1)).lock() !=
                 nullptr);
-    UUID uuid_2(TEST_UUID_1);
-    EXPECT_TRUE(test_dag->find_vertex_by_uuid(std::move(uuid_2)).lock() !=
+    UUID uuid_2(test_uuid_1);
+    EXPECT_TRUE(test_dag->findVertexByUUID(std::move(uuid_2)).lock() !=
                 nullptr);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_title_dag_config_vertices) {
+TEST(TestYAMLDAGDeserializer, makeDAGTitleDAGConfigVertices) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
     YAML::Node second_vertex;
-    second_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_2;
+    second_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_2;
     std::vector<YAML::Node> vertices = {first_vertex, second_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(2ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    EXPECT_TRUE(test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock() !=
+    EXPECT_EQ(2ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    EXPECT_TRUE(test_dag->findVertexByUUID(std::move(uuid_1)).lock() !=
                 nullptr);
-    UUID uuid_2(TEST_UUID_1);
-    EXPECT_TRUE(test_dag->find_vertex_by_uuid(std::move(uuid_2)).lock() !=
+    UUID uuid_2(test_uuid_1);
+    EXPECT_TRUE(test_dag->findVertexByUUID(std::move(uuid_2)).lock() !=
                 nullptr);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_bad_vertices_no_vertex_uuid) {
+TEST(TestYAMLDAGDeserializer, makeDAGBadVerticesNoVertexUUID) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::name_key)] =
             "A Vertex without a uuid.";
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_TRUE(false);
-    } catch (const std::runtime_error& excep) {
+    } catch (const std::runtime_error& exception) {
         std::string expected_what = std::string("invalid node; first ") +
                                     std::string("invalid key: \"UUID\"");
-        EXPECT_EQ(expected_what, std::string(excep.what()));
+        EXPECT_EQ(expected_what, std::string(exception.what()));
     }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_vertices_named_task) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTask) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
     std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
     EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_vertices_named_task_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTaskTaskConfig) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
-                        YAML::Node(uuid1_task_label);
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_vertices_named_task_initial_inputs) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
-                        YAML::Node(uuid1_task_label);
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_vertices_named_task_initial_inputs_task_config) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
-                        YAML::Node(uuid1_task_label);
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_named_task) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
-    YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
-                        YAML::Node(uuid1_task_label);
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_named_task_task_config) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
-    YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
     std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
     EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
 
     std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_named_task_initial_inputs) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+TEST(TestYAMLDAGDeserializer, makeDAGVerticesNamedTaskInitialInputs) {
     YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
     std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
     EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
 
     std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_named_task_initial_inputs_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGVerticesNamedTaskInitialInputsTaskConfig) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    const std::string uuid1_task_label = "A named task";
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
+                        YAML::Node(uuid1_task_label);
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesNamedTask) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
+                        YAML::Node(uuid1_task_label);
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+}
+
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesNamedTaskTaskConfig) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    const std::string uuid1_task_label = "A named task";
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_NE(nullptr, test_dag);
     EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
     std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
     EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ(uuid1_task_label, uuid1_vertex->get_task()->label());
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_task_config) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_initial_inputs) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_initial_inputs_task_config) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesNamedTaskInitialInputs) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_task_config) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
-    YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_initial_inputs) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
-    YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_initial_inputs_task_config) {
-    YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
-    YAML::Node yaml_node;
-    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
-
-    YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
-                        task_config;
-
-    YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
-                        task_initial_inputs;
-
-    std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
-    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
-    ASSERT_NE(nullptr, test_dag);
-    EXPECT_EQ("Test YAML DAG", test_dag->title());
-    EXPECT_EQ(1ull, test_dag->vertex_count());
-    UUID uuid_1(TEST_UUID_1);
-    std::shared_ptr<DAGVertex> uuid1_vertex =
-            test_dag->find_vertex_by_uuid(std::move(uuid_1)).lock();
-    EXPECT_TRUE(uuid1_vertex != nullptr);
-    EXPECT_EQ("", uuid1_vertex->get_task()->label());
-    std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
-
-    std::string uuid1_task_config_str;
-    uuid1_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
-    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
-
-    std::string uuid1_task_initial_inputs_str;
-    uuid1_vertex->get_task()->json_initial_inputs_str(
-            uuid1_task_initial_inputs_str);
-    std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
-    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
-}
-
-TEST(TestYAMLDagDeserializer, make_dag_title_vertices_bad_task_callback) {
-    YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
-                                                YAML::Node("Test YAML DAG")}});
-    YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesNamedTaskInitialInputsTaskConfig) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    const std::string uuid1_task_label = "A named task";
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
+                        YAML::Node(uuid1_task_label);
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ(uuid1_task_label, uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTask) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskTaskConfig) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskInitialInputs) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskInitialInputsTaskConfig) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTask) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskTaskConfig) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskInitialInputs) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskInitialInputsTaskConfig) {
+    YAML::Node dag_configuration_node;
+    getBaseDAGConfiguration(dag_configuration_node);
+    YAML::Node yaml_node;
+    yaml_node["DAG"] = std::map<std::string, YAML::Node>(
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+
+    YAML::Node task_config;
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
+                        task_config;
+
+    YAML::Node task_initial_inputs;
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
+                        task_initial_inputs;
+
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
+    auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
+    ASSERT_NE(nullptr, test_dag);
+    EXPECT_EQ("Test YAML DAG", test_dag->title());
+    EXPECT_EQ(1ull, test_dag->vertexCount());
+    UUID uuid_1(test_uuid_1);
+    std::shared_ptr<DAGVertex> uuid1_vertex =
+            test_dag->findVertexByUUID(std::move(uuid_1)).lock();
+    EXPECT_TRUE(uuid1_vertex != nullptr);
+    EXPECT_EQ("", uuid1_vertex->getTask()->label());
+    std::string expected_config_json_str;
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
+
+    std::string uuid1_task_config_str;
+    uuid1_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
+    EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
+
+    std::string uuid1_task_initial_inputs_str;
+    uuid1_vertex->getTask()->jsonInitialInputsStr(
+            uuid1_task_initial_inputs_str);
+    std::string expected_task_initial_inputs_str =
+            getBaseTaskInitialInputsAsJsonStr();
+    EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
+}
+
+TEST(TestYAMLDAGDeserializer, makeDAGTitleVerticesBadTaskCallback) {
+    YAML::Node yaml_node;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
+                                                YAML::Node("Test YAML DAG")}});
+    YAML::Node first_vertex;
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
+    const std::string uuid1_task_label = "A named task";
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
+                        YAML::Node(uuid1_task_label);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::vector<YAML::Node> vertices = {first_vertex};
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
-    } catch (const YAML::InvalidNode& excep) {
-        EXPECT_EQ(
-                std::string("invalid node; first invalid key: \"LibraryName\""),
-                std::string(excep.what()));
+    } catch (const YAML::InvalidNode& exception) {
+        EXPECT_EQ(std::string(
+                          "invalid node; first invalid key: \"LibraryName\""),
+                  std::string(exception.what()));
     }
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_bad_task_callback_lib_not_found) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesBadTaskCallbackLibNotFound) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node("Library DNE");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("Method DNE");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
-    } catch (const YAMLDagDeserializerError& yaml_deserialization_error) {
+    } catch (const YAMLDAGDeserializerError& yaml_deserialization_error) {
         auto expected_error_substr =
                 std::string("Could not load library from ");
         auto actual_error_str = std::string(yaml_deserialization_error.what());
@@ -1176,41 +1170,42 @@ TEST(TestYAMLDagDeserializer,
     }
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_bad_task_callback_lib_found_no_method) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesBadTaskCallbackLibFoundNoMethod) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("Method DNE");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_FALSE(true);
-    } catch (const YAMLDagDeserializerError& yaml_deserialization_error) {
+    } catch (const YAMLDAGDeserializerError& yaml_deserialization_error) {
         auto expected_error_substr =
                 std::string("Failed to load Method DNE from");
         auto actual_error_str = std::string(yaml_deserialization_error.what());
@@ -1219,955 +1214,961 @@ TEST(TestYAMLDagDeserializer,
     }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_callback) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallback) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_task_config) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackTaskConfig) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_initial_inputs) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackInitialInputs) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_initial_inputs_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskCallbackInitialInputsTaskConfig) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskCallback) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskCallbackTaskConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback_initial_inputs) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskCallbackInitialInputs) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     label_dag_config_vertices_task_callback_initial_inputs_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     labelDAGConfigVerticesTaskCallbackInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Function");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_callback_plugin) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskCallbackPlugin) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_plugin_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskCallbackPluginTaskConfig) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_plugin_initial_inputs) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskCallbackPluginInitialInputs) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_callback_plugin_initial_inputs_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskCallbackPluginInitialInputsTaskConfig) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback_plugin) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskCallbackPlugin) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback_plugin_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskCallbackPluginTaskConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_callback_plugin_initial_inputs) {
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskCallbackPluginInitialInputs) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     dag_config_vertices_task_callback_plugin_initial_inputs_task_config) {
+TEST(TestYAMLDAGDeserializer,
+     daGConfigVerticesTaskCallbackPluginInitialInputsTaskConfig) {
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
-    EXPECT_TRUE(test_vertex->get_task()->callback_plugin_is_set());
-    test_vertex->get_task()->complete(true);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask()->callbackPluginIsSet());
+    test_vertex->getTask()->complete(true);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_bad_task_callback_plugin_symbol_dne) {
+TEST(TestYAMLDAGDeserializer,
+     make_DAG_label_vertices_bad_task_callback_plugin_symbol_dne) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin_dne");
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
         ASSERT_TRUE(false);
-    } catch (const YAMLDagDeserializerError& yaml_deserialization_error) {
+    } catch (const YAMLDAGDeserializerError& yaml_deserialization_error) {
         auto expected_error_substr =
                 std::string("Failed to load task_callback_plugin_dne from");
         auto actual_error_str = std::string(yaml_deserialization_error.what());
@@ -2176,24 +2177,23 @@ TEST(TestYAMLDagDeserializer,
     }
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_bad_task_stages_node_wrong_type) {
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesBadTaskStagesNodeWrongType) {
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = YAML::Node();
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
 
     try {
         yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
@@ -2206,57 +2206,58 @@ TEST(TestYAMLDagDeserializer,
     }
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStages) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2268,64 +2269,65 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages) {
     EXPECT_EQ(1, stage_count);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages_task_config) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStagesTaskConfig) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2337,71 +2339,70 @@ TEST(TestYAMLDagDeserializer, make_dag_label_vertices_task_stages_task_config) {
     EXPECT_EQ(1, stage_count);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_stages_initial_inputs) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer, makeDAGLabelVerticesTaskStagesInitialInputs) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2413,78 +2414,79 @@ TEST(TestYAMLDagDeserializer,
     EXPECT_EQ(1, stage_count);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_vertices_task_stages_initial_inputs_task_config) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelVerticesTaskStagesInitialInputsTaskConfig) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node yaml_node;
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)] =
-            std::map<std::string, YAML::Node>({{YAMLDagDeserializer::TITLE_KEY,
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)] =
+            std::map<std::string, YAML::Node>({{YAMLDAGDeserializer::title_key,
                                                 YAML::Node("Test YAML DAG")}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2496,72 +2498,73 @@ TEST(TestYAMLDagDeserializer,
     EXPECT_EQ(1, stage_count);
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task_stages) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer, makeDAGLabelDAGConfigVerticesTaskStages) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2572,72 +2575,73 @@ TEST(TestYAMLDagDeserializer, make_dag_label_dag_config_vertices_task_stages) {
     });
     EXPECT_EQ(1, stage_count);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_stages_task_config) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskStagesTaskConfig) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2648,78 +2652,78 @@ TEST(TestYAMLDagDeserializer,
     });
     EXPECT_EQ(1, stage_count);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     make_dag_label_dag_config_vertices_task_stages_initial_inputs) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer,
+     makeDAGLabelDAGConfigVerticesTaskStagesInitialInputs) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2730,85 +2734,86 @@ TEST(TestYAMLDagDeserializer,
     });
     EXPECT_EQ(1, stage_count);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 }
 
-TEST(TestYAMLDagDeserializer,
-     label_dag_config_vertices_task_stages_initial_inputs_task_config) {
-    std::string lib_path = testing::TestEnvironment::PATHING.get_lib_path();
+TEST(TestYAMLDAGDeserializer,
+     labelDAGConfigVerticesTaskStagesInitialInputsTaskConfig) {
+    std::string lib_path = testing::TestEnvironment::pathing.getLibPath();
     std::string stages_lib_path =
-            testing::TestEnvironment::PATHING.get_stages_lib_path();
+            testing::TestEnvironment::pathing.getStagesLibPath();
 
     YAML::Node dag_configuration_node;
-    get_base_dag_configuration(dag_configuration_node);
+    getBaseDAGConfiguration(dag_configuration_node);
     YAML::Node yaml_node;
     yaml_node["DAG"] = std::map<std::string, YAML::Node>(
-            {{YAMLDagDeserializer::TITLE_KEY, YAML::Node("Test YAML DAG")},
-             {YAMLDagDeserializer::CONFIGURATION_KEY, dag_configuration_node}});
+            {{YAMLDAGDeserializer::title_key, YAML::Node("Test YAML DAG")},
+             {YAMLDAGDeserializer::configuration_key,
+              dag_configuration_node}});
     YAML::Node first_vertex;
-    first_vertex[std::string(YAMLDagDeserializer::UUID_KEY)] = TEST_UUID_1;
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)] = YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::uuid_key)] = test_uuid_1;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)] = YAML::Node();
     const std::string uuid1_task_label = "A named task";
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::name_key)] =
                         YAML::Node(uuid1_task_label);
 
     YAML::Node task_config;
-    get_base_task_configuration(task_config);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CONFIGURATION_KEY)] =
+    getBaseTaskConfiguration(task_config);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::configuration_key)] =
                         task_config;
 
     YAML::Node task_initial_inputs;
-    get_base_task_initial_inputs(task_initial_inputs);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::INITIAL_INPUTS_KEY)] =
+    getBaseTaskInitialInputs(task_initial_inputs);
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::initial_inputs_key)] =
                         task_initial_inputs;
 
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)] = YAML::Node();
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)] =
+                        YAML::Node();
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::library_name_key)] =
                         YAML::Node(lib_path);
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_TYPE_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::callback_type_key)] =
                         YAML::Node("Plugin");
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::CALLBACK_KEY)]
-                [std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::callback_key)]
+                [std::string(YAMLDAGDeserializer::symbol_name_key)] =
                         YAML::Node("task_callback_plugin");
     YAML::Node stage_node;
-    stage_node[std::string(YAMLDagDeserializer::NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::name_key)] =
             YAML::Node("PrintStage");
-    stage_node[std::string(YAMLDagDeserializer::LIBRARY_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::library_name_key)] =
             YAML::Node(stages_lib_path);
-    stage_node[std::string(YAMLDagDeserializer::SYMBOL_NAME_KEY)] =
+    stage_node[std::string(YAMLDAGDeserializer::symbol_name_key)] =
             "print_stage";
     std::vector<YAML::Node> stage_nodes = {stage_node};
-    first_vertex[std::string(YAMLDagDeserializer::TASK_KEY)]
-                [std::string(YAMLDagDeserializer::STAGES_KEY)] = stage_nodes;
+    first_vertex[std::string(YAMLDAGDeserializer::task_key)]
+                [std::string(YAMLDAGDeserializer::stages_key)] = stage_nodes;
     std::vector<YAML::Node> vertices = {first_vertex};
-    yaml_node[std::string(YAMLDagDeserializer::DAG_KEY)]
-             [std::string(YAMLDagDeserializer::VERTICES_KEY)] = vertices;
+    yaml_node[std::string(YAMLDAGDeserializer::dag_key)]
+             [std::string(YAMLDAGDeserializer::vertices_key)] = vertices;
     auto test_dag = yaml_node.as<std::unique_ptr<com::dag_scheduler::DAG>>();
     ASSERT_TRUE(test_dag != nullptr);
     std::shared_ptr<DAGVertex> test_vertex =
-            test_dag->find_vertex_by_uuid(UUID(TEST_UUID_1)).lock();
+            test_dag->findVertexByUUID(UUID(test_uuid_1)).lock();
     EXPECT_TRUE(test_vertex != nullptr);
-    EXPECT_TRUE(test_vertex->get_task() != nullptr);
+    EXPECT_TRUE(test_vertex->getTask() != nullptr);
     std::size_t stage_count = 0;
-    test_vertex->get_task()->iterate_stages([&](TaskStage& stage) -> bool {
+    test_vertex->getTask()->iterateStages([&](TaskStage& stage) -> bool {
         std::string actual_type_str = typeid(stage).name();
         auto expected_type_substr = "PrintStage";
         EXPECT_TRUE(actual_type_str.find(expected_type_substr) !=
@@ -2819,21 +2824,19 @@ TEST(TestYAMLDagDeserializer,
     });
     EXPECT_EQ(1, stage_count);
     std::string expected_config_json_str;
-    test_dag->json_config_str(expected_config_json_str);
-    EXPECT_EQ(expected_config_json_str,
-              get_base_dag_configuration_as_json_str());
+    test_dag->jsonConfigStr(expected_config_json_str);
+    EXPECT_EQ(expected_config_json_str, getBaseDAGConfigurationAsJsonStr());
 
     std::string uuid1_task_config_str;
-    test_vertex->get_task()->json_config_str(uuid1_task_config_str);
-    std::string expected_task_config_str =
-            get_base_task_configuration_as_json_str();
+    test_vertex->getTask()->jsonConfigStr(uuid1_task_config_str);
+    std::string expected_task_config_str = getBaseTaskConfigurationAsJsonStr();
     EXPECT_EQ(expected_task_config_str, uuid1_task_config_str);
 
     std::string uuid1_task_initial_inputs_str;
-    test_vertex->get_task()->json_initial_inputs_str(
+    test_vertex->getTask()->jsonInitialInputsStr(
             uuid1_task_initial_inputs_str);
     std::string expected_task_initial_inputs_str =
-            get_base_task_initial_inputs_as_json_str();
+            getBaseTaskInitialInputsAsJsonStr();
     EXPECT_EQ(expected_task_initial_inputs_str, uuid1_task_initial_inputs_str);
 
     std::cout << yaml_node << "Dude" << std::endl;
